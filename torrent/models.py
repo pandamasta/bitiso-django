@@ -9,15 +9,18 @@ choicesSizeUnit = (('b',  _(u'b')),
                     ('Gb', _(u'Gb')))
 
 class Category(models.Model):
+    """
+    This class represent the categorie of torrents i
+    """
+
     class Meta:
         verbose_name        = _(u'Category')
         verbose_name_plural = _(u'Categories')
-        #db_tablespace = 'torrent_data'
-        # db_table = "'torrent'.'category'"
-        # why ?
+
         indexes = [
             models.Index(fields=['categoryParentId'], name='ix_category_categoryParentId'),
         ]
+
         unique_together = (('categoryParentId', 'name'), )
 
     def __str__(self):
@@ -36,16 +39,21 @@ class Category(models.Model):
     deletion = models.DateTimeField(_(u'Delete?'), blank=True, null=True)
 
 class Torrent(models.Model):
+    """
+    Torrent with all it's meta data to rebuild it on the fly 
+    Compliant with BEP 0003 
+    http://www.bittorrent.org/beps/bep_0003.html
+    """
+
     class Meta:
         verbose_name        = _(u'Torrent')
         verbose_name_plural = _(u'Torrents')
-        #db_tablespace = 'torrent_data'
-        # db_table = "'torrent'.'torrent'"
+
         indexes = [
             models.Index(fields=['categoryId'], name='ix_torrent_categoryId'),
             models.Index(fields=['uploader'], name='ix_torrent_uploader'),
         ]
-        #I comment it because it create some issue for the migration 0002 to 0003
+
         #unique_together = (('torrentFileName'), )
 
     def __str__(self):
@@ -77,9 +85,9 @@ class Torrent(models.Model):
     is_bitiso = models.BooleanField(_(u'Created by bitiso ?'),null=False, default=True)
 
 class TorrentStatSL(models.Model):
-    #class Meta:
-        #db_tablespace = 'torrent_tmp'
-        # db_table = "'torrenttmp'.'torrent_stats_sl'"
+    """
+    Live statistic of torrent hash
+    """
 
     def __str__(self):
         return u'Hash %s' % (self.hash)
