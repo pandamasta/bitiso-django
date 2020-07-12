@@ -25,7 +25,7 @@ SECRET_KEY = '!10aph(vk^c-^8*q!eho4w-))6zk((j%wpm65kw9rdak=p5i^s'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['51.75.123.90']
+ALLOWED_HOSTS = ['51.75.123.90','www.bitiso.org']
 
 
 # Application definition
@@ -119,3 +119,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = 'static'
+
+# Extra variable needed by used plugin
+
+TORRENT_URL = "/torrent"
+TORRENT_FILE_EXT = ".torrent"
+TORRENT_ROOT = "/home/owel/bitiso_data"
+TORRENT_ROOT_TMP = "/home/owel/bitiso_data/torrent_tmp"
+TORRENT_DATA = "/home/owel/bitiso_data/data"
+
+BITISO_CURRENT_URL = "http://www.bitiso.com/"
+BITISO_TRACKER_URL = "http://tracker.bitiso.net:6969/"
+BITISO_TRACKER_STATS_PAGE = "stats?mode=tpbs&format=txt"
+
