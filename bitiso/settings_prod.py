@@ -25,7 +25,7 @@ SECRET_KEY = '!10aph(vk^c-^8*q!eho4w-))6zk((j%wpm65kw9rdak=p5i^s'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['51.75.123.90','www.bitiso.org']
+ALLOWED_HOSTS = ['51.75.123.90','www.bitiso.org','127.0.0.1']
 
 
 # Application definition
@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'torrent'
+    'torrent',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
