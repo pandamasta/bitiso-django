@@ -10,7 +10,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ['DEBUG']
 
-ALLOWED_HOSTS = ['51.75.123.90','www.bitiso.org','127.0.0.1']
+ALLOWED_HOSTS = ['bitiso.org','www.bitiso.org','bitiso.net','www.bitiso.net','127.0.0.1','163.172.48.46']
 
 
 # Application definition
