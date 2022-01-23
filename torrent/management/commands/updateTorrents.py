@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from torrent.models import *
+from torrent.models import Torrent
 import os, shutil, filecmp, urllib.request
 from pathlib import Path
 
@@ -13,50 +13,60 @@ class Command(BaseCommand):
                             nargs='+', type=int)
     '''
     def handle(self, *args, **options):
-        pathFileTrackerStatsDL = os.path.join(settings.TORRENT_ROOT_TMP, 'trackerStats.txt')
-        pathFileTrackerStatsDLPrev = os.path.join(settings.TORRENT_ROOT_TMP, 'trackerStats_prev.txt')
+
+        tracker_stats_file_current = os.path.join(settings.BITISO_TRACKER_STATS_FILES, 'tracker_stats_curent.txt')
+        tracker_stats_file_last= os.path.join(settings.BITISO_TRACKER_STATS_FILES, 'tracker_stats_last.txt')
 
         try:
-            # Check statistics page with seeders/leechers
-            trackerStats = urllib.request.urlopen(settings.BITISO_TRACKER_URL + settings.BITISO_TRACKER_STATS_PAGE)
+            # Get statistics page with seeders/leechers
+            tracker_stats_live = urllib.request.urlopen(settings.BITISO_TRACKER_URL + settings.BITISO_TRACKER_STATS_PAGE)
             self.stdout.write(self.style.SUCCESS('Success during urlopen'))
         except:
             self.stdout.write(self.style.ERROR('Error during urlopen'))
             raise
 
-        # Copy previous statistics page if exist
-        if Path(pathFileTrackerStatsDL).is_file():
-            shutil.copyfile(pathFileTrackerStatsDL, pathFileTrackerStatsDLPrev)
+        # Check if files stats exist
 
-        trackerStatsSL = open(pathFileTrackerStatsDL, 'w')
-        trackerStatsSL.write(trackerStats.read().decode('utf-8'))
-        trackerStatsSL.close()
+        if not os.path.exists(tracker_stats_file_current):
+            print ('Create ' + tracker_stats_file_current)
+            open(tracker_stats_file_current, 'a').close()
+
+        if not os.path.exists(tracker_stats_file_last):
+            print ('Create ' + tracker_stats_file_last)
+            open(tracker_stats_file_last, 'a').close()
+
+        # Move current stats file to last stat file
+
+        print ('Copy previous stat from ' + tracker_stats_file_current + ' to ' + tracker_stats_file_last)
+        shutil.copyfile(tracker_stats_file_current, tracker_stats_file_last)
+
+        # Pull live tracker stats to file 
+
+        print ('Insert tracker live stats to ' + tracker_stats_file_current)
+        f1 = open(tracker_stats_file_current, 'w')
+        f1.write(tracker_stats_live.read().decode('utf-8'))
+        f1.close()
 
         # Files are differents (current vs previous)
-        if Path(pathFileTrackerStatsDLPrev).is_file() and not filecmp.cmp(pathFileTrackerStatsDL, pathFileTrackerStatsDLPrev):
-            TorrentStatSL.objects.all().delete()
-            trackerStatsSL = open(pathFileTrackerStatsDL, 'r')
 
-            torrentStat = TorrentStatSL()
-            # Update
-            for trackerStatLine in trackerStatsSL.readlines():
-                torrentInfos = trackerStatLine.split(':')
-                torrentStat.hash = torrentInfos[0]
-                torrentStat.seederNr = torrentInfos[1]
-                torrentStat.leecherNr = torrentInfos[2]
+        if not filecmp.cmp(tracker_stats_file_current, tracker_stats_file_last):
+            print ("There is diff")
 
-                try:
-                    torrentStat.save()
-                except:
-                    pass
+            with open(tracker_stats_file_current, 'r') as file1:
+                with open(tracker_stats_file_last, 'r') as file2:
+                    #same = set(file1).intersection(file2)
+                    diff = set(file1).difference(file2)
+            diff.discard('\n')
 
-            trackerStatsSL.close()
+            # Update database with new leach and seed value
+            for line in diff:
+                line_split=line.rstrip("\n").split(':')
+                print(line_split)
 
-            try:
-                Torrent.objects.raw('UPDATE torrent_Torrent AS t ' +
-                                    'SET seed = tsl.seederNr, leech = tsl.leecherNr ' +
-                                    'FROM torrent_TorrentStatSL AS tsl ' +
-                                    'WHERE t.hash = tsl.hash;')
-                self.stdout.write(self.style.SUCCESS('Successfully update torrent statistics!'))
-            except:
-                self.stdout.write(self.style.ERROR('Error during update torrent statistics!'))
+                q = Torrent.objects.get(hash=line_split[0].lower())
+                q.seed = line_split[1]
+                q.leech = line_split[2]
+                q.save()
+
+        else:
+            print ("No diff")
