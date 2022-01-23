@@ -5,7 +5,18 @@ from .serializers import TorrentSerializer
 from .models import Torrent
 
 def index(request):
-    return HttpResponse("Bitiso.org index page")
+
+    torrent_list = Torrent.objects.all()
+    context = {'torrent_list': torrent_list}
+
+    return render(request, 'torrent/index.html', context)
+
+def detail(request, hash_sha1):
+
+    torrent_detail = Torrent.objects.get(hash=hash_sha1)
+    context = {'torrent_detail': torrent_detail}
+
+    return render(request, 'torrent/details.html', context)
 
 class TorrentViewSet(viewsets.ModelViewSet):
     queryset = Torrent.objects.all()

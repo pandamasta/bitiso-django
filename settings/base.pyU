@@ -11,7 +11,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = os.environ['DEBUG']
 
 ALLOWED_HOSTS = ['localhost','bitiso.org','www.bitiso.org','bitiso.net','www.bitiso.net','127.0.0.1','163.172.48.46']
-CSRF_TRUSTED_ORIGINS = ['https://www.bitiso.org']
+
 
 # Application definition
 
@@ -74,7 +74,7 @@ DATABASES = {
         'USER': 'bitiso',
         'PASSWORD': 'bitiso',
         #'HOST': '/var/run/postgresql/.s.PGSQL.5432',
-        #'PORT': '5432',
+        #'PORT': '5433',
     }
 }
 
@@ -115,12 +115,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/srv/bitiso/static'
 
-MEDIA_ROOT= '/srv/bitiso/media'
-
-# Media root
-
+STATIC_ROOT = 'static'
 
 # Extra variable needed by used plugin
 
@@ -129,8 +125,6 @@ TORRENT_FILE_EXT =  os.environ['TORRENT_FILE_EXT']
 TORRENT_ROOT =  os.environ['TORRENT_ROOT']
 TORRENT_ROOT_TMP =  os.environ['TORRENT_ROOT_TMP']
 TORRENT_DATA =  os.environ['TORRENT_DATA']
-TORRENT_DATA_TMP =  os.environ['TORRENT_DATA_TMP']
-TORRENT_FILES =  os.environ['TORRENT_FILES']
 
 BITISO_CURRENT_URL =  os.environ['BITISO_CURRENT_URL']
 BITISO_TRACKER_URL =  os.environ['BITISO_TRACKER_URL']

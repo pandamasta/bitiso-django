@@ -1,0 +1,37 @@
+{% extends "torrent/base.html" %}
+{% block title %}Bitiso.org{% endblock %}
+{% block content %}
+    <h1>Detail of {{ torrent_detail.name }}</h1>
+
+
+    {{ torrent_detail.hash }}</br> 
+    {{ torrent_detail.name}} </br> 
+    {{ torrent_detail.size}} </br> 
+    {{ torrent_detail.pieces}} </br> 
+    {{ torrent_detail.piece_size }} </br> 
+    {{ torrent_detail.magnet}} </br> 
+    {{ torrent_detail.torrent_filename}} </br> 
+
+    # Other field that describe the torrent
+
+    {{ torrent_detail.category_id }} </br> 
+    {{ torrent_detail.is_bitiso }} </br> 
+    {{ torrent_detail.description }}</br>  
+    {{ torrent_detail.website_url }} </br> 
+    {{ torrent_detail.website_url_download }} </br> 
+    {{ torrent_detail.website_url_repo }} </br> 
+    {{ torrent_detail.architecture }} </br> 
+    {{ torrent_detail.version }} </br> 
+    {{ torrent_detail.gpg_signature}} </br> 
+    {{ torrent_detail.metainfo_file}} </br> 
+
+
+    {{ torrent_detail.creation }}</br> 
+    
+    # Stats
+
+    {{ torrent_detail.seed }}</br> 
+   {{ torrent_detail.leech }}</br> 
+   {{ torrent_detail.dl_number }}</br> 
+   {{ torrent_detail.dl_completed }}</br> 
+{% endblock %}

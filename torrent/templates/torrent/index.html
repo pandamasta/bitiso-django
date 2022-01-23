@@ -1,0 +1,28 @@
+{% extends "torrent/base.html" %}
+{% block title %}List of torrents{% endblock %}
+{% block content %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Torrent file</th>
+                <th>Magnet</th>
+                <th>Seed</th>
+                <th>Leach</th>
+            </tr>
+        </thead>
+        <tbody>
+{% for torrent in torrent_list %}
+            <tr>
+                <td><a href="detail/{{ torrent.hash }}">{{ torrent.name }}</a></td>
+                <td>{{ torrent.size | filesizeformat  }}</td>
+                <td><a href="{{ torrent.metainfo_file }}">Torrent</a></td>
+                <td><a href="{{ torrent.magnet }}">Magnet</a></td>
+                <td>{{ torrent.seed }}</td>
+                <td>{{ torrent.leech }}</td>
+            </tr>
+{% endfor %}
+        <tbody>
+    </table>
+{% endblock %}
