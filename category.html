@@ -13,16 +13,16 @@
                 <th>Torrent file</th>
                 <th>Magnet</th>
                 <th>Seed</th>
-                <th>Leech</th>
+                <th>Leach</th>
             </tr>
         </thead>
         <tbody>
 {% for torrent in torrent_list %}
             <tr>
-                <td><a href="/category/{{ torrent.category_id.id }}">{{ torrent.category_id.name }}</a></td>
-                <td><a href="/detail/{{ torrent.info_hash }}">{{ torrent.name }}</a></td>
-                <td>{{ torrent.creation }}</td>
+                <td>{{ torrent.category_id.name }}</td>
+                <td><a href="detail/{{ torrent.info_hash }}">{{ torrent.name }}</a></td>
                 <td>{{ torrent.size | filesizeformat  }}</td>
+                <td>{{ torrent.creation }}</td>
                 <td><a href="{{ torrent.metainfo_file }}">Torrent</a></td>
                 <td><a href="{{ torrent.magnet }}">Magnet</a></td>
                 <td>{{ torrent.seed }}</td>

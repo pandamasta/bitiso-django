@@ -126,8 +126,8 @@ MEDIA_ROOT= '/srv/bitiso/media'
 
 TORRENT_URL =  os.environ['TORRENT_URL']
 TORRENT_FILE_EXT =  os.environ['TORRENT_FILE_EXT']
-TORRENT_ROOT =  os.environ['TORRENT_ROOT']
-TORRENT_ROOT_TMP =  os.environ['TORRENT_ROOT_TMP']
+#TORRENT_ROOT =  os.environ['TORRENT_ROOT']
+#TORRENT_ROOT_TMP =  os.environ['TORRENT_ROOT_TMP']
 TORRENT_DATA =  os.environ['TORRENT_DATA']
 TORRENT_DATA_TMP =  os.environ['TORRENT_DATA_TMP']
 TORRENT_FILES =  os.environ['TORRENT_FILES']

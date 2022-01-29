@@ -6,13 +6,13 @@ from torrent.models import Torrent
 import shutil
 
 class Command(BaseCommand):
-    help = "all sha1"
+    help = "All info_hash in DB"
 
 
     def handle(self, *args, **kwargs):
 
         for i in Torrent.objects.all():
-           print(i.hash)
+           print(i.info_hash)
 
            #self.stdout.write(absolute_path)
 

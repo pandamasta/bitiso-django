@@ -6,7 +6,7 @@ from torrent.models import Torrent
 import shutil
 
 class Command(BaseCommand):
-    help = "Create a torrent aka metainfo file from file or direcotry"
+    help = "Create a torrent (metainfo file) from file or direcotry"
     def add_arguments(self, parser):
 
         # Optional argument
@@ -27,15 +27,21 @@ class Command(BaseCommand):
                        trackers=['http://tracker.bitiso.net:6969/announce'],
                        comment='Torrent created by bitiso.org')
 
+
            t.private = True
            t.generate()
 
-           t.write(os.path.join(settings.TORRENT_FILES,t.name+'.torrent'))
+           #t.write(os.path.join(settings.TORRENT_FILES,t.name+'.torrent'))
 
 
            # Insert general metadata in DB
 
-           obj = Torrent(hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size, magnet=t.magnet(),torrent_filename=t.name + '.torrent',metainfo_file='torrent/'+ t.name + '.torrent')
+           file_list=''
+           for i in t.files:
+               file_list+=str(i.name + ';' +  str(i.size) + '\n')
+               print(file_list)
+
+           obj = Torrent(info_hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size, magnet=t.magnet(),torrent_filename=t.name + '.torrent',metainfo_file='torrent/'+ t.name + '.torrent', file_list=file_list, file_nbr=len(t.files))
            
            obj.save()
 
@@ -43,14 +49,14 @@ class Command(BaseCommand):
 
 
            # absolute path
-           src_path = absolute_path
-           dst_path = settings.TORRENT_DATA + '/' + i
+           #src_path = absolute_path
+           #dst_path = settings.TORRENT_DATA + '/' + i
 
-           print (src_path)
-           print (dst_path)
-           shutil.move(src_path, dst_path)
+           #print (src_path)
+           #print (dst_path)
+           #shutil.move(src_path, dst_path)
 
-           self.stdout.write(absolute_path)
+           #self.stdout.write(absolute_path)
 
         #path = kwargs['path']
 

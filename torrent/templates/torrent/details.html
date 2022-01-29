@@ -3,15 +3,16 @@
 {% block content %}
     <h1>Detail of {{ torrent_detail.name }}</h1>
 
+<!-- Torrent general information -->
 <dl class="row">
   <dt class="col-sm-3">Info hash</dt>
-  <dd class="col-sm-9">{{ torrent_detail.hash}}</dd>
+  <dd class="col-sm-9">{{ torrent_detail.info_hash}}</dd>
 
   <dt class="col-sm-3">Name</dt>
   <dd class="col-sm-9">{{ torrent_detail.name}} </dd>
 
   <dt class="col-sm-3">Size</dt>
-  <dd class="col-sm-9">{{ torrent_detail.size}} </dd>
+  <dd class="col-sm-9">{{ torrent_detail.size | filesizeformat }} ({{torrent_detail.size}} byte) </dd>
 
   <dt class="col-sm-3">Pieces</dt>
   <dd class="col-sm-9">{{ torrent_detail.pieces}} </dd>
@@ -19,22 +20,41 @@
   <dt class="col-sm-3">Piece Size</dt>
   <dd class="col-sm-9">{{ torrent_detail.piece_size}} </dd>
 
+  <dt class="col-sm-3">Creation</dt>
+  <dd class="col-sm-9">{{ torrent_detail.creation }} </dd>
+
+  <dt class="col-sm-3">Trackers</dt>
+  <dd class="col-sm-9">
+	   {% for tracker in torrent_detail.trackers.all %} 
+	   {{ tracker.url }} <br/>
+	   {% endfor %}
+  </dd>
+
   <dt class="col-sm-3">Magnet</dt>
   <dd class="col-sm-9">{{ torrent_detail.magnet}} </dd>
 
-  <dt class="col-sm-3">Torrent filename</dt>
-  <dd class="col-sm-9">{{ torrent_detail.torrent_filename}} </dd>
-<!--
--->
+  <dt class="col-sm-3">Metainfo file (.torrent)</dt>
+  <dd class="col-sm-9"><a href="/{{ torrent_detail.metainfo_file }} ">{{ torrent_detail.torrent_filename }}</a></dd>
+                
+  <dt class="col-sm-3">GPG signature</dt>
+  <dd class="col-sm-9">{{ torrent_detail.gpg_signature }} </dd>
 
   <dt class="col-sm-3">Created by bitiso</dt>
   <dd class="col-sm-9">{{ torrent_detail.is_bitiso}} </dd>
+
+  <dt class="col-sm-3">File numbers</dt>
+  <dd class="col-sm-9">{{ torrent_detail.file_nbr}} </dd>
+
+  <dt class="col-sm-3">File list</dt>
+  <dd class="col-sm-9"><pre>{{ torrent_detail.file_list}}</pre></dd>
+
+<!-- Torrent bitiso extra information -->
 
   <dt class="col-sm-3">Description</dt>
   <dd class="col-sm-9"> <p> {{ torrent_detail.description }} </p></dd>
 
   <dt class="col-sm-3">Website URL</dt>
-  <dd class="col-sm-9">{{ torrent_detail.website_url }} </dd>
+  <dd class="col-sm-9"><a href="{{ torrent_detail.website_url }}">{{ torrent_detail.website_url }}</a></dd>
 
   <dt class="col-sm-3">Website URL download</dt>
   <dd class="col-sm-9">{{ torrent_detail.website_url_download }} </dd>
@@ -48,24 +68,17 @@
   <dt class="col-sm-3">Version</dt>
   <dd class="col-sm-9">{{ torrent_detail.version }} </dd>
 
-  <dt class="col-sm-3">GPG signature</dt>
-  <dd class="col-sm-9">{{ torrent_detail.gpg_signature }} </dd>
 
-  <dt class="col-sm-3">Metainfo file</dt>
-  <dd class="col-sm-9">{{ torrent_detail.metainfo_file }} </dd>
-
-  <dt class="col-sm-3">Creation</dt>
-  <dd class="col-sm-9">{{ torrent_detail.creation }} </dd>
 </dl>
 
 <!--
   <ul class="list-group list-group-flush">
-  <li class="list-group-item">Info hash : {{ torrent_detail.hash }}</li>
+  <li class="list-group-item">Info hash : {{ torrent_detail.info_hash }}</li>
 -->
 
 <!--
   </li>
-    {{ torrent_detail.hash }}</br>
+    {{ torrent_detail.info_hash }}</br>
     {{ torrent_detail.name}} </br> 
     {{ torrent_detail.size}} </br> 
     {{ torrent_detail.pieces}} </br> 

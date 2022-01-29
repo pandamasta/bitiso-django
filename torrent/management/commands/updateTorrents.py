@@ -17,8 +17,9 @@ class Command(BaseCommand):
         tracker_stats_file_current = os.path.join(settings.BITISO_TRACKER_STATS_FILES, 'tracker_stats_curent.txt')
         tracker_stats_file_last= os.path.join(settings.BITISO_TRACKER_STATS_FILES, 'tracker_stats_last.txt')
 
+        # Get statistics page with seeders/leechers
+
         try:
-            # Get statistics page with seeders/leechers
             tracker_stats_live = urllib.request.urlopen(settings.BITISO_TRACKER_URL + settings.BITISO_TRACKER_STATS_PAGE)
             self.stdout.write(self.style.SUCCESS('Success during urlopen'))
         except:
@@ -37,8 +38,8 @@ class Command(BaseCommand):
 
         # Move current stats file to last stat file
 
-        print ('Copy previous stat from ' + tracker_stats_file_current + ' to ' + tracker_stats_file_last)
-        shutil.copyfile(tracker_stats_file_current, tracker_stats_file_last)
+#        print ('Copy previous stat from ' + tracker_stats_file_current + ' to ' + tracker_stats_file_last)
+#        shutil.copyfile(tracker_stats_file_current, tracker_stats_file_last)
 
         # Pull live tracker stats to file 
 
@@ -63,10 +64,24 @@ class Command(BaseCommand):
                 line_split=line.rstrip("\n").split(':')
                 print(line_split)
 
-                q = Torrent.objects.get(hash=line_split[0].lower())
+                q = Torrent.objects.get(info_hash=line_split[0].lower())
                 q.seed = line_split[1]
                 q.leech = line_split[2]
                 q.save()
 
+
+            shutil.move(tracker_stats_file_current, tracker_stats_file_last)
+
+
         else:
             print ("No diff")
+
+        # Update all torrents stats in DB
+       # print ('Update all torrent stats')
+       # with open(tracker_stats_file_current) as file:
+       #     for line in file:
+       #         line_split=line.rstrip().split(':')
+       #         q = Torrent.objects.get(info_hash=line_split[0].lower())
+       #         q.seed = line_split[1]
+       #         q.leech = line_split[2]
+       #         q.save()
