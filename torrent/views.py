@@ -6,7 +6,13 @@ from .models import Torrent
 
 def index(request):
 
-    torrent_list = Torrent.objects.filter(is_active=True).order_by('-creation')
+    #torrent_list = Torrent.objects.filter(is_active=True).order_by('-creation')
+    #torrent_list = "test" 
+    try:
+      torrent_list =  Torrent.objects.filter(is_active=True).order_by('-creation')
+    except Torrent.DoesNotExist:
+      torrent_list = None
+
     context = {'torrent_list': torrent_list}
 
     return render(request, 'torrent/index.html', context)

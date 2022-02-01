@@ -17,6 +17,7 @@
             </tr>
         </thead>
         <tbody>
+{% if torrent_list %}
 {% for torrent in torrent_list %}
             <tr>
                 <td><a href="/category/{{ torrent.category_id.id }}">{{ torrent.category_id.name }}</a></td>
@@ -29,6 +30,7 @@
                 <td>{{ torrent.leech }}</td>
             </tr>
 {% endfor %}
+{% endif %}
         <tbody>
     </table>
 <!--    </div> -->

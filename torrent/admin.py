@@ -4,7 +4,6 @@ from .models import *
 
 admin.site.register(Category)
 admin.site.register(Tracker)
-admin.site.register(TorrentStatSL)
 
 @admin.action(description='Show torrent in frontend')
 def make_published(modeladmin, request, queryset):

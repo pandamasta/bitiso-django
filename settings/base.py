@@ -8,7 +8,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ['DEBUG']
+#DEBUG = os.environ['DEBUG']
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost','bitiso.org','www.bitiso.org','bitiso.net','www.bitiso.net','127.0.0.1','163.172.48.46']
 CSRF_TRUSTED_ORIGINS = ['https://www.bitiso.org']
@@ -23,7 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'torrent',
-    'rest_framework',
+    #'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -69,12 +70,13 @@ WSGI_APPLICATION = 'bitiso.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bitiso',
-        'USER': 'bitiso',
-        'PASSWORD': 'bitiso',
+        'ENGINE': os.environ['DB_ENGINE'],
+        'NAME': os.environ['DB_NAME'],
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
         #'HOST': '/var/run/postgresql/.s.PGSQL.5432',
-        #'PORT': '5432',
+        'HOST': os.environ['DB_HOST'],
+        'PORT':  os.environ['DB_PORT'],
     }
 }
 
