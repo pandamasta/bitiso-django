@@ -117,10 +117,11 @@ class Command(BaseCommand):
            src_path = absolute_path
            dst_path = settings.TORRENT_DATA + "/" 
 
-           shutil.move(src_path, dst_path)
-
            print ("Move file " + src_path)
            print ("To :" + dst_path)
+
+           shutil.move(src_path, dst_path)
+
 
            #self.stdout.write(absolute_path)
 

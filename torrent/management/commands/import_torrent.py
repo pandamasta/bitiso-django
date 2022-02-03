@@ -20,12 +20,20 @@ class Command(BaseCommand):
         
         t = Torrenttorf.read
 
-        for i in os.listdir('/home/panda/exiting_torrent/'):
-           absolute_path = os.path.join('/home/panda/exiting_torrent/',i)
+        torrent_file_tmp=settings.TORRENT_FILES_TMP
+
+        for i in os.listdir(torrent_file_tmp):
+           absolute_path = os.path.join(torrent_file_tmp,i)
 
            ## Read meta info from .torrent
 
            t = Torrenttorf.read(absolute_path)
+
+           # Check if infohash exit in DB
+
+           if Torrent.objects.filter(info_hash=t.infohash).exists():
+             print("Info hash " + t.infohash + " already exist in DB. skip")
+             continue
 
            # Insert bitiso tracker
 
@@ -52,12 +60,11 @@ class Command(BaseCommand):
 
              list_of_tracker_id.append(Tracker.objects.get(url=tracker_url_sanitized).id)
            print(list_of_tracker_id)
-             #list_of_tracker_id.append(Tracker.objects.get(name=tracker_url_sanitized))
               
          
-#
-#           # Insert general metadata in DB
-#
+
+           # Insert general metadata in DB
+
            file_list=''
            for i in t.files:
                file_list+=str(i.name + ';' +  str(i.size) + '\n')
@@ -74,15 +81,13 @@ class Command(BaseCommand):
 #           # Move data to torrent client path
 #
 #
-#           # absolute path
-#           #src_path = absolute_path
-#           #dst_path = settings.TORRENT_DATA + '/' + i
-#
-#           #print (src_path)
-#           #print (dst_path)
-#           #shutil.move(src_path, dst_path)
-#
-#           #self.stdout.write(absolute_path)
-#
-#        #path = kwargs['path']
-#
+           # absolute path
+           src_path = absolute_path
+           dst_path = settings.TORRENT_FILES_TMP_OK
+
+           print ("Move file " + src_path)
+           print ("To :" + dst_path)
+
+           shutil.move(src_path, dst_path + '/' + t.name  + '.torrent')
+
+           #self.stdout.write(absolute_path)

@@ -50,10 +50,10 @@ class Torrent(models.Model):
 
     info_hash = models.CharField(_(u'SHA1 of torrent'), max_length=40, primary_key=True)
     name = models.CharField(_(u'Name'), max_length=128, null=False)
-    size = models.IntegerField(_(u'Size'), null=False, default=0)
+    size = models.PositiveBigIntegerField(_(u'Size'), null=False, default=0)
     pieces = models.IntegerField(_(u'Number of piece'), null=False, default=1)
     piece_size = models.IntegerField(_(u'Piece size in byte'), null=False, default=0)
-    magnet= models.CharField(_(u'Magnet URI'), max_length=2000, null=False, default="NONAME")
+    magnet= models.TextField(_(u'Magnet URI'), null=False, default="NONAME")
     torrent_filename= models.CharField(_(u'Torrent file name'), max_length=128, null=False, default="NONAME")
     comment = models.CharField(_(u'Comment'), max_length=256, null=False, default="NONAME")
     trackers = models.ManyToManyField(Tracker)

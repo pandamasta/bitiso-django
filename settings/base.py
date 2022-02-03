@@ -9,7 +9,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = os.environ['DEBUG']
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost','bitiso.org','www.bitiso.org','bitiso.net','www.bitiso.net','127.0.0.1','163.172.48.46']
 CSRF_TRUSTED_ORIGINS = ['https://www.bitiso.org']
@@ -126,13 +126,13 @@ MEDIA_ROOT= '/srv/bitiso/media'
 
 # Extra variable needed by used plugin
 
-TORRENT_URL =  os.environ['TORRENT_URL']
+#TORRENT_URL =  os.environ['TORRENT_URL']
 TORRENT_FILE_EXT =  os.environ['TORRENT_FILE_EXT']
-#TORRENT_ROOT =  os.environ['TORRENT_ROOT']
-#TORRENT_ROOT_TMP =  os.environ['TORRENT_ROOT_TMP']
 TORRENT_DATA =  os.environ['TORRENT_DATA']
 TORRENT_DATA_TMP =  os.environ['TORRENT_DATA_TMP']
 TORRENT_FILES =  os.environ['TORRENT_FILES']
+TORRENT_FILES_TMP =  os.environ['TORRENT_FILES_TMP']
+TORRENT_FILES_TMP_OK =  os.environ['TORRENT_FILES_TMP_OK']
 
 BITISO_CURRENT_URL =  os.environ['BITISO_CURRENT_URL']
 BITISO_TRACKER_URL =  os.environ['BITISO_TRACKER_URL']
