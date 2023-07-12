@@ -1,91 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-<style type="text/css">
-
-body { 
-background: #181A1B; 
-color: #d1cdc7;
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
+    <title>Responsive Side Menu &ndash; Layout Examples &ndash; Pure</title>
+    <link rel="stylesheet" href="/static/css/pure-min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<style>
+pre {
+  color: rgb(255, 117, 26);
 }
-
-nav.navbar. {
-background: #1b1e1f;
-}
-
-nav {
-background: #1b1e1f;
-}
-
-
-a.navbar-brand {
-
-color: pink;
-
-}
-
-a.nav-link {
-color: yellow;
-
-}
-
-a {
-
-color: #2394FD;
-
-}
-
-th {
-
-color: #d1cdc7;
-
-}
-
-.table {
-
-#border-color: rgba(209,205,199,1);
-color: #a9a9a9;
-#color: #a9a9a9;
-#border-color: rgb(56, 61, 63);
-}
-
-thead, tr {
-    border-color: rgba(56,61,63,1);
-    border-style: solid;
-    #border-width: 0;
-}
-
-#.table>:not(caption)>*>*{
-#padding: 0px;
-
-#}
-
-td {
-color: #d1cdc7;
-
-}
-
 </style>
-    <title>
-      {% block title %} {% endblock %}
-    </title>
-  </head>
-  <body>
-<!-- 
--->
+<body>
 
-    <main  class="container">
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
     {% include "torrent/menu.html" %}
+
+    <div id="main">
+        <div class="header">
+
+        <pre>
+ _      _  _    _                             _   
+| |__  (_)| |_ (_) ___   ___     _ __    ___ | |_ 
+| '_ \ | || __|| |/ __| / _ \   | '_ \  / _ \| __|
+| |_) || || |_ | |\__ \| (_) |_ | | | ||  __/| |_ 
+|_.__/ |_| \__||_||___/ \___/(_)|_| |_| \___| \__|
+        </pre>
+            <!-- <h2></h2> -->
+        </div>
+
+        <div class="content">
     {% block content %}
     {% endblock %}
-    {% include "torrent/footer.html" %}
-    </main>
+       </div>
+</div>
 
-   </body>
+<script src="/static/js/ui.js"></script>
+
+</body>
 </html>
 

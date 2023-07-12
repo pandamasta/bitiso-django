@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from rest_framework import viewsets
-from .serializers import TorrentSerializer
+#from rest_framework import viewsets
+#from .serializers import TorrentSerializer
 from .models import Torrent
 
 def index(request):
@@ -31,6 +31,6 @@ def category(request, category_id):
 
     return render(request, 'torrent/index.html', context)
 
-class TorrentViewSet(viewsets.ModelViewSet):
-    queryset = Torrent.objects.all()
-    serializer_class = TorrentSerializer
+#class TorrentViewSet(viewsets.ModelViewSet):
+#    queryset = Torrent.objects.all()
+#    serializer_class = TorrentSerializer

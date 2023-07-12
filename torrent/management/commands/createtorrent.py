@@ -11,7 +11,7 @@ import hashlib
 
 
 class Command(BaseCommand):
-    help = "Create a torrent (metainfo file) from file or direcotry"
+    help = "Create a torrent (metainfo file) from a file or a directory"
     def add_arguments(self, parser):
 
         # Optional argument

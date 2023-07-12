@@ -1,10 +1,8 @@
 {% extends "torrent/base.html" %}
 {% block title %}Bitiso.org{% endblock %}
 {% block content %}
-<div class="container d-flex h-100">
-  <!--  <div class="row align-self-center"> -->
-    <table class="table .table-sm">
-        <thead>
+<table class="pure-table pure-table-horizontal">
+    <thead>
             <tr>
                 <th>Category</th>
                 <th>Name</th>
@@ -15,7 +13,7 @@
                 <th>Seed</th>
                 <th>Leech</th>
             </tr>
-        </thead>
+    </thead>
         <tbody>
 {% if torrent_list %}
 {% for torrent in torrent_list %}
@@ -31,8 +29,6 @@
             </tr>
 {% endfor %}
 {% endif %}
-        <tbody>
-    </table>
-<!--    </div> -->
-</div>
+        </tbody>
+</table>
 {% endblock %}
