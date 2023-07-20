@@ -1,7 +1,6 @@
 *.pyc
 bitiso/__pycache__/
 db.sqlite3
-static/
 .env
 .env*
 .env_systemd
