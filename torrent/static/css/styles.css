@@ -1,5 +1,9 @@
+html {
+
+background-color: #181a1b;
+}
 body {
-    color: #777;
+	color: rgb(157, 148, 136);
 }
 
 .pure-img-responsive {
@@ -42,17 +46,19 @@ The content `<div>` is where all your content goes.
 .content {
     margin: 0 auto;
     padding: 0 2em;
-    max-width: 800px;
+    /*max-width: 400px;*/
     margin-bottom: 50px;
     line-height: 1.6em;
 }
 
 .header {
      margin: 0;
-     color: #333;
+     /*color: #333;*/
      text-align: center;
      padding: 2.5em 2em 0;
-     border-bottom: 1px solid #eee;
+     /*border-bottom: 1px solid #eee;*/
+     color: rgb(200, 195, 188);
+     border-bottom-color: rgb(53, 57, 59);
  }
     .header h1 {
         margin: 0.2em 0;
@@ -79,6 +85,7 @@ The `#menu` `<div>` is the parent `<div>` that contains the `.pure-menu` that
 appears on the left side of the page.
 */
 
+
 #menu {
     margin-left: -150px; /* "#menu" width */
     width: 150px;
@@ -89,6 +96,8 @@ appears on the left side of the page.
     z-index: 1000; /* so the menu or its navicon stays above all content */
     background: #191818;
     overflow-y: auto;
+    background-color: rgb(18, 20, 21);
+    background-image: none;
 }
     /*
     All anchors inside the menu should be styled like this.
@@ -245,4 +254,50 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         position: relative;
         left: 150px;
     }
+}
+
+.pure-table thead {
+	background-color: rgb(42, 45, 47);
+	color: rgb(232, 230, 227);
+}
+.pure-table-horizontal td, .pure-table-horizontal th {
+	border-bottom-color: rgb(63, 68, 71);
+}
+.pure-table {
+	border-color: rgb(63, 68, 71);
+}
+.seed {
+	background-color: transparent;
+	color: #6dff69;
+	
+}
+.leech {
+	background-color: transparent;
+	color: #ff2f2f;
+	
+}
+/*
+a {
+	color: #3391ff;
+}
+*/
+a:link {
+  color: rgb(230, 230, 230);
+  background-color: transparent;
+  text-decoration: none;
+}
+a:visited {
+  color: rgb(230, 230, 230);
+  background-color: transparent;
+  text-decoration: none;
+}
+a:hover {
+  color: rgb(202, 197, 255);
+  background-color: transparent;
+  text-decoration: underline;
+}
+a:active {
+  color: rgb(230, 230, 230);
+  background-color: transparent;
+  text-decoration: underline;
 }

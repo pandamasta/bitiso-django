@@ -1,5 +1,6 @@
 {% extends "torrent/base.html" %}
 {% block title %}Bitiso.org{% endblock %}
+{% load static %}
 {% block content %}
 <table class="pure-table pure-table-horizontal">
     <thead>
@@ -20,12 +21,12 @@
             <tr>
                 <td><a href="/category/{{ torrent.category_id.id }}">{{ torrent.category_id.name }}</a></td>
                 <td><a href="/detail/{{ torrent.info_hash }}">{{ torrent.name }}</a></td>
-                <td>{{ torrent.creation }}</td>
+                <td>{{ torrent.creation | date:"N n, Y" }}</td>
                 <td>{{ torrent.size | filesizeformat  }}</td>
-                <td><a href="{{ torrent.metainfo_file }}">Torrent</a></td>
-                <td><a href="{{ torrent.magnet }}">Magnet</a></td>
-                <td>{{ torrent.seed }}</td>
-                <td>{{ torrent.leech }}</td>
+                <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
+                <td><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+                <td class="seed">{{ torrent.seed }}</td>
+                <td class="leech">{{ torrent.leech }}</td>
             </tr>
 {% endfor %}
 {% endif %}

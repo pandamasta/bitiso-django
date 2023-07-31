@@ -7,8 +7,7 @@ import shutil
 import datetime
 import re
 import hashlib
-
-
+from django.conf import settings
 
 class Command(BaseCommand):
     help = "Create a torrent (metainfo file) from a file or a directory"
@@ -53,13 +52,12 @@ class Command(BaseCommand):
 
            print("File hash " + absolute_path + " " + sha256)
 
-
            ## Create the metainfo file .torrent
 
            now = datetime.datetime.now()
 
            t = Torrenttorf(absolute_path, 
-                       trackers=['http://tracker.bitiso.org:6969/announce'],
+                       trackers=[settings.TRACKER_ANNOUNCE],
                        comment='',
                        created_by='Bitiso.org',
                        creation_date=now)
@@ -83,6 +81,7 @@ class Command(BaseCommand):
            # Insert unknown tracker in DB
 
            list_of_tracker_id=[]
+           print(t.trackers)
            for tracker_url in t.trackers:
 
              tracker_url_sanitized=re.search('\'(.*)\'', str(tracker_url), re.IGNORECASE).group(1)

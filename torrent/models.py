@@ -30,7 +30,8 @@ class Tracker(models.Model):
     url = models.CharField(max_length=1000)
 
     def __str__(self):
-        return self.name 
+        return self.name
+
 
 
 class Torrent(models.Model):
@@ -56,7 +57,8 @@ class Torrent(models.Model):
     magnet= models.TextField(_(u'Magnet URI'), null=False, default="NONAME")
     torrent_filename= models.CharField(_(u'Torrent file name'), max_length=128, null=False, default="NONAME")
     comment = models.CharField(_(u'Comment'), max_length=256, null=False, default="NONAME")
-    trackers = models.ManyToManyField(Tracker)
+    #trackers = models.ManyToManyField(Tracker)
+    trackers = models.ManyToManyField(Tracker, through="TrackerStats")
     file_list = models.TextField(_(u'List of files'), null=False, default="NONAME")
     file_nbr = models.IntegerField(_(u'Number of file'), null=False, default=1)
 
@@ -85,3 +87,13 @@ class Torrent(models.Model):
     leech = models.IntegerField(_(u'Number of leech'), default=0)
     dl_number = models.IntegerField(_(u'Number of download'), default=0)
     dl_completed = models.IntegerField(_(u'Number of completed'), default=0)
+
+class TrackerStats(models.Model):
+    """
+    Tracker stats
+    """
+    torrent = models.ForeignKey(Torrent, on_delete=models.CASCADE)
+    tracker = models.ForeignKey(Tracker, on_delete=models.CASCADE)
+    seed = models.IntegerField(_(u'Number of seed'), default=0)
+    leech = models.IntegerField(_(u'Number of leech'), default=0)
+
