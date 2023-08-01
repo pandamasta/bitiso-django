@@ -57,7 +57,7 @@ class Command(BaseCommand):
            now = datetime.datetime.now()
 
            t = Torrenttorf(absolute_path, 
-                       trackers=[settings.TRACKER_ANNOUNCE],
+                       trackers=settings.TRACKER_ANNOUNCE,
                        comment='',
                        created_by='Bitiso.org',
                        creation_date=now)

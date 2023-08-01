@@ -40,7 +40,7 @@ class Command(BaseCommand):
             print("Insert bitiso tracker")
             print("Current Trackers in the torrent")
             print(t.trackers)
-            print("Insert tracker in the current list ")
+            print("Insert tracker from settings.TRACKER_ANNOUNCE ")
             t.trackers.insert(1, settings.TRACKER_ANNOUNCE)
             print("Tracker list after insert: " + str(t.trackers)  )
 
@@ -62,27 +62,31 @@ class Command(BaseCommand):
                     tracker=Tracker(url=tracker_url)
                     tracker.save()
                     list_of_tracker_id.append(tracker.id)
-#
+                else:
                     list_of_tracker_id.append(Tracker.objects.get(url=tracker_url).id)
-            print(list_of_tracker_id)
+#            print(list_of_tracker_id)
 #
 #
 #
 #            # Insert general metadata in DB
 #
-#            file_list=''
-#            for i in t.files:
-#                file_list+=str(i.name + ';' +  str(i.size) + '\n')
-#                print(file_list)
-#
-#            obj = Torrent(info_hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size, magnet=t.magnet(),torrent_filename=t.name + '.torrent',metainfo_file='torrent/'+ t.name + '.torrent', file_list=file_list, file_nbr=len(t.files))
-#
+            file_list=''
+            for i in t.files:
+                file_list+=str(i.name + ';' +  str(i.size) + '\n')
+                print(file_list)
+
+            obj = Torrent(info_hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size, magnet=t.magnet(),torrent_filename=t.name + '.torrent',metainfo_file='torrent/'+ t.name + '.torrent', file_list=file_list, file_nbr=len(t.files))
+
 # #
-#            obj.save()
+            obj.save()
 #
-#            for tracker_id in list_of_tracker_id:
-#              obj.trackers.add(tracker_id)
-# #
+            for tracker_id in list_of_tracker_id:
+                obj.trackers.add(tracker_id)
+
+            for tracker_local_id in settings.TRACKER_ANNOUNCE:
+                if not Tracker.objects.filter(url=tracker_local_id).exists():
+                    obj.trackers.add(Tracker.objects.filter(url=tracker_local_id).id())
+
 # #           # Move data to torrent client path
 # #
 # #
