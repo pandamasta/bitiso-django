@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from torrent.models import Tracker, TrackerStat
+from torrent.models import Torrent, Tracker, TrackerStat
 from tracker_scraper import scrape
 
 from urllib.parse import urlparse
@@ -39,4 +39,15 @@ class Command(BaseCommand):
                 torrent.seed = scrape_dict[tracker_id][info_hash]['seeds']
                 torrent.peers = scrape_dict[tracker_id][info_hash]['peers']
                 torrent.save()
+
+        # Update the torrent seed and leech with tracker stat level 0
+
+        torrents=Torrent.objects.all()
+
+        for t in torrents:
+            t_stats=TrackerStat.objects.filter(torrent_id=t.info_hash, level=0)[0]
+            t.seed = t_stats.seed
+            t.leech = t_stats.leech
+            t.save()
+
            #self.stdout.write(absolute_path)
