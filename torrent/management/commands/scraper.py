@@ -1,28 +1,37 @@
-#!/usr/bin/env python
-"""Simple script to scrape a tracker"""
-import bencode
-import urllib.request
+from django.core.management.base import BaseCommand
+from torrent.models import Tracker, TrackerStats
+from tracker_scraper import scrape
 
-SCRAPE_URL = 'http://tracker.bitiso.org:6969/scrape'
+from urllib.parse import urlparse
 
-def scrape(url=SCRAPE_URL):
-    """Return dict of scrape results"""
-    try:
-        with urllib.request.urlopen(url) as response:
-            binary_file = response.read()
-            print(binary_file)
-            return bencode.bdecode(response.read())
-    except(urllib.error.URLError):
-        print("Connection Refused")
 
-def print_scrape():
-    """Print files with pprint"""
-    from pprint import pprint
-    data = scrape()
-    files = data['files']
-    for file_hash in files:
-        pprint(file_hash)
-        pprint(files[file_hash])
+class Command(BaseCommand):
+    help = "Scrape tracker and update stats"
 
-if __name__ == '__main__':
-    print_scrape()
+    def handle(self, *args, **kwargs):
+
+        # def get_url_without_path(url):
+        #     parsed_url = urlparse(url)
+        #     url_without_path = f"{parsed_url.scheme}://{parsed_url.netloc}"
+        #     return url_without_path
+
+        hashes=[]
+        #for tracker in Tracker.objects.all():
+        for tracker in Tracker.objects.filter(id="29"):
+
+            #print(get_url_without_path(tracker.url))
+            print(tracker.url)
+
+            for torrent in TrackerStats.objects.filter(tracker_id=tracker.id):
+                print(torrent.torrent_id)
+                hashes.append(torrent.torrent_id)
+            print(scrape(tracker=tracker.url,hashes=hashes))
+
+           #self.stdout.write(absolute_path)
+
+# scrape(
+#     tracker='udp://tracker.opentrackr.org:1337',
+#     hashes=[
+#         "8df6e26142615621983763b729f640372cf1fc34",
+#     ]
+# )
