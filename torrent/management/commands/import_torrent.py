@@ -88,11 +88,8 @@ class Command(BaseCommand):
                 t.level=tracker_id[1]
                 t.save()
 
-            # for tracker_local_id in settings.TRACKER_ANNOUNCE:
-            #     if not Tracker.objects.filter(url=tracker_local_id).exists():
-            #         obj.trackers.add(Tracker.objects.filter(url=tracker_local_id).id())
 
-# #           # Move data to torrent client path
+# #          # Move data to torrent client path
 # #
 # #
 #            # absolute path
