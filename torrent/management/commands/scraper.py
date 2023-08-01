@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from torrent.models import Tracker, TrackerStats
+from torrent.models import Tracker, TrackerStat
 from tracker_scraper import scrape
 
 from urllib.parse import urlparse
@@ -22,7 +22,7 @@ class Command(BaseCommand):
             #print(get_url_without_path(tracker.url))
             print(tracker.url)
 
-            for torrent in TrackerStats.objects.filter(tracker_id=tracker.id):
+            for torrent in TrackerStat.objects.filter(tracker_id=tracker.id):
                 print(torrent.torrent_id)
                 hashes.append(torrent.torrent_id)
             print(scrape(tracker=tracker.url,hashes=hashes))

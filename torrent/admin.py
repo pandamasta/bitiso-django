@@ -12,15 +12,15 @@ def make_published(modeladmin, request, queryset):
     queryset.update(is_active=True)
 
 
-class TrackerStatsInline(admin.TabularInline):
-    model = TrackerStats
+class TrackerStatInline(admin.TabularInline):
+    model = TrackerStat
     extra = 1
 
 class TorrentAdmin(admin.ModelAdmin):
     #list_display = ['name', 'is_ative', 'size', 'pieces', 'pieces_size','torrent_filename']
     list_display = ['name', 'seed','leech','is_active','size', 'pieces', 'piece_size','metainfo_file']
     actions = [make_published]
-    inlines = [TrackerStatsInline]
+    inlines = [TrackerStatInline]
 
 class TrackerAdmin(admin.ModelAdmin):
     #list_display = ['name', 'is_ative', 'size', 'pieces', 'pieces_size','torrent_filename']

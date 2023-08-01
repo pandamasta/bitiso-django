@@ -31,9 +31,9 @@ class Command(BaseCommand):
 
             # Check if info_hash exit in DB
 
-            if Torrent.objects.filter(info_hash=t.infohash).exists():
-                print("Info hash " + t.infohash + " already exist in DB. skip")
-                continue
+            # if Torrent.objects.filter(info_hash=t.infohash).exists():
+            #     print("Info hash " + t.infohash + " already exist in DB. skip")
+            #     continue
 
             # Insert bitiso tracker
 
@@ -46,26 +46,28 @@ class Command(BaseCommand):
 
             # Write the .torrent
 
-            print("Write torrent to:" + os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
-            t.write(os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
+            # print("Write torrent to:" + os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
+            # t.write(os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
 
             # Insert unknown tracker in DB
 
             list_of_tracker_id = []
-            flat_list = [item for sublist in t.trackers for item in sublist]
-            print(flat_list)
             print("Insert unknown tracker in DB")
-            for tracker_url in flat_list:
-                print("tracker_url : " + str(tracker_url))
-                if not Tracker.objects.filter(url=tracker_url).exists():
-                    print('Insert new tracker: ' + str(tracker_url))
-                    tracker = Tracker(url=tracker_url)
-                    tracker.save()
-                    list_of_tracker_id.append(tracker.id)
-                else:
-                    list_of_tracker_id.append(Tracker.objects.get(url=tracker_url).id)
+            for sublist in t.trackers:
+                level = t.trackers.index(sublist)
+                for tracker_url in sublist:
+                    print("tracker_url : " + str(tracker_url) + "level: " + str(level))
+                    if not Tracker.objects.filter(url=tracker_url).exists():
+                        print('Insert new tracker: ' + str(tracker_url))
+                        tracker = Tracker(url=tracker_url)
+                        tracker.save()
+                        list_of_tracker_id.append([tracker.id,level])
+                    else:
+                        list_of_tracker_id.append([Tracker.objects.get(url=tracker_url).id, level])
 
-            # Insert general metadata in DB
+                    print(list_of_tracker_id)
+
+            # Insert torrent metadata in DB
 
             file_list = ''
             for file in t.files:
@@ -76,12 +78,19 @@ class Command(BaseCommand):
                           metainfo_file='torrent/' + t.name + '.torrent', file_list=file_list, file_nbr=len(t.files))
             obj.save()
 
-            for tracker_id in list_of_tracker_id:
-                obj.trackers.add(tracker_id)
 
-            for tracker_local_id in settings.TRACKER_ANNOUNCE:
-                if not Tracker.objects.filter(url=tracker_local_id).exists():
-                    obj.trackers.add(Tracker.objects.filter(url=tracker_local_id).id())
+            # Attach tracker to torrent and set the tracker level
+
+            for tracker_id in list_of_tracker_id:
+                obj.trackers.add(tracker_id[0])
+                # obj.save()
+                t=obj.trackerstat_set.get(tracker_id=tracker_id[0])
+                t.level=tracker_id[1]
+                t.save()
+
+            # for tracker_local_id in settings.TRACKER_ANNOUNCE:
+            #     if not Tracker.objects.filter(url=tracker_local_id).exists():
+            #         obj.trackers.add(Tracker.objects.filter(url=tracker_local_id).id())
 
 # #           # Move data to torrent client path
 # #

@@ -60,7 +60,7 @@ class Torrent(models.Model):
     torrent_filename = models.CharField(_(u'Torrent file name'), max_length=128, null=False, default="NONAME")
     comment = models.CharField(_(u'Comment'), max_length=256, null=False, default="NONAME")
     # trackers = models.ManyToManyField(Tracker)
-    trackers = models.ManyToManyField(Tracker, through="TrackerStats")
+    trackers = models.ManyToManyField(Tracker, through="TrackerStat")
     file_list = models.TextField(_(u'List of files'), null=False, default="NONAME")
     file_nbr = models.IntegerField(_(u'Number of file'), null=False, default=1)
 
@@ -91,11 +91,13 @@ class Torrent(models.Model):
     dl_completed = models.IntegerField(_(u'Number of completed'), default=0)
 
 
-class TrackerStats(models.Model):
+class TrackerStat(models.Model):
     """
-    Tracker stats
+    Torrent statistic on trackers
     """
     torrent = models.ForeignKey(Torrent, on_delete=models.CASCADE)
     tracker = models.ForeignKey(Tracker, on_delete=models.CASCADE)
+    level = models.IntegerField(_(u'Announce level'), default=0)
     seed = models.IntegerField(_(u'Number of seed'), default=0)
     leech = models.IntegerField(_(u'Number of leech'), default=0)
+
