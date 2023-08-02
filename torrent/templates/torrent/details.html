@@ -1,4 +1,5 @@
 {% extends "torrent/base.html" %}
+{% load static %}
 {% block title %}Bitiso.org{% endblock %}
 {% block content %}
     <h1>Detail of {{ torrent_detail.name }}</h1>
@@ -25,13 +26,13 @@
 
   <dt class="col-sm-3">Trackers</dt>
   <dd class="col-sm-9">
-	   {% for tracker in torrent_detail.trackers.all %} 
-	   {{ tracker.url }} <br/>
-	   {% endfor %}
+	   {% for tracker in tracker_detail %}
+           {{ tracker.tracker.url }} <span class="seed">{{ tracker.seed }}</span> <span class="leech">{{ tracker.leech }}</span> <br/>
+  	   {% endfor %}
   </dd>
 
   <dt class="col-sm-3">Magnet</dt>
-  <dd class="col-sm-9">{{ torrent_detail.magnet}} </dd>
+  <dd class="col-sm-9"> <a href="{{ torrent_detail.magnet}} "><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></dd>
 
   <dt class="col-sm-3">Metainfo file (.torrent)</dt>
   <dd class="col-sm-9"><a href="/media/{{ torrent_detail.metainfo_file }} ">{{ torrent_detail.torrent_filename }}</a></dd>

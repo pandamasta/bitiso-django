@@ -20,7 +20,8 @@ def index(request):
 def detail(request, info_hash):
 
     torrent_detail = Torrent.objects.get(info_hash=info_hash)
-    context = {'torrent_detail': torrent_detail}
+    tracker_detail = torrent_detail.trackerstat_set.all()
+    context = {'torrent_detail': torrent_detail ,'tracker_detail': tracker_detail}
 
     return render(request, 'torrent/details.html', context)
 
