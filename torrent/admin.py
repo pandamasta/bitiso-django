@@ -3,6 +3,8 @@ from django.contrib import admin
 from .models import *
 
 admin.site.register(Category)
+admin.site.register(Project)
+
 #admin.site.register(Tracker)
 #admin.site.register(Torrent)
 
@@ -17,16 +19,17 @@ class TrackerStatInline(admin.TabularInline):
     extra = 1
 
 class TorrentAdmin(admin.ModelAdmin):
-    #list_display = ['name', 'is_ative', 'size', 'pieces', 'pieces_size','torrent_filename']
     list_display = ['name', 'seed','leech','is_active','size', 'pieces', 'piece_size','metainfo_file']
     actions = [make_published]
     inlines = [TrackerStatInline]
 
 class TrackerAdmin(admin.ModelAdmin):
-    #list_display = ['name', 'is_ative', 'size', 'pieces', 'pieces_size','torrent_filename']
-    list_display = ['name', 'url']
+    list_display = ['url']
     actions = [make_published]
 
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ['name','url','description']
+    actions = [make_published]
 
 
 admin.site.register(Torrent, TorrentAdmin)

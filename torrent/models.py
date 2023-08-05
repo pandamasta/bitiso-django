@@ -29,12 +29,23 @@ class Tracker(models.Model):
     Tracker info
     """
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=32, default='NONAME')
     url = models.CharField(max_length=1000)
 
     def __str__(self):
-        return self.name
+        return self.url
 
+class Project(models.Model):
+    """
+    Project
+    """
+    name = models.CharField(_(u'Project name'), max_length=128, null=False)
+    description = models.TextField(_(u'Description of project'), blank=True, null=True, default='')
+    website_url = models.CharField(_(u'URL of official website'), max_length=2000, blank=True, null=True)
+    website_url_download = models.CharField(_(u'URL of official download page'), max_length=2000, blank=True)
+    website_url_repo = models.CharField(_(u'URL of repository'), max_length=2000, blank=True)
+
+    def __str__(self):
+        return self.name
 
 class Torrent(models.Model):
     """
@@ -59,14 +70,13 @@ class Torrent(models.Model):
     magnet = models.TextField(_(u'Magnet URI'), null=False, default="NONAME")
     torrent_filename = models.CharField(_(u'Torrent file name'), max_length=128, null=False, default="NONAME")
     comment = models.CharField(_(u'Comment'), max_length=256, null=False, default="NONAME")
-    # trackers = models.ManyToManyField(Tracker)
     trackers = models.ManyToManyField(Tracker, through="TrackerStat")
     file_list = models.TextField(_(u'List of files'), null=False, default="NONAME")
     file_nbr = models.IntegerField(_(u'Number of file'), null=False, default=1)
 
     # Other field that describe the torrent
 
-    category_id = models.ForeignKey(Category, verbose_name=_(u'Category'), null=True, on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, verbose_name=_(u'Category'), null=True, on_delete=models.PROTECT)
     is_active = models.BooleanField(_(u'Show in the front end'), null=False, default=False)
     is_bitiso = models.BooleanField(_(u'Created by bitiso ?'), null=False, default=True)
     description = models.TextField(_(u'Description'), blank=True, null=True, default='')
@@ -90,6 +100,10 @@ class Torrent(models.Model):
     dl_number = models.IntegerField(_(u'Number of download'), default=0)
     dl_completed = models.IntegerField(_(u'Number of completed'), default=0)
 
+    # Project
+
+    project = models.ForeignKey(Project, verbose_name=_(u'Project'), null=True, on_delete=models.PROTECT)
+
 
 class TrackerStat(models.Model):
     """
@@ -100,4 +114,5 @@ class TrackerStat(models.Model):
     level = models.IntegerField(_(u'Announce level'), default=0)
     seed = models.IntegerField(_(u'Number of seed'), default=0)
     leech = models.IntegerField(_(u'Number of leech'), default=0)
+
 

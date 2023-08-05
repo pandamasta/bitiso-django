@@ -19,7 +19,7 @@
 {% if torrent_list %}
 {% for torrent in torrent_list %}
             <tr>
-                <td><a href="/category/{{ torrent.category_id.id }}">{{ torrent.category_id.name }}</a></td>
+                <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.name }}</a></td>
                 <td><a href="/detail/{{ torrent.info_hash }}">{{ torrent.name }}</a></td>
                 <td>{{ torrent.creation | date:"N n, Y" }}</td>
                 <td>{{ torrent.size | filesizeformat  }}</td>
