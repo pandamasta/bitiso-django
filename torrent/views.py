@@ -1,8 +1,7 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-#from rest_framework import viewsets
-#from .serializers import TorrentSerializer
 from .models import Torrent
+from django.http import HttpResponse
+from django.core.management import call_command
+from django.shortcuts import render
 
 def index(request):
 
@@ -32,6 +31,25 @@ def category(request, category_id):
 
     return render(request, 'torrent/index.html', context)
 
-#class TorrentViewSet(viewsets.ModelViewSet):
-#    queryset = Torrent.objects.all()
-#    serializer_class = TorrentSerializer
+# Admin custom
+
+def custom_admin_page(request):
+    return render(request, 'admin/custom_admin_page.html')
+
+def get_script_name(script_param):
+    mapping = {
+        'import_torrent': 'import_torrent',
+        'scraper': 'scraper',
+    }
+    return mapping.get(script_param, None)
+
+def run_management_script(request, script):
+    script_name = get_script_name(script)
+    if script_name:
+        try:
+            call_command(script_name)
+            return HttpResponse(f"Le script de gestion '{script_name}' a été déclenché avec succès.")
+        except Exception as e:
+            return HttpResponse(f"Une erreur s'est produite : {e}", status=500)
+    else:
+        return HttpResponse("Script inconnu.", status=400)

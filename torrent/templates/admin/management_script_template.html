@@ -1,0 +1,8 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+  <h1>Page personnalisée dans l'interface d'administration</h1>
+    {#      <a href="{% url 'admin:run_import_torrent' %}" class="historylink">Déclencher import_torrent</a>#}
+    <p><a href="{% url 'run_management_script' script='import_torrent' %}">Importer les torrent</a></p>
+    <p><a href="{% url 'run_management_script' script='scrapper' %}">Srapper</a></p>
+{% endblock %}

@@ -19,7 +19,8 @@ class Command(BaseCommand):
 
         t = Torrenttorf.read
 
-        torrent_file_tmp = settings.TORRENT_FILES_TMP
+        torrent_file_tmp = settings.TORRENT_EXTERNAL
+
 
         for i in os.listdir(torrent_file_tmp):
             absolute_path = os.path.join(torrent_file_tmp, i)
@@ -31,62 +32,74 @@ class Command(BaseCommand):
 
             # Check if info_hash exit in DB
 
-            # if Torrent.objects.filter(info_hash=t.infohash).exists():
-            #     print("Info hash " + t.infohash + " already exist in DB. skip")
-            #     continue
+            if Torrent.objects.filter(info_hash=t.infohash).exists():
+                print("Info hash " + t.infohash + " already exist in DB. skip")
+            else:
+                print("Torrent " + t.infohash + " doesn't exist")
+                #continue
 
-            # Insert bitiso tracker
+                # Insert bitiso tracker
 
-            print("Insert bitiso tracker")
-            print("Current Trackers in the torrent")
-            print(t.trackers)
-            print("Insert tracker from settings.TRACKER_ANNOUNCE ")
-            t.trackers.insert(1, settings.TRACKER_ANNOUNCE)
-            print("Tracker list after insert: " + str(t.trackers))
+                print("Insert bitiso tracker")
+                print("Current Trackers in the torrent")
+                print(t.trackers)
+                print("Insert tracker from settings.TRACKER_ANNOUNCE ")
+                t.trackers.insert(len(t.trackers), settings.TRACKER_ANNOUNCE)
+                print("Tracker list after insert: " + str(t.trackers))
 
-            # Write the .torrent
+                # Write the .torrent
 
-            # print("Write torrent to:" + os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
-            # t.write(os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
+                # print("Write torrent to:" + os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
+                # t.write(os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
+                torrent_file_path=os.path.join(settings.TORRENT_FILES, t.name + '.torrent')
+                if os.path.exists(torrent_file_path):
+                    print("Le fichier existe déjà. Remove")
+                    os.remove(torrent_file_path)
+                else:
+                    print("Le fichier n'existe pas.")
 
-            # Insert unknown tracker in DB
+                # Écrivez le fichier torrent
+                t.write(torrent_file_path)
+                print("Fichier torrent " + torrent_file_path + " écrit avec succès.")
 
-            list_of_tracker_id = []
-            print("Insert unknown tracker in DB")
-            for sublist in t.trackers:
-                level = t.trackers.index(sublist)
-                for tracker_url in sublist:
-                    print("tracker_url : " + str(tracker_url) + "level: " + str(level))
-                    if not Tracker.objects.filter(url=tracker_url).exists():
-                        print('Insert new tracker: ' + str(tracker_url))
-                        tracker = Tracker(url=tracker_url)
-                        tracker.save()
-                        list_of_tracker_id.append([tracker.id,level])
-                    else:
-                        list_of_tracker_id.append([Tracker.objects.get(url=tracker_url).id, level])
+                # Insert unknown tracker in DB
 
-                    print(list_of_tracker_id)
+                list_of_tracker_id = []
+                print("Insert unknown tracker in DB")
+                for sublist in t.trackers:
+                    level = t.trackers.index(sublist)
+                    for tracker_url in sublist:
+                        print("tracker_url : " + str(tracker_url) + "level: " + str(level))
+                        if not Tracker.objects.filter(url=tracker_url).exists():
+                            print('Insert new tracker: ' + str(tracker_url))
+                            tracker = Tracker(url=tracker_url)
+                            tracker.save()
+                            list_of_tracker_id.append([tracker.id,level])
+                        else:
+                            list_of_tracker_id.append([Tracker.objects.get(url=tracker_url).id, level])
 
-            # Insert torrent metadata in DB
+                        print(list_of_tracker_id)
 
-            file_list = ''
-            for file in t.files:
-                file_list += str(file.name + ';' + str(file.size) + '\n')
-            print("File in torrent: " + file_list)
-            obj = Torrent(info_hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size,
-                          magnet=t.magnet(), torrent_filename=t.name + '.torrent',
-                          metainfo_file='torrent/' + t.name + '.torrent', file_list=file_list, file_nbr=len(t.files))
-            obj.save()
+                # Insert torrent metadata in DB
+
+                file_list = ''
+                for file in t.files:
+                    file_list += str(file.name + ';' + str(file.size) + '\n')
+                print("File in torrent: " + file_list)
+                obj = Torrent(info_hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size,
+                              magnet=t.magnet(), torrent_filename=t.name + '.torrent',
+                              metainfo_file='torrent/' + t.name + '.torrent', file_list=file_list, file_nbr=len(t.files))
+                obj.save()
 
 
-            # Attach tracker to torrent and set the tracker level
+                # Attach tracker to torrent and set the tracker level
 
-            for tracker_id in list_of_tracker_id:
-                obj.trackers.add(tracker_id[0])
-                # obj.save()
-                t=obj.trackerstat_set.get(tracker_id=tracker_id[0])
-                t.level=tracker_id[1]
-                t.save()
+                for tracker_id in list_of_tracker_id:
+                    obj.trackers.add(tracker_id[0])
+                    # obj.save()
+                    t=obj.trackerstat_set.get(tracker_id=tracker_id[0])
+                    t.level=tracker_id[1]
+                    t.save()
 
 
 # #          # Move data to torrent client path

@@ -1,18 +1,12 @@
 from django.contrib import admin
-
+from django import forms
 from .models import *
 
-admin.site.register(Category)
-admin.site.register(Project)
-
-#admin.site.register(Tracker)
-#admin.site.register(Torrent)
-
+from django.core.management import call_command
 
 @admin.action(description='Show torrent in frontend')
 def make_published(modeladmin, request, queryset):
     queryset.update(is_active=True)
-
 
 class TrackerStatInline(admin.TabularInline):
     model = TrackerStat
@@ -31,6 +25,33 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display = ['name','url','description']
     actions = [make_published]
 
+#############################
 
+class ExternalTorrentAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = ExternalTorrent
+        fields = '__all__'
+
+
+class ExternalTorrentAdmin(admin.ModelAdmin):
+    form = ExternalTorrentAdminForm
+    actions = ['download_torrent']
+
+    def __str__(self):
+        return self.url
+
+    def download_torrent(self, request, queryset):
+
+        print("In download_torrent")
+        for obj in queryset:
+            print(obj.url)
+            call_command('download_torrent', obj.url)
+
+    download_torrent.short_description = "Download torrent file"
+
+admin.site.register(Category)
+admin.site.register(Project)
 admin.site.register(Torrent, TorrentAdmin)
 admin.site.register(Tracker, TrackerAdmin)
+admin.site.register(ExternalTorrent, ExternalTorrentAdmin)

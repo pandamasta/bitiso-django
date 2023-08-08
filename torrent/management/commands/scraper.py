@@ -17,18 +17,18 @@ class Command(BaseCommand):
 
         # Scrape and build a dictionary with tracker_id as key
 
-        # hashes=[]
-        # scrape_dict={}
-        # for tracker in Tracker.objects.all():
-        #     scrape_dict[tracker.id]={}
-        #     print(tracker.url)
-        #     for torrent in TrackerStat.objects.filter(tracker_id=tracker.id):
-        #         print(torrent.torrent_id)
-        #         hashes.append(torrent.torrent_id)
-        #     scrape_dict[tracker.id]=scrape(tracker=tracker.url,hashes=hashes)
-        #     hashes=[]
+        hashes=[]
+        scrape_dict={}
+        for tracker in Tracker.objects.all():
+            scrape_dict[tracker.id]={}
+            print(tracker.url)
+            for torrent in TrackerStat.objects.filter(tracker_id=tracker.id):
+                print(torrent.torrent_id)
+                hashes.append(torrent.torrent_id)
+            scrape_dict[tracker.id]=scrape(tracker=tracker.url,hashes=hashes)
+            hashes=[]
 
-        scrape_dict={5: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 33, 'peers': 0, 'complete': 47}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 15, 'peers': 0, 'complete': 15}}, 6: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 33, 'peers': 0, 'complete': 47}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 15, 'peers': 0, 'complete': 15}}, 7: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 0, 'peers': 0, 'complete': 0}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 1, 'peers': 0, 'complete': 1}}, 8: {'6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 1, 'peers': 0, 'complete': 1}}}
+        # scrape_dict={5: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 33, 'peers': 0, 'complete': 47}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 15, 'peers': 0, 'complete': 15}}, 6: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 33, 'peers': 0, 'complete': 47}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 15, 'peers': 0, 'complete': 15}}, 7: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 0, 'peers': 0, 'complete': 0}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 1, 'peers': 0, 'complete': 1}}, 8: {'6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 1, 'peers': 0, 'complete': 1}}}
 
         # Parse the scraping result and update the DB
 
@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 print(scrape_dict[tracker_id][info_hash])
                 torrent = TrackerStat.objects.get(tracker_id=tracker_id, torrent_id=info_hash)
                 torrent.seed = scrape_dict[tracker_id][info_hash]['seeds']
-                torrent.peers = scrape_dict[tracker_id][info_hash]['peers']
+                torrent.leech = scrape_dict[tracker_id][info_hash]['peers']
                 torrent.save()
 
         # Update the torrent seed and leech with tracker stat level 0

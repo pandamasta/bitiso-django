@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
@@ -115,4 +114,10 @@ class TrackerStat(models.Model):
     seed = models.IntegerField(_(u'Number of seed'), default=0)
     leech = models.IntegerField(_(u'Number of leech'), default=0)
 
+
+class ExternalTorrent(models.Model):
+    url = models.CharField(_(u'URL of official website'), max_length=2000, blank=True, null=True)
+
+    def __str__(self):
+        return self.url
 
