@@ -21,7 +21,7 @@
             <tr>
                 <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.name }}</a></td>
                 <td><a href="/detail/{{ torrent.info_hash }}">{{ torrent.name }}</a></td>
-                <td>{{ torrent.creation | date:"N n, Y" }}</td>
+                <td>{{ torrent.creation | date:"M. j, Y" }}</td>
                 <td>{{ torrent.size | filesizeformat  }}</td>
                 <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
                 <td><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
