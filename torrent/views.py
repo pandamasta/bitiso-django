@@ -1,4 +1,4 @@
-from .models import Torrent
+from .models import Torrent, Project
 from django.http import HttpResponse
 from django.core.management import call_command
 from django.shortcuts import render
@@ -30,6 +30,13 @@ def category(request, category_id):
     context = {'torrent_list': torrent_list}
 
     return render(request, 'torrent/index.html', context)
+
+def project(request):
+
+    project_list = Project.objects.all()
+    context = {'projects': project_list}
+
+    return render(request, 'torrent/project.html', context)
 
 # Admin custom
 

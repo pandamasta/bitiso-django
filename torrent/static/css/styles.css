@@ -305,3 +305,97 @@ a:active {
   background-color: transparent;
   text-decoration: underline;
 }
+
+/*.pure-card {*/
+/*    border: 1px solid #e0e0e0;*/
+/*    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
+/*    margin: 20px;*/
+/*    transition: transform 0.3s;*/
+/*}*/
+
+/*.pure-card:hover {*/
+/*    transform: scale(1.05);*/
+/*}*/
+
+/*.pure-card-content {*/
+/*    padding: 15px;*/
+/*}*/
+
+/*.pure-card-title {*/
+/*    margin: 0;*/
+/*    padding-bottom: 15px;*/
+/*}*/
+/*.pure-g {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*}*/
+
+
+
+
+.pure-g {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.pure-u-1, .pure-u-md-1-3, .pure-u-lg-1-4 {
+    box-sizing: border-box; /* s'assurer que la largeur inclut les paddings et les bordures */
+    flex-basis: 100%; /* par défaut, prenez toute la largeur */
+}
+
+@media (min-width: 768px) { /* ajustez la valeur selon vos besoins */
+    .pure-u-md-1-3 {
+        flex-basis: calc(33.33% - 10px); /* un peu moins que 1/3 pour laisser de la marge */
+        margin-right: 10px;
+    }
+}
+
+@media (min-width: 992px) { /* ajustez la valeur selon vos besoins */
+    .pure-u-lg-1-4 {
+        flex-basis: calc(25% - 10px); /* un peu moins que 1/4 pour laisser de la marge */
+        margin-right: 10px;
+    }
+}
+
+.project-card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px; /* Espace entre les cartes */
+
+    display: flex;
+    flex-direction: column; /* empile les éléments verticalement */
+}
+
+.project-image {
+    width: 45%;
+    display: block;
+    max-height: 200px; /* Vous pouvez ajuster cette valeur selon vos préférences */
+    /*object-fit: cover; !* Gardez l'image à l'intérieur de ses dimensions sans la déformer *!*/
+
+    /*  flex-grow: 1; !* permet à l'image de prendre tout l'espace disponible *!*/
+    /*display: block;*/
+    margin: auto; /* centrer horizontalement */
+    /*max-height: 200px;*/
+    /*object-fit: cover;*/
+    /*width: auto; !* pour ne pas étirer l'image horizontalement *!*/
+    /*max-width: 100%; !* pour s'assurer que l'image ne dépasse pas son conteneur *!*/
+       width: 150px; /* ou la largeur fixe que vous souhaitez */
+    height: 150px; /* ou la hauteur fixe que vous souhaitez */
+    display: block;
+}
+
+
+.project-description {
+    padding: 15px;
+    /*background-color: #f7f7f7; !* Vous pouvez choisir une couleur différente si vous le souhaitez *!*/
+    background-color: rgb(29, 31, 32);
+    font-size: 14px; /* Ajustez la taille du texte selon vos préférences */
+}
+
+.project-name {
+    font-weight: bold; /* Met le texte en gras */
+    text-align: center; /* Centre le texte */
+    margin-top: 10px;  /* Ajoute un espace au-dessus du nom */
+    margin-bottom: 10px;  /* Ajoute un espace en dessous du nom */
+}

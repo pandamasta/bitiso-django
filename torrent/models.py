@@ -65,7 +65,7 @@ class Project(models.Model):
         from PIL import Image
         sizes = {
             'mini': (12, 12),
-            'small': (300, 300),
+            'small': (150, 150),
             'medium': (600, 600),
             'large': (900, 900),
         }
