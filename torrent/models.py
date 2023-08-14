@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-
+from PIL import Image as PILImage
+import os
 
 class Category(models.Model):
     """
@@ -43,8 +44,52 @@ class Project(models.Model):
     website_url_download = models.CharField(_(u'URL of official download page'), max_length=2000, blank=True)
     website_url_repo = models.CharField(_(u'URL of repository'), max_length=2000, blank=True)
 
+    # Image
+
+    image = models.ImageField(upload_to='img/project/original/', null=True, blank=True)
+    # original_image = models.ImageField(upload_to='img/project/original/',null=True, blank=True)
+    mini_image = models.ImageField(upload_to='img/project/mini/', blank=True)
+    small_image = models.ImageField(upload_to='img/project/small/', blank=True)
+    medium_image = models.ImageField(upload_to='img/project/medium/', blank=True)
+    large_image = models.ImageField(upload_to='img/project/large/', blank=True)
+
+
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # sauvegarde de l'image originale
+        self.create_resized_images()
+
+    def create_resized_images(self):
+        from PIL import Image
+        sizes = {
+            'mini': (12, 12),
+            'small': (300, 300),
+            'medium': (600, 600),
+            'large': (900, 900),
+        }
+
+        for size_name, size in sizes.items():
+            # Ouvrez l'image originale
+            img = Image.open(self.image.path)
+            img.thumbnail(size)
+
+            # Construisez le chemin pour la nouvelle image redimensionnée
+            filename = os.path.basename(self.image.name)
+            new_path = f'img/project/{size_name}/{filename}'
+
+            # Assurez-vous que le dossier de destination existe
+            full_path = os.path.join(settings.MEDIA_ROOT, new_path)
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+
+            # Sauvegardez l'image redimensionnée
+            img.save(full_path)
+
+            # Mettez à jour le champ correspondant dans le modèle
+            setattr(self, f'{size_name}_image', new_path)
+
+        super().save(update_fields=['mini_image','small_image', 'medium_image', 'large_image'])
 
 class Torrent(models.Model):
     """

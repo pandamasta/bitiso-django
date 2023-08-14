@@ -53,3 +53,10 @@ def run_management_script(request, script):
             return HttpResponse(f"Une erreur s'est produite : {e}", status=500)
     else:
         return HttpResponse("Script inconnu.", status=400)
+
+
+
+
+    # categories = Category.objects.all()
+    # projects = Project.objects.all()
+    return render(request, 'upload_image.html')

@@ -22,7 +22,7 @@ class TrackerAdmin(admin.ModelAdmin):
     actions = [make_published]
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['name','url','description']
+    list_display = ['name','description','small_image']
     actions = [make_published]
 
 #############################
@@ -51,7 +51,7 @@ class ExternalTorrentAdmin(admin.ModelAdmin):
     download_torrent.short_description = "Download torrent file"
 
 admin.site.register(Category)
-admin.site.register(Project)
+admin.site.register(Project, ProjectAdmin)
 admin.site.register(Torrent, TorrentAdmin)
 admin.site.register(Tracker, TrackerAdmin)
 admin.site.register(ExternalTorrent, ExternalTorrentAdmin)
