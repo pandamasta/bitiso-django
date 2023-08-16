@@ -1,7 +1,11 @@
 from .models import Torrent, Project
 from django.http import HttpResponse
 from django.core.management import call_command
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+
+def project_detail(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    return render(request, 'path_to_your_template.html', {'project': project})
 
 def index(request):
 
@@ -37,6 +41,11 @@ def project(request):
     context = {'projects': project_list}
 
     return render(request, 'torrent/project.html', context)
+
+
+def project_detail(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    return render(request, 'torrent/project_detail.html', {'project': project})
 
 # Admin custom
 

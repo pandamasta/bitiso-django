@@ -61,8 +61,8 @@
             </div>
 
             <!-- Afficher l'image si elle existe -->
-            {% if project.image %}
-            <img src="{{ project.image.url }}" alt="{{ project.name }}" class="project-image">
+            {% if project.small_image %}
+            <img src="{{ project.small_image.url }}" alt="{{ project.name }}" class="project-image">
             {% endif %}
 
             <div class="project-description">

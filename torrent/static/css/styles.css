@@ -399,3 +399,85 @@ a:active {
     margin-top: 10px;  /* Ajoute un espace au-dessus du nom */
     margin-bottom: 10px;  /* Ajoute un espace en dessous du nom */
 }
+.scrollable-container {
+    overflow-x: auto;
+    width: 100%; /* Assurez-vous que le conteneur prend toute la largeur disponible */
+}
+
+
+/* Style pour empêcher le débordement et ajouter une ellipse en cas de débordement */
+.no-wrap {
+    white-space: nowrap;       /* Empêche le texte de passer à la ligne */
+    /*overflow: hidden;         !* Cache le texte qui déborde *!*/
+    text-overflow: ellipsis;  /* Ajoute les points de suspension à la fin */
+    max-width: 100%;         /* Largeur maximale que vous voulez pour cette colonne (ajustez selon vos besoins) */
+}
+
+/* Vous pouvez augmenter cette largeur max selon vos besoins, ou la réduire si nécessaire. */
+
+
+/* Style par défaut pour les écrans normaux */
+.pure-table td, .pure-table th {
+            overflow: visible; /* Permet le débordement pour le comportement responsive sur mobile */
+
+}
+
+/* Styles spécifiques pour les mobiles */
+@media only screen and (max-width: 600px) {
+    /*.pure-table td, .pure-table th {*/
+    /*        !*overflow: hidden; !* Cache le débordement pour éviter que le contenu ne s'étende dans la cellule suivante *!*!*/
+        .pure-table {
+        overflow-x: auto;
+    }
+    }
+
+.single-line {
+    white-space: nowrap;       /* Empêche le texte de passer à la ligne */
+    text-overflow: ellipsis;  /* Ajoute les points de suspension à la fin en cas de débordement */
+    overflow: hidden;         /* Cache le débordement */
+    max-width: 100%;          /* Utilisez toute la largeur disponible dans la cellule */
+}
+
+.project-detail-container {
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #e6e6e6;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.project-image-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.project-image {
+    max-width: 100%;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/*h1 {*/
+/*    margin-top: 0;*/
+/*    color: #333;*/
+/*}*/
+
+.project-links {
+    list-style-type: none;
+    padding: 0;
+}
+
+.project-links li {
+    margin: 10px 0;
+}
+
+.project-links a {
+    color: #006fe6;
+    text-decoration: none;
+    border-bottom: 1px dotted #006fe6;
+    transition: border-color 0.3s;
+}
+
+.project-links a:hover {
+    border-bottom-color: transparent;
+}

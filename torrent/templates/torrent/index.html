@@ -2,6 +2,7 @@
 {% block title %}Bitiso.org{% endblock %}
 {% load static %}
 {% block content %}
+    <div class="scrollable-container">
 <table class="pure-table pure-table-horizontal">
     <thead>
             <tr>
@@ -9,7 +10,7 @@
                 <th>Name</th>
                 <th>Creation</th>
                 <th>Size</th>
-                <th>Torrent file</th>
+                <th>Torrent</th>
                 <th>Magnet</th>
                 <th>Seed</th>
                 <th>Leech</th>
@@ -20,12 +21,12 @@
 {% for torrent in torrent_list %}
             <tr>
                 <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.name }}</a></td>
-                <td>
+                <td class="no-wrap">
                     {% if torrent.project.mini_image %}
                     <img src="{{ torrent.project.mini_image.url }}" alt="">
                     {% endif %}
                     <a href="/detail/{{ torrent.info_hash }}">{{ torrent.name }}</a></td>
-                <td>{{ torrent.creation | date:"M. j, Y" }}</td>
+                <td class="single-line">{{ torrent.creation | date:"M. j, Y" }}</td>
                 <td>{{ torrent.size | filesizeformat  }}</td>
                 <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
                 <td><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
@@ -36,4 +37,5 @@
 {% endif %}
         </tbody>
 </table>
+    </div>
 {% endblock %}
