@@ -5,8 +5,6 @@ from django.shortcuts import render, get_object_or_404
 from .models import Torrent
 from .forms import SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django_ratelimit.decorators import ratelimit
-from django_ratelimit.exceptions import Ratelimited
 from .ratelimit import RateLimit, RateLimitExceeded
 
 def project_detail(request, project_id):
@@ -95,23 +93,13 @@ def run_management_script(request, script):
     # projects = Project.objects.all()
     return render(request, 'upload_image.html')
 
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        # Prenez la première IP de la liste (la dernière étant généralement l'IP du proxy)
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
-
 def torrent_list_view(request):
-    client_ip = get_client_ip(request)
-    print(f"IP du client: {client_ip}")  # Affiche l'IP dans la console
     try:
         RateLimit(
             key=f"{request.user.id}:torrent_list",
             limit=20,  # par exemple, limitez à 5 requêtes par minute
             period=60,  # en secondes
+            request=request,
         ).check()
     except RateLimitExceeded as e:
         return HttpResponse(
