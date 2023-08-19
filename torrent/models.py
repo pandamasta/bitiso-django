@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from PIL import Image as PILImage
+from django.utils.text import slugify
 import os
 
 class Category(models.Model):
@@ -18,11 +19,29 @@ class Category(models.Model):
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(_(u'Name'), max_length=64, null=False)
+    # slug = models.SlugField(unique=False, blank=True)
+    slug = models.SlugField(blank=True, null=True)
+
     category_parent_id = models.ForeignKey('self', verbose_name=_(u'Parent category'), blank=True, null=True,
                                            on_delete=models.PROTECT)
     creation = models.DateTimeField(auto_now_add=True, null=False)
     deletion = models.DateTimeField(_(u'Delete?'), blank=True, null=True)
 
+    def _generate_unique_slug(self):
+        value = self.name
+        slug_candidate = slugify(value)
+        unique_slug = slug_candidate
+        number = 1
+        while Category.objects.filter(slug=unique_slug).exists():
+            unique_slug = '{}-{}'.format(slug_candidate, number)
+            number += 1
+        return unique_slug
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generate_unique_slug()
+            # self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 class Tracker(models.Model):
     """

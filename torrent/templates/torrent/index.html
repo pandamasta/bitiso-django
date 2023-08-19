@@ -2,8 +2,16 @@
 {% block title %}Bitiso.org{% endblock %}
 {% load static %}
 {% block content %}
+
+<div class="search-container">
+    <form method="get" action="" class="centered-form">
+        <input type="text" class="search-input" placeholder="Search" name="query" value="{{ request.GET.query|default:'' }}" maxlength="30">
+        <button type="submit" class="search-btn">Search</button>
+    </form>
+</div>
+
     <div class="scrollable-container">
-<table class="pure-table pure-table-horizontal">
+<table class="pure-table pure-table-horizontal torrent-table">
     <thead>
             <tr>
                 <th>Category</th>

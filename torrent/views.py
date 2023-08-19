@@ -2,6 +2,8 @@ from .models import Torrent, Project
 from django.http import HttpResponse
 from django.core.management import call_command
 from django.shortcuts import render, get_object_or_404
+from .models import Torrent
+from .forms import SearchForm
 
 def project_detail(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
@@ -71,8 +73,21 @@ def run_management_script(request, script):
         return HttpResponse("Script inconnu.", status=400)
 
 
-
-
     # categories = Category.objects.all()
     # projects = Project.objects.all()
     return render(request, 'upload_image.html')
+
+
+
+def torrent_list_view(request):
+    form = SearchForm(request.GET or None)
+    torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
+
+    if form.is_valid():
+        query = form.cleaned_data['query']
+        torrents = torrents.filter(name__icontains=query)
+
+        # ... (code de pagination si nécessaire)
+
+    context = {'form': form, 'torrent_list': torrents}
+    return render(request, 'torrent/index.html', context)
