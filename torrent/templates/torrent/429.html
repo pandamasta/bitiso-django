@@ -1,0 +1,9 @@
+{% extends "base.html" %}  {# Assurez-vous d'étendre votre base ou layout si vous en avez un #}
+
+{% block content %}
+<div class="error-container">
+    <h2>Oops!</h2>
+    <p>Désolé, vous avez effectué trop de requêtes en peu de temps. Veuillez patienter un moment et réessayer.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary">Retour à l'accueil</a>
+</div>
+{% endblock %}

@@ -5,23 +5,13 @@ from django.shortcuts import render, get_object_or_404
 from .models import Torrent
 from .forms import SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django_ratelimit.decorators import ratelimit
+from django_ratelimit.exceptions import Ratelimited
+from .ratelimit import RateLimit, RateLimitExceeded
 
 def project_detail(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     return render(request, 'path_to_your_template.html', {'project': project})
-
-# def index(request):
-#
-#     #torrent_list = Torrent.objects.filter(is_active=True).order_by('-creation')
-#     #torrent_list = "test"
-#     try:
-#       torrent_list =  Torrent.objects.filter(is_active=True).order_by('-creation')
-#     except Torrent.DoesNotExist:
-#       torrent_list = None
-#
-#     context = {'torrent_list': torrent_list}
-#
-#     return render(request, 'torrent/index.html', context)
 
 def index(request):
 
@@ -105,22 +95,30 @@ def run_management_script(request, script):
     # projects = Project.objects.all()
     return render(request, 'upload_image.html')
 
-
-
-# def torrent_list_view(request):
-#     form = SearchForm(request.GET or None)
-#     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
-#
-#     if form.is_valid():
-#         query = form.cleaned_data['query']
-#         torrents = torrents.filter(name__icontains=query)
-#
-#         # ... (code de pagination si nécessaire)
-#
-#     context = {'form': form, 'torrent_list': torrents}
-#     return render(request, 'torrent/index.html', context)
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        # Prenez la première IP de la liste (la dernière étant généralement l'IP du proxy)
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 def torrent_list_view(request):
+    client_ip = get_client_ip(request)
+    print(f"IP du client: {client_ip}")  # Affiche l'IP dans la console
+    try:
+        RateLimit(
+            key=f"{request.user.id}:torrent_list",
+            limit=20,  # par exemple, limitez à 5 requêtes par minute
+            period=60,  # en secondes
+        ).check()
+    except RateLimitExceeded as e:
+        return HttpResponse(
+            f"Rate limit exceeded. You have used {e.usage} requests, limit is {e.limit}.",
+            status=429,
+        )
+
     form = SearchForm(request.GET or None)
     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
 

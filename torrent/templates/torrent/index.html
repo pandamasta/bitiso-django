@@ -5,7 +5,7 @@
 
 <div class="search-container">
     <form method="get" action="" class="centered-form">
-        <input type="text" class="search-input" placeholder="Search" name="query" value="{{ request.GET.query|default:'' }}" maxlength="30">
+        <input type="text" class="search-input" placeholder="Search. 2 characters min." name="query" value="{{ request.GET.query|default:'' }}" maxlength="30">
         <button type="submit" class="search-btn">Search</button>
     </form>
 </div>
