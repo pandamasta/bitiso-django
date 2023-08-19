@@ -37,7 +37,7 @@
                 <td class="single-line">{{ torrent.creation | date:"M. j, Y" }}</td>
                 <td>{{ torrent.size | filesizeformat  }}</td>
                 <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
-                <td><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+                <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
                 <td class="seed">{{ torrent.seed }}</td>
                 <td class="leech">{{ torrent.leech }}</td>
             </tr>
@@ -46,4 +46,34 @@
         </tbody>
 </table>
     </div>
+
+
+<div class="pagination">
+    {% if torrent_list.has_previous %}
+        <a href="?page=1" class="pure-button">&laquo; première</a>
+        <a href="?page={{ torrent_list.previous_page_number }}" class="pure-button">précédent</a>
+    {% endif %}
+
+    {% with total_pages=torrent_list.paginator.num_pages %}
+    {% with current=torrent_list.number %}
+        {% for i in torrent_list.paginator.page_range %}
+            {% if i <= 4 or i > total_pages|add:"-4" %}
+                {% if torrent_list.number == i %}
+                    <a href="?page={{ i }}" class="pure-button pure-button-active">{{ i }}</a>
+                {% else %}
+                    <a href="?page={{ i }}" class="pure-button">{{ i }}</a>
+                {% endif %}
+            {% elif i == 5 %}
+                ...
+            {% endif %}
+        {% endfor %}
+    {% endwith %}
+    {% endwith %}
+
+    {% if torrent_list.has_next %}
+        <a href="?page={{ torrent_list.next_page_number }}" class="pure-button">suivant</a>
+        <a href="?page={{ torrent_list.paginator.num_pages }}" class="pure-button">&raquo; dernière</a>
+    {% endif %}
+</div>
+
 {% endblock %}

@@ -4,22 +4,50 @@ from django.core.management import call_command
 from django.shortcuts import render, get_object_or_404
 from .models import Torrent
 from .forms import SearchForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def project_detail(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     return render(request, 'path_to_your_template.html', {'project': project})
 
+# def index(request):
+#
+#     #torrent_list = Torrent.objects.filter(is_active=True).order_by('-creation')
+#     #torrent_list = "test"
+#     try:
+#       torrent_list =  Torrent.objects.filter(is_active=True).order_by('-creation')
+#     except Torrent.DoesNotExist:
+#       torrent_list = None
+#
+#     context = {'torrent_list': torrent_list}
+#
+#     return render(request, 'torrent/index.html', context)
+
 def index(request):
 
     #torrent_list = Torrent.objects.filter(is_active=True).order_by('-creation')
-    #torrent_list = "test" 
+    #torrent_list = "test"
     try:
       torrent_list =  Torrent.objects.filter(is_active=True).order_by('-creation')
     except Torrent.DoesNotExist:
       torrent_list = None
 
-    context = {'torrent_list': torrent_list}
+    # Créer un objet Paginator avec `torrent_list` et, par exemple, 10 éléments par page.
+    paginator = Paginator(torrent_list, 10)
 
+    # Essayez d'obtenir le numéro de page de la requête GET.
+    page = request.GET.get('page')
+
+    try:
+        torrents = paginator.page(page)
+    except PageNotAnInteger:
+        # Si la page n'est pas un entier, montrez la première page.
+        torrents = paginator.page(1)
+    except EmptyPage:
+        # Si la page est hors plage (ex : 9999), montrez la dernière page.
+        torrents = paginator.page(paginator.num_pages)
+    context = {'torrent_list': torrent_list}
+    # return render(request, 'torrent/index.html', context)
     return render(request, 'torrent/index.html', context)
 
 def detail(request, info_hash):
@@ -79,15 +107,42 @@ def run_management_script(request, script):
 
 
 
+# def torrent_list_view(request):
+#     form = SearchForm(request.GET or None)
+#     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
+#
+#     if form.is_valid():
+#         query = form.cleaned_data['query']
+#         torrents = torrents.filter(name__icontains=query)
+#
+#         # ... (code de pagination si nécessaire)
+#
+#     context = {'form': form, 'torrent_list': torrents}
+#     return render(request, 'torrent/index.html', context)
+
 def torrent_list_view(request):
     form = SearchForm(request.GET or None)
     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
 
-    if form.is_valid():
+    if form.is_valid() and form.cleaned_data['query']:
         query = form.cleaned_data['query']
         torrents = torrents.filter(name__icontains=query)
 
-        # ... (code de pagination si nécessaire)
+    # Pagination
+    paginator = Paginator(torrents, 60)  # 10 torrents par page, ajustez si nécessaire
 
-    context = {'form': form, 'torrent_list': torrents}
+    page = request.GET.get('page')
+    try:
+        torrents = paginator.page(page)
+    except PageNotAnInteger:
+        # Si la page n'est pas un entier, donnez la première page.
+        torrents = paginator.page(1)
+    except EmptyPage:
+        # Si la page est en dehors de la plage (par exemple, 9999), donnez la dernière page des résultats.
+        torrents = paginator.page(paginator.num_pages)
+
+    context = {
+        'form': form,
+        'torrent_list': torrents
+    }
     return render(request, 'torrent/index.html', context)
