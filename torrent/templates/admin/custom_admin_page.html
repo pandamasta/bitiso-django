@@ -1,7 +1,26 @@
 {% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}Ma page personnalisée{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">Accueil de l'administration</a>
+&rsaquo; Ma page personnalisée
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{{ block.super }}
+<ul id="content-related">
+    <li>
+    eeeeee
+    </li>
+</ul>
+{% endblock %}
 
 {% block content %}
   <h1>Page personnalisée dans l'interface d'administration</h1>
     <p><a href="{% url 'run_management_script' script='import_torrent' %}">Importer les torrent</a></p>
-    <p><a href="{% url 'run_management_script' script='scraper' %}">Srapper</a></p>
+    <p><a href="{% url 'run_management_script' script='scraper' %}">Scraper</a></p>
 {% endblock %}

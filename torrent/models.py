@@ -58,6 +58,7 @@ class Project(models.Model):
     Project
     """
     name = models.CharField(_(u'Project name'), max_length=128, null=False)
+    is_active = models.BooleanField(_(u'Show in the front end'), null=False, default=False)
     description = models.TextField(_(u'Description of project'), blank=True, null=True, default='')
     website_url = models.CharField(_(u'URL of official website'), max_length=2000, blank=True, null=True)
     website_url_download = models.CharField(_(u'URL of official download page'), max_length=2000, blank=True)

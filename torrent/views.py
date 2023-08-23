@@ -55,7 +55,7 @@ def category(request, category_id):
 
 def project(request):
 
-    project_list = Project.objects.all()
+    project_list = Project.objects.filter(is_active=True)
     context = {'projects': project_list}
 
     return render(request, 'torrent/project.html', context)

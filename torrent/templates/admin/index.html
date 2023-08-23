@@ -1,0 +1,11 @@
+{% extends "admin/index.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block sidebar %}
+{{ block.super }}  {# Cela permet d'inclure le contenu original du bloc `content` #}
+
+<div >
+<a href="{% url 'custom_admin_page' %}">Script management</a>
+</div>
+{% endblock %}
