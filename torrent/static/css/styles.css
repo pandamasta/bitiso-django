@@ -23,7 +23,6 @@ Add transition to containers so they can push in and out.
     -o-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
 }
-
 /*
 This is the parent `<div>` that contains the menu and the content area.
 */
@@ -40,6 +39,7 @@ This is the parent `<div>` that contains the menu and the content area.
     #layout.active .menu-link {
         left: 150px;
     }
+
 /*
 The content `<div>` is where all your content goes.
 */
@@ -60,19 +60,20 @@ The content `<div>` is where all your content goes.
      color: rgb(200, 195, 188);
      border-bottom-color: rgb(53, 57, 59);
  }
-    .header h1 {
-        /*margin: 0.5em 0;*/
-        padding: 0px;
-        margin: 0px;
-        font-size: 3em;
-        font-weight: 300;
-    }
-     .header h2 {
-        font-weight: 300;
-        color: #ccc;
-        padding: 0;
-        margin-top: 0;
-    }
+
+.header h1 {
+    /*margin: 0.5em 0;*/
+    padding: 0px;
+    margin: 0px;
+    font-size: 3em;
+    font-weight: 300;
+}
+ .header h2 {
+    font-weight: 300;
+    color: #ccc;
+    padding: 0;
+    margin-top: 0;
+}
 
 .content-subhead {
     margin: 50px 0 20px 0;
@@ -80,14 +81,10 @@ The content `<div>` is where all your content goes.
     color: #888;
 }
 
-
-
 /*
 The `#menu` `<div>` is the parent `<div>` that contains the `.pure-menu` that
 appears on the left side of the page.
 */
-
-
 #menu {
     margin-left: -150px; /* "#menu" width */
     width: 150px;
@@ -101,61 +98,63 @@ appears on the left side of the page.
     background-color: rgb(18, 20, 21);
     background-image: none;
 }
+
+/*
+All anchors inside the menu should be styled like this.
+*/
+#menu a {
+    color: #999;
+    border: none;
+    padding: 0.6em 0 0.6em 0.6em;
+}
+
+/*
+Remove all background/borders, since we are applying them to #menu.
+*/
+ #menu .pure-menu,
+ #menu .pure-menu ul {
+    border: none;
+    background: transparent;
+}
+
+/*
+Add that light border to separate items into groups.
+*/
+#menu .pure-menu ul,
+#menu .pure-menu .menu-item-divided {
+    border-top: 1px solid #333;
+}
     /*
-    All anchors inside the menu should be styled like this.
+    Change color of the anchor links on hover/focus.
     */
-    #menu a {
-        color: #999;
-        border: none;
-        padding: 0.6em 0 0.6em 0.6em;
+    #menu .pure-menu li a:hover,
+    #menu .pure-menu li a:focus {
+        background: #333;
     }
 
-    /*
-    Remove all background/borders, since we are applying them to #menu.
-    */
-     #menu .pure-menu,
-     #menu .pure-menu ul {
-        border: none;
-        background: transparent;
-    }
+/*
+This styles the selected menu item `<li>`.
+*/
+#menu .pure-menu-selected,
+#menu .pure-menu-heading {
+    background: #1f8dd6;
+}
 
-    /*
-    Add that light border to separate items into groups.
-    */
-    #menu .pure-menu ul,
-    #menu .pure-menu .menu-item-divided {
-        border-top: 1px solid #333;
-    }
-        /*
-        Change color of the anchor links on hover/focus.
-        */
-        #menu .pure-menu li a:hover,
-        #menu .pure-menu li a:focus {
-            background: #333;
-        }
+/*
+This styles a link within a selected menu item `<li>`.
+*/
+#menu .pure-menu-selected a {
+    color: #fff;
+}
 
-    /*
-    This styles the selected menu item `<li>`.
-    */
-    #menu .pure-menu-selected,
-    #menu .pure-menu-heading {
-        background: #1f8dd6;
-    }
-        /*
-        This styles a link within a selected menu item `<li>`.
-        */
-        #menu .pure-menu-selected a {
-            color: #fff;
-        }
-
-    /*
-    This styles the menu heading.
-    */
-    #menu .pure-menu-heading {
-        font-size: 110%;
-        color: #fff;
-        margin: 0;
-    }
+/*
+This styles the menu heading.
+*/
+#menu .pure-menu-heading {
+    font-size: 110%;
+    color: #fff;
+    margin: 0;
+}
 
 /* -- Dynamic Button For Responsive Menu -------------------------------------*/
 
@@ -182,36 +181,35 @@ small screens.
     padding: 2.1em 1.6em;
 }
 
-    .menu-link:hover,
-    .menu-link:focus {
-        background: #000;
-    }
+.menu-link:hover,
+.menu-link:focus {
+    background: #000;
+}
 
-    .menu-link span {
-        position: relative;
-        display: block;
-    }
+.menu-link span {
+    position: relative;
+    display: block;
+}
 
-    .menu-link span,
-    .menu-link span:before,
-    .menu-link span:after {
-        background-color: #fff;
-        pointer-events: none;
-        width: 100%;
-        height: 0.2em;
-    }
+.menu-link span,
+.menu-link span:before,
+.menu-link span:after {
+    background-color: #fff;
+    pointer-events: none;
+    width: 100%;
+    height: 0.2em;
+}
 
-        .menu-link span:before,
-        .menu-link span:after {
-            position: absolute;
-            margin-top: -0.6em;
-            content: " ";
-        }
+.menu-link span:before,
+.menu-link span:after {
+    position: absolute;
+    margin-top: -0.6em;
+    content: " ";
+}
 
-        .menu-link span:after {
-            margin-top: 0.6em;
-        }
-
+.menu-link span:after {
+    margin-top: 0.6em;
+}
 
 /* -- Responsive Styles (Media Queries) ------------------------------------- */
 
@@ -270,23 +268,19 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     margin: auto;
     margin-top: 50px;
     border: 0px;
-    /*line-height: 0.5em;*/
 }
+
 .seed {
 	background-color: transparent;
 	color: #6dff69;
-	
 }
+
 .leech {
 	background-color: transparent;
 	color: #ff2f2f;
 	
 }
-/*
-a {
-	color: #3391ff;
-}
-*/
+
 a:link {
   color: rgb(230, 230, 230);
   background-color: transparent;
@@ -307,52 +301,24 @@ a:active {
   background-color: transparent;
   text-decoration: underline;
 }
-
-/*.pure-card {*/
-/*    border: 1px solid #e0e0e0;*/
-/*    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
-/*    margin: 20px;*/
-/*    transition: transform 0.3s;*/
-/*}*/
-
-/*.pure-card:hover {*/
-/*    transform: scale(1.05);*/
-/*}*/
-
-/*.pure-card-content {*/
-/*    padding: 15px;*/
-/*}*/
-
-/*.pure-card-title {*/
-/*    margin: 0;*/
-/*    padding-bottom: 15px;*/
-/*}*/
-/*.pure-g {*/
-/*    display: flex;*/
-/*    flex-wrap: wrap;*/
-/*}*/
-
-
-
-
 .pure-g {
-    display: flex;
-    flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .pure-u-1, .pure-u-md-1-3, .pure-u-lg-1-4 {
-    box-sizing: border-box; /* s'assurer que la largeur inclut les paddings et les bordures */
-    flex-basis: 100%; /* par défaut, prenez toute la largeur */
+    box-sizing: border-box;
+    flex-basis: 100%;
 }
 
-@media (min-width: 768px) { /* ajustez la valeur selon vos besoins */
+@media (min-width: 768px) {
     .pure-u-md-1-3 {
         flex-basis: calc(33.33% - 10px); /* un peu moins que 1/3 pour laisser de la marge */
         margin-right: 10px;
     }
 }
 
-@media (min-width: 992px) { /* ajustez la valeur selon vos besoins */
+@media (min-width: 992px) {
     .pure-u-lg-1-4 {
         flex-basis: calc(25% - 10px); /* un peu moins que 1/4 pour laisser de la marge */
         margin-right: 10px;
@@ -363,89 +329,67 @@ a:active {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     overflow: hidden;
-    margin-bottom: 20px; /* Espace entre les cartes */
+    margin-bottom: 20px;
 
     display: flex;
-    flex-direction: column; /* empile les éléments verticalement */
+    flex-direction: column;
 }
 
 .project-image {
     width: 45%;
     display: block;
-    max-height: 200px; /* Vous pouvez ajuster cette valeur selon vos préférences */
-    /*object-fit: cover; !* Gardez l'image à l'intérieur de ses dimensions sans la déformer *!*/
-
-    /*  flex-grow: 1; !* permet à l'image de prendre tout l'espace disponible *!*/
-    /*display: block;*/
-    margin: auto; /* centrer horizontalement */
-    /*max-height: 200px;*/
-    /*object-fit: cover;*/
-    /*width: auto; !* pour ne pas étirer l'image horizontalement *!*/
-    /*max-width: 100%; !* pour s'assurer que l'image ne dépasse pas son conteneur *!*/
-       width: 150px; /* ou la largeur fixe que vous souhaitez */
-    height: 150px; /* ou la hauteur fixe que vous souhaitez */
+    max-height: 200px;
+    margin: auto;
+    width: 150px;
+    height: 150px;
     display: block;
 }
 
-
 .project-description {
     padding: 15px;
-    /*background-color: #f7f7f7; !* Vous pouvez choisir une couleur différente si vous le souhaitez *!*/
     background-color: rgb(29, 31, 32);
-    font-size: 14px; /* Ajustez la taille du texte selon vos préférences */
+    font-size: 14px;
 }
 
 .project-name {
-    font-weight: bold; /* Met le texte en gras */
-    text-align: center; /* Centre le texte */
-    margin-top: 10px;  /* Ajoute un espace au-dessus du nom */
-    margin-bottom: 10px;  /* Ajoute un espace en dessous du nom */
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
+
 .scrollable-container {
     overflow-x: auto;
-    width: 100%; /* Assurez-vous que le conteneur prend toute la largeur disponible */
+    width: 100%;
 }
 
-
-/* Style pour empêcher le débordement et ajouter une ellipse en cas de débordement */
 .no-wrap {
-    white-space: nowrap;       /* Empêche le texte de passer à la ligne */
-    /*overflow: hidden;         !* Cache le texte qui déborde *!*/
-    text-overflow: ellipsis;  /* Ajoute les points de suspension à la fin */
-    max-width: 100%;         /* Largeur maximale que vous voulez pour cette colonne (ajustez selon vos besoins) */
+    white-space: nowrap;
+    max-width: 100%;
 }
 
-/* Vous pouvez augmenter cette largeur max selon vos besoins, ou la réduire si nécessaire. */
-
-
-/* Style par défaut pour les écrans normaux */
+/* Normal screen  */
 .pure-table td, .pure-table th {
-            overflow: visible; /* Permet le débordement pour le comportement responsive sur mobile */
-
+            overflow: visible;
 }
 
-/* Styles spécifiques pour les mobiles */
+/* Mobile */
 @media only screen and (max-width: 600px) {
-    /*.pure-table td, .pure-table th {*/
-    /*        !*overflow: hidden; !* Cache le débordement pour éviter que le contenu ne s'étende dans la cellule suivante *!*!*/
         .pure-table {
         overflow-x: auto;
     }
-    }
+}
 
 .single-line {
-    white-space: nowrap;       /* Empêche le texte de passer à la ligne */
-    text-overflow: ellipsis;  /* Ajoute les points de suspension à la fin en cas de débordement */
-    overflow: hidden;         /* Cache le débordement */
-    max-width: 100%;          /* Utilisez toute la largeur disponible dans la cellule */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
 }
 
 .project-detail-container {
     margin: 20px 0;
     padding: 20px;
-    /*border: 1px solid #e6e6e6;*/
-    /*border-radius: 5px;*/
-    /*background-color: #f9f9f9;*/
 }
 
 .project-image-container {
@@ -458,11 +402,6 @@ a:active {
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
-/*h1 {*/
-/*    margin-top: 0;*/
-/*    color: #333;*/
-/*}*/
 
 .project-links {
     list-style-type: none;
@@ -488,12 +427,12 @@ a:active {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;  /* Donne un peu d'espace autour du formulaire */
+    padding: 20px;
 }
 
 .centered-form {
     text-align: center;
-    display: flex; /* Utilisation de flex pour disposer les éléments en ligne */
+    display: flex;
 }
 
 .search-container {
@@ -503,9 +442,9 @@ a:active {
 }
 
 .centered-form {
-    display: inline-flex; /* Changed this to inline-flex */
-    justify-content: center; /* Horizontally aligns the child elements in the center */
-    align-items: center; /* Vertically aligns the child elements in the middle */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .search-input {
