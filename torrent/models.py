@@ -58,6 +58,7 @@ class Project(models.Model):
     """
     # id = models.AutoField(primary_key=True)
     name = models.CharField(_(u'Project name'), max_length=128, null=False)
+    slug = models.SlugField(blank=True, null=True)
     is_active = models.BooleanField(_(u'Show in the front end'), null=False, default=False)
     description = models.TextField(_(u'Description of project'), blank=True, null=True, default='')
     website_url = models.CharField(_(u'URL of official website'), max_length=2000, blank=True, null=True)
@@ -77,7 +78,19 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+    def _generate_unique_slug(self):
+        value = self.name
+        slug_candidate = slugify(value)
+        unique_slug = slug_candidate
+        number = 1
+        while Category.objects.filter(slug=unique_slug).exists():
+            unique_slug = '{}-{}'.format(slug_candidate, number)
+            number += 1
+        return unique_slug
+
     def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generate_unique_slug()
         super().save(*args, **kwargs)  # sauvegarde de l'image originale
         self.create_resized_images()
 
@@ -87,7 +100,7 @@ class Project(models.Model):
 
         from PIL import Image
         sizes = {
-            'mini': (12, 12),
+            'mini': (13, 13),
             'small': (150, 150),
             'medium': (600, 600),
             'large': (900, 900),
@@ -132,6 +145,8 @@ class Torrent(models.Model):
     info_hash = models.CharField(_(u'SHA1 of torrent'), max_length=40, unique=True)
    #  info_hash = models.CharField(_(u'SHA1 of torrent'), max_length=40, primary_key=True)
     name = models.CharField(_(u'Name'), max_length=128, null=False)
+    slug = models.SlugField(blank=True, null=True)
+
     size = models.PositiveBigIntegerField(_(u'Size'), null=False, default=0)
     pieces = models.IntegerField(_(u'Number of piece'), null=False, default=1)
     piece_size = models.IntegerField(_(u'Piece size in byte'), null=False, default=0)
@@ -172,6 +187,22 @@ class Torrent(models.Model):
 
     project = models.ForeignKey(Project, verbose_name=_(u'Project'), null=True, on_delete=models.PROTECT)
 
+    def _generate_unique_slug(self):
+        value = self.name
+        slug_candidate = slugify(value)
+        unique_slug = slug_candidate
+        number = 1
+        while Category.objects.filter(slug=unique_slug).exists():
+            unique_slug = '{}-{}'.format(slug_candidate, number)
+            number += 1
+        return unique_slug
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generate_unique_slug()
+            # self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
 class TrackerStat(models.Model):
     """
     Torrent statistic on trackers
@@ -181,6 +212,8 @@ class TrackerStat(models.Model):
     level = models.IntegerField(_(u'Announce level'), default=0)
     seed = models.IntegerField(_(u'Number of seed'), default=0)
     leech = models.IntegerField(_(u'Number of leech'), default=0)
+    complete = models.IntegerField(_(u'Complete'), default=0)
+
 
 class ExternalTorrent(models.Model):
     url = models.CharField(_(u'URL of official website'), max_length=2000, blank=True, null=True)

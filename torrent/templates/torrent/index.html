@@ -5,7 +5,7 @@
 
 <div class="search-container">
     <form method="get" action="" class="centered-form">
-        <input type="text" class="search-input" placeholder="Search. 2 characters min." name="query" value="{{ request.GET.query|default:'' }}" maxlength="30">
+        <input type="text" class="search-input" placeholder="Search" name="query" value="{{ request.GET.query|default:'' }}" maxlength="30">
         <button type="submit" class="search-btn">Search</button>
     </form>
 </div>
@@ -16,8 +16,8 @@
             <tr>
                 <th>Category</th>
                 <th>Name</th>
-                <th>Creation</th>
                 <th>Size</th>
+                <th>Creation</th>
                 <th>Torrent</th>
                 <th>Magnet</th>
                 <th>Seed</th>
@@ -34,9 +34,11 @@
                     <img src="{{ torrent.project.mini_image.url }}" alt="">
                     {% endif %}
                     <a href="/detail/{{ torrent.info_hash }}">{{ torrent.name }}</a></td>
-                <td class="single-line">{{ torrent.creation | date:"M. j, Y" }}</td>
                 <td>{{ torrent.size | filesizeformat  }}</td>
+                <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
+{#                <td><a href="/media/{{ torrent.metainfo_file }}"><img src="{% static 'img/download7.png' %}" width="13" height="13" alt="Torrent"></a></td>#}
                 <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
+
                 <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
                 <td class="seed">{{ torrent.seed }}</td>
                 <td class="leech">{{ torrent.leech }}</td>

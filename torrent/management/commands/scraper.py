@@ -36,6 +36,7 @@ class Command(BaseCommand):
                 torrent = TrackerStat.objects.get(tracker_id=tracker_id, torrent_id=torrent_obj.id)
                 torrent.seed = scrape_dict[tracker_id][info_hash]['seeds']
                 torrent.leech = scrape_dict[tracker_id][info_hash]['peers']
+                torrent.complete = scrape_dict[tracker_id][info_hash]['complete']
                 torrent.save()
 
         # Update the torrent seed and leech with tracker stat level 0
