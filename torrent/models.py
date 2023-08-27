@@ -16,7 +16,7 @@ class Category(models.Model):
     def __str__(self):
         return u'%s (ID %d)' % (self.name, self.id)
 
-    id = models.AutoField(primary_key=True)
+    # id = models.AutoField(primary_key=True)
     name = models.CharField(_(u'Name'), max_length=64, null=False)
     # slug = models.SlugField(unique=False, blank=True)
     slug = models.SlugField(blank=True, null=True)
@@ -46,7 +46,7 @@ class Tracker(models.Model):
     """
     Tracker info
     """
-    id = models.AutoField(primary_key=True)
+    # id = models.AutoField(primary_key=True)
     url = models.CharField(max_length=1000)
 
     def __str__(self):
@@ -56,6 +56,7 @@ class Project(models.Model):
     """
     Project
     """
+    # id = models.AutoField(primary_key=True)
     name = models.CharField(_(u'Project name'), max_length=128, null=False)
     is_active = models.BooleanField(_(u'Show in the front end'), null=False, default=False)
     description = models.TextField(_(u'Description of project'), blank=True, null=True, default='')
@@ -81,6 +82,9 @@ class Project(models.Model):
         self.create_resized_images()
 
     def create_resized_images(self):
+        if not self.image:
+            return
+
         from PIL import Image
         sizes = {
             'mini': (12, 12),
@@ -124,8 +128,9 @@ class Torrent(models.Model):
         return u'%s (Hash %s)' % (self.name, self.info_hash)
 
     # Fields extracted from .torrent file with management import2db.py
-
-    info_hash = models.CharField(_(u'SHA1 of torrent'), max_length=40, primary_key=True)
+    # id = models.AutoField(primary_key=True)
+    info_hash = models.CharField(_(u'SHA1 of torrent'), max_length=40, unique=True)
+   #  info_hash = models.CharField(_(u'SHA1 of torrent'), max_length=40, primary_key=True)
     name = models.CharField(_(u'Name'), max_length=128, null=False)
     size = models.PositiveBigIntegerField(_(u'Size'), null=False, default=0)
     pieces = models.IntegerField(_(u'Number of piece'), null=False, default=1)
@@ -167,7 +172,6 @@ class Torrent(models.Model):
 
     project = models.ForeignKey(Project, verbose_name=_(u'Project'), null=True, on_delete=models.PROTECT)
 
-
 class TrackerStat(models.Model):
     """
     Torrent statistic on trackers
@@ -178,10 +182,8 @@ class TrackerStat(models.Model):
     seed = models.IntegerField(_(u'Number of seed'), default=0)
     leech = models.IntegerField(_(u'Number of leech'), default=0)
 
-
 class ExternalTorrent(models.Model):
     url = models.CharField(_(u'URL of official website'), max_length=2000, blank=True, null=True)
 
     def __str__(self):
         return self.url
-

@@ -10,23 +10,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        # def get_url_without_path(url):
-        #     parsed_url = urlparse(url)
-        #     url_without_path = f"{parsed_url.scheme}://{parsed_url.netloc}"
-        #     return url_without_path
-
         # Scrape and build a dictionary with tracker_id as key
 
         hashes=[]
         scrape_dict={}
         for tracker in Tracker.objects.all():
             scrape_dict[tracker.id]={}
-            print(tracker.url)
             for torrent in TrackerStat.objects.filter(tracker_id=tracker.id):
-                print(torrent.torrent_id)
-                hashes.append(torrent.torrent_id)
+                hashes.append(torrent.torrent.info_hash)
             try:
-                scrape_dict[tracker.id]=scrape(tracker=tracker.url,hashes=hashes)
+                if not hashes:
+                    print("No Torrent for tracker: " + str(tracker))
+                else:
+                    scrape_dict[tracker.id]=scrape(tracker=tracker.url,hashes=hashes)
             except(TimeoutError):
                 print("timeout")
             hashes=[]
@@ -34,11 +30,10 @@ class Command(BaseCommand):
         # scrape_dict={5: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 33, 'peers': 0, 'complete': 47}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 15, 'peers': 0, 'complete': 15}}, 6: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 33, 'peers': 0, 'complete': 47}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 15, 'peers': 0, 'complete': 15}}, 7: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 0, 'peers': 0, 'complete': 0}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 1, 'peers': 0, 'complete': 1}}, 8: {'6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 1, 'peers': 0, 'complete': 1}}}
 
         # Parse the scraping result and update the DB
-
         for tracker_id in scrape_dict:
             for info_hash in scrape_dict[tracker_id]:
-                print(scrape_dict[tracker_id][info_hash])
-                torrent = TrackerStat.objects.get(tracker_id=tracker_id, torrent_id=info_hash)
+                torrent_obj = Torrent.objects.get(info_hash=info_hash)
+                torrent = TrackerStat.objects.get(tracker_id=tracker_id, torrent_id=torrent_obj.id)
                 torrent.seed = scrape_dict[tracker_id][info_hash]['seeds']
                 torrent.leech = scrape_dict[tracker_id][info_hash]['peers']
                 torrent.save()
@@ -48,7 +43,7 @@ class Command(BaseCommand):
         torrents=Torrent.objects.all()
 
         for t in torrents:
-            t_stats=TrackerStat.objects.filter(torrent_id=t.info_hash, level=0)[0]
+            t_stats=TrackerStat.objects.filter(torrent_id=t.id, level=0)[0]
             t.seed = t_stats.seed
             t.leech = t_stats.leech
             t.save()
