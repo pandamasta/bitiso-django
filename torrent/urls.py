@@ -18,6 +18,7 @@ urlpatterns = [
     path('about/', TemplateView.as_view(template_name="torrent/about.html")),    
     path('faq/', TemplateView.as_view(template_name="torrent/faq.html")),    
     path('contact/', TemplateView.as_view(template_name="torrent/contact.html")),
+    path('categories/', views.category_list, name='category_list'),
 
 
 ]

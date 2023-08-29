@@ -14,7 +14,9 @@ class Category(models.Model):
         verbose_name_plural = _(u'Categories')
 
     def __str__(self):
-        return u'%s (ID %d)' % (self.name, self.id)
+        if self.category_parent_id:
+            return f"{self.category_parent_id.name} -> {self.name}"
+        return self.name
 
     # id = models.AutoField(primary_key=True)
     name = models.CharField(_(u'Name'), max_length=64, null=False)

@@ -25,6 +25,13 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display = ['name','description','small_image']
     actions = [make_published]
 
+class CategoryAdmin(admin.ModelAdmin):
+    ordering = ['category_parent_id', 'name']
+    list_display = ['name', 'category_parent_id']
+    list_filter = ['category_parent_id']
+
+
+
 #############################
 
 class ExternalTorrentAdminForm(forms.ModelForm):
@@ -50,8 +57,8 @@ class ExternalTorrentAdmin(admin.ModelAdmin):
 
     download_torrent.short_description = "Download torrent file"
 
-admin.site.register(Category)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Torrent, TorrentAdmin)
 admin.site.register(Tracker, TrackerAdmin)
 admin.site.register(ExternalTorrent, ExternalTorrentAdmin)
+admin.site.register(Category, CategoryAdmin)

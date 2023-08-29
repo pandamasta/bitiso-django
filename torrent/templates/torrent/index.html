@@ -28,7 +28,7 @@
 {% if torrent_list %}
 {% for torrent in torrent_list %}
             <tr>
-                <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.name }}</a></td>
+                <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.category_parent_id.name|default:"None"  }}</a></td>
                 <td class="no-wrap">
                     {% if torrent.project.mini_image %}
                     <img src="{{ torrent.project.mini_image.url }}" alt="">

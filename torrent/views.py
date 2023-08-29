@@ -1,4 +1,4 @@
-from .models import Torrent, Project
+from .models import Torrent, Project, Category
 from django.http import HttpResponse
 from django.core.management import call_command
 from django.shortcuts import render, get_object_or_404
@@ -126,3 +126,7 @@ def torrent_list_view(request):
         'torrent_list': torrents
     }
     return render(request, 'torrent/index.html', context)
+
+def category_list(request):
+    categories = Category.objects.filter(category_parent_id__isnull=True)
+    return render(request, 'torrent/category_list.html', {'categories': categories})
