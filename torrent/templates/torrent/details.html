@@ -2,74 +2,143 @@
 {% load static %}
 {% block title %}Bitiso.org{% endblock %}
 {% block content %}
-    <h1>{{ torrent_detail.name }}</h1>
+    <h1 style="text-align: center">{{ torrent_detail.name }}</h1>
+    <div class="scrollable-container">
 
-
-{{ torrent_detail.info_hash}}
-    {{ torrent_detail.name}}
-    {{ torrent_detail.size | filesizeformat }} ({{torrent_detail.size}}
-    {{ torrent_detail.pieces}}
-    {{ torrent_detail.piece_size}}
-    {{ torrent_detail.creation }}
-	   {% for tracker in tracker_detail %}
-           {{ tracker.tracker.url }} <span class="seed">{{ tracker.seed }}</span> <span class="leech">{{ tracker.leech }}</span> <br/>
-  	   {% endfor %}
-    <a href="{{ torrent_detail.magnet}} "><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a>
-    <a href="/media/{{ torrent_detail.metainfo_file }} ">{{ torrent_detail.torrent_filename }}</a>
-    {% if torrent_detail.gpg_signature %}
-        {{ torrent_detail.gpg_signature }}
+<table class="pure-table pure-table-bordered">
+    <tbody>
+        <tr>
+            <td><strong>Info hash</strong></td>
+            <td>{{ torrent_detail.info_hash }}</td>
+        </tr>
+        <tr>
+            <td><strong>Name</strong></td>
+            <td>{{ torrent_detail.name }}</td>
+        </tr>
+        <tr>
+            <td><strong>Size</strong></td>
+            <td>{{ torrent_detail.size | filesizeformat }} ({{ torrent_detail.size }} byte)</td>
+        </tr>
+        <tr>
+            <td><strong>Metainfo File</strong></td>
+            <td><a href="/media/{{ torrent_detail.metainfo_file }}">{{ torrent_detail.torrent_filename }}</a></td>
+        </tr>
+        <tr>
+            <td><strong>Magnet</strong></td>
+            <td><a href="{{ torrent_detail.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+        </tr>
+        <tr>
+            <td><strong>Pieces</strong></td>
+            <td>{{ torrent_detail.pieces }}</td>
+        </tr>
+        <tr>
+            <td><strong>Piece Size</strong></td>
+            <td>{{ torrent_detail.piece_size }}</td>
+        </tr>
+        <tr>
+            <td><strong>Creation Date</strong></td>
+            <td>{{ torrent_detail.creation }}</td>
+        </tr>
+        <tr>
+            <td><strong>Trackers</strong></td>
+            <td>
+                {% for tracker in tracker_detail %}
+                    {{ tracker.tracker.url }} <span class="seed">{{ tracker.seed }}</span> <span class="leech">{{ tracker.leech }}</span><br/>
+                {% endfor %}
+            </td>
+        </tr>
+        {% if torrent_detail.gpg_signature %}
+        <tr>
+            <td><strong>GPG signature</strong></td>
+            <td>{{ torrent_detail.gpg_signature }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td><strong>Created by bitiso</strong></td>
+            <td>
+                {% if torrent_detail.is_bitiso == True %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+        </tr>
+    <tr>
+    <td><strong>File Number</strong></td>
+    <td>{{ torrent_detail.file_nbr }}</td>
+</tr>
+<tr>
+    <td><strong>File List</strong></td>
+    <td>{{ torrent_detail.file_list }}</td>
+</tr>
+{% if torrent_detail.description %}
+<tr>
+    <td><strong>Description</strong></td>
+    <td>{{ torrent_detail.description }}</td>
+</tr>
+{% endif %}
+{% if torrent_detail.website_url %}
+<tr>
+    <td><strong>Website URL</strong></td>
+    <td><a href="{{ torrent_detail.website_url }}">{{ torrent_detail.website_url }}</a></td>
+</tr>
+{% endif %}
+{% if torrent_detail.website_url_download %}
+<tr>
+    <td><strong>Download URL</strong></td>
+    <td>{{ torrent_detail.website_url_download }}</td>
+</tr>
+{% endif %}
+{% if torrent_detail.website_url_repo %}
+<tr>
+    <td><strong>Repository URL</strong></td>
+    <td>{{ torrent_detail.website_url_repo }}</td>
+</tr>
+{% endif %}
+{% if torrent_detail.architecture %}
+<tr>
+    <td><strong>Architecture</strong></td>
+    <td>{{ torrent_detail.architecture }}</td>
+</tr>
+{% endif %}
+{% if torrent_detail.version %}
+<tr>
+    <td><strong>Version</strong></td>
+    <td>{{ torrent_detail.version }}</td>
+</tr>
+{% endif %}
+{% if torrent_detail.project.name %}
+<tr>
+    <td><strong>Project Name</strong></td>
+    <td>{{ torrent_detail.project.name }}</td>
+</tr>
+{% endif %}
+{% if torrent_detail.project.description %}
+<tr>
+    <td><strong>Project Description</strong></td>
+    <td>{{ torrent_detail.project.description }}</td>
+</tr>
+{% endif %}
+{% if torrent_detail.project.website_url %}
+<tr>
+    <td><strong>Project Website URL</strong></td>
+    <td><a href="{{ torrent_detail.project.website_url }}">{{ torrent_detail.project.website_url }}</a></td>
+</tr>
+{% endif %}
+{% if torrent_detail.project.website_url_download %}
+<tr>
+    <td><strong>Project Download URL</strong></td>
+    <td><a href="{{ torrent_detail.project.website_url_download }}">{{ torrent_detail.project.website_url_download }}</a></td>
+</tr>
+{% endif %}
+{% if torrent_detail.project.website_url_repo %}
+<tr>
+    <td><strong>Project Repository URL</strong></td>
+    <td>{{ torrent_detail.project.website_url_repo }}</td>
+</tr>
     {% endif %}
-  {% if torrent_detail.is_bitiso == True %}
-  Yes
-  {% else %}
-  No
-  {% endif %}
-{{ torrent_detail.file_nbr}}
-{{ torrent_detail.file_list}}
 
-  {% if torrent_detail.description %}
-  {{ torrent_detail.description }}
-  {% endif %}
-
-    {%  if torrent_detail.website_url %}
-<a href="{{ torrent_detail.website_url }}">{{ torrent_detail.website_url }}</a>
-  {% endif %}
-
-  {% if torrent_detail.website_url_download %}
-{{ torrent_detail.website_url_download }}
-  {% endif %}
-
-  {% if torrent_detail.website_url_repo %}
-{{ torrent_detail.website_url_repo }}
-  {% endif %}
-
-  {% if torrent_detail.architecture  %}
-  {{ torrent_detail.architecture }}
-  {% endif %}
-
-  {% if torrent_detail.version  %}
-  {{ torrent_detail.version }}
-  {% endif %}
-
-  {% if torrent_detail.project.name %}
-  {{ torrent_detail.project.name }}
-  {% endif %}
-
-  {% if torrent_detail.project.description  %}
-  {{ torrent_detail.project.description }}
-  {% endif %}
-
-  {% if torrent_detail.project.website_url  %}
-  <a href="{{  torrent_detail.project.website_url }}">{{  torrent_detail.project.website_url }}</a>
-  {% endif %}
-
-  {%   if  torrent_detail.project.website_url_download  %}
-<a href="{{ torrent_detail.project.website_url_download }}">{{ torrent_detail.project.website_url_download }}</a>
-  {% endif %}
-
-  {%   if   torrent_detail.website_url_repo  %}
-{{ torrent_detail.project.website_url_repo }}
-  {% endif %}
-
-
+    </tbody>
+</table>
+    </div>
 {% endblock %}
