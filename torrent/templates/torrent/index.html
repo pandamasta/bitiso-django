@@ -29,11 +29,13 @@
 {% for torrent in torrent_list %}
             <tr>
                 <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.category_parent_id.name|default:"None"  }}</a></td>
+                {#<td>{{ torrent.category.category_parent_id.name|default:"None"  }}</td>#}
+
                 <td class="no-wrap">
                     {% if torrent.project.mini_image %}
                     <img src="{{ torrent.project.mini_image.url }}" alt="">
                     {% endif %}
-                    <a href="/detail/{{ torrent.info_hash }}">{{ torrent.name }}</a></td>
+                    <a href="/detail/{{ torrent.name }}">{{ torrent.name }}</a></td>
                 <td>{{ torrent.size | filesizeformat  }}</td>
                 <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
 {#                <td><a href="/media/{{ torrent.metainfo_file }}"><img src="{% static 'img/download7.png' %}" width="13" height="13" alt="Torrent"></a></td>#}
