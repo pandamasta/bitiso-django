@@ -34,17 +34,18 @@ def index(request):
 
 def detail(request, torrent_name):
 
-    torrent_detail = Torrent.objects.get(name=name)
+    torrent_detail = Torrent.objects.get(name=torrent_name)
     tracker_detail = torrent_detail.trackerstat_set.all()
     context = {'torrent_detail': torrent_detail ,'tracker_detail': tracker_detail}
 
     return render(request, 'torrent/details.html', context)
+
 def category(request, category_id):
 
     torrent_list = Torrent.objects.filter(is_active=True).filter(category_id=category_id).order_by('-creation')
     context = {'torrent_list': torrent_list}
 
-    return render(request, 'torrent/index.html', context)
+    return render(request, 'torrent/category.html', context)
 
 def project(request):
 

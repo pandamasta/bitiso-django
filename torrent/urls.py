@@ -10,7 +10,7 @@ from django.contrib import admin
 urlpatterns = [
     path('', views.torrent_list_view),
     # path('', search, name='torrent/index.html'),
-    path('detail/<name>/', views.detail),
+    path('detail/<torrent_name>/', views.detail),
     path('category/<category_id>/', views.category),
     path('project/<int:project_id>/', views.project_detail, name='torrent/project_detail.html'),
     path('project/', views.project),
