@@ -25,7 +25,7 @@ class Command(BaseCommand):
         for i in os.listdir(torrent_data):
            absolute_path = os.path.join(torrent_data,i)
            torrent_filename = i+".torrent"
-           absolute_path_torrent = settings.TORRENT_FILES + '/' + torrent_filename 
+           absolute_path_torrent = settings.BITISO_TORRENT_STATIC + '/' + torrent_filename 
 
            # Check if file not null, not existing, and not a directory
 
@@ -75,6 +75,7 @@ class Command(BaseCommand):
 
 
            t.write(os.path.join(settings.TORRENT_FILES,t.name+'.torrent'))
+           t.write(os.path.join(settings.BITISO_TORRENT_STATIC,t.name+'.torrent'))
            print("Write torrent: " + t.name+'.torrent')
 
 

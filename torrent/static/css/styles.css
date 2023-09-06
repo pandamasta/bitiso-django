@@ -363,6 +363,10 @@ a:active {
     width: 100%;
 }
 
+.scrollable-container.catagory {
+  margin-top: 50px;
+}
+
 .no-wrap {
     white-space: nowrap;
     max-width: 100%;

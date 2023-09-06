@@ -13,7 +13,7 @@ class TrackerStatInline(admin.TabularInline):
     extra = 1
 
 class TorrentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'seed','leech','is_active','size', 'pieces', 'piece_size','metainfo_file']
+    list_display = ['name', 'is_active', 'is_bitiso', 'seed','leech', 'pieces', 'piece_size','metainfo_file']
     actions = [make_published]
     inlines = [TrackerStatInline]
 

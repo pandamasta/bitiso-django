@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 import os
+from django.conf import settings
 
 class Category(models.Model):
     """
@@ -99,7 +100,7 @@ class Project(models.Model):
     def create_resized_images(self):
         if not self.image:
             return
-
+    
         from PIL import Image
         sizes = {
             'mini': (13, 13),
@@ -107,27 +108,29 @@ class Project(models.Model):
             'medium': (600, 600),
             'large': (900, 900),
         }
-
+    
         for size_name, size in sizes.items():
             # Ouvrez l'image originale
             img = Image.open(self.image.path)
             img.thumbnail(size)
-
+    
             # Construisez le chemin pour la nouvelle image redimensionnée
             filename = os.path.basename(self.image.name)
-            new_path = f'img/project/{size_name}/{filename}'
-
+            new_path_relative = f'img/project/{size_name}/{filename}'
+            #new_path_absolute = os.path.join(settings.MEDIA_ROOT, new_path_relative)
+            new_path_absolute = os.path.join(settings.MEDIA_ROOT, new_path_relative)
+    
             # Assurez-vous que le dossier de destination existe
-            full_path = os.path.join(settings.MEDIA_ROOT, new_path)
-            os.makedirs(os.path.dirname(full_path), exist_ok=True)
-
+            os.makedirs(os.path.dirname(new_path_absolute), exist_ok=True)
+    
             # Sauvegardez l'image redimensionnée
-            img.save(full_path)
-
+            #img.save(new_path_relative)
+            img.save(new_path_absolute)
+    
             # Mettez à jour le champ correspondant dans le modèle
-            setattr(self, f'{size_name}_image', new_path)
-
-        super().save(update_fields=['mini_image','small_image', 'medium_image', 'large_image'])
+            setattr(self, f'{size_name}_image', new_path_relative)
+    
+        super().save(update_fields=['mini_image', 'small_image', 'medium_image', 'large_image'])
 
 class Torrent(models.Model):
     """

@@ -51,7 +51,8 @@ class Command(BaseCommand):
 
                 # print("Write torrent to:" + os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
                 # t.write(os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
-                torrent_file_path=os.path.join(settings.TORRENT_FILES, t.name + '.torrent')
+                #torrent_file_path=os.path.join(settings.TORRENT_FILES, t.name + '.torrent')
+                torrent_file_path=os.path.join(settings.BITISO_TORRENT_STATIC, t.name + '.torrent')
                 if os.path.exists(torrent_file_path):
                     print("Le fichier existe déjà. Remove")
                     os.remove(torrent_file_path)
