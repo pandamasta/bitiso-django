@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-# Extra app attached to this project 
+# Extra app attached to this project
 extra_apps = os.getenv('DJANGO_EXTRA_APPS', '')
 if extra_apps:
     extra_apps_list = extra_apps.split(',')
@@ -120,7 +120,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# webroot
+#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WEBROOT = os.getenv('DJANGO_WEBROOT_PATH', os.path.join(BASE_DIR, 'webroot'))
+
+# static
+STATIC_URL = os.getenv('DJANGO_STATIC_URL', '/static/')
+STATIC_ROOT = os.getenv('DJANGO_STATIC_ROOT', os.path.join(WEBROOT, 'static'))
+
+# media
+MEDIA_URL = os.getenv('DJANGO_MEDIA_URL', '/media/')
+MEDIA_ROOT = os.getenv('DJANGO_MEDIA_ROOT', os.path.join(WEBROOT, 'media'))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

@@ -1,4 +1,5 @@
 venv/
+webroot/
 *.pyc
 bitiso/__pycache__/
 db.sqlite3
