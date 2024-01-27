@@ -44,6 +44,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+# Extra app attached to this project 
+extra_apps = os.getenv('DJANGO_EXTRA_APPS', '')
+if extra_apps:
+    extra_apps_list = extra_apps.split(',')
+    INSTALLED_APPS.extend(extra_apps_list)
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
