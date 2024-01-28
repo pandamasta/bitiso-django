@@ -154,17 +154,14 @@ CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
 
 # APP
 
-TORRENT_EXTERNAL = os.getenv('DJANGO_TORRENT_EXTERNAL', os.path.join(WEBROOT, 'torrent', 'external'))
+TRACKER_ANNOUNCE = ['http://tracker.bitiso.org:6969','udp://tracker.bitiso.org:6969']
 
-#TORRENT_DATA_TMP= os.getenv('TORRENT_DATA_TMP', os.path.join(WEBROOT, 'torrent', 'data_tmp'))
-
-#TORRENT_DATA_TMP= '/home/panda/git/private/djkick/projects/bitiso/webroot/torrent/data_tmp'
+TORRENT_FILES = os.getenv('TORRENT_FILES', os.path.join(WEBROOT, 'torrent', 'media'))
+ENFORCE_CREATE = os.getenv('ENFORCE_CREATE', 'True')
 
 TORRENT_DATA_TMP = os.getenv('TORRENT_DATA_TMP', os.path.join(WEBROOT, 'torrent', 'data_tmp'))
 TORRENT_DATA = os.getenv('TORRENT_DATA', os.path.join(WEBROOT, 'torrent', 'data'))
 
+TORRENT_EXTERNAL = os.getenv('DJANGO_TORRENT_EXTERNAL', os.path.join(WEBROOT, 'torrent','external'))
+BITISO_TORRENT_STATIC = os.getenv('BITISO_TORRENT_STATIC', os.path.join(WEBROOT, 'media', 'torrent'))
 
-BITISO_TORRENT_STATIC = os.getenv('BITISO_TORRENT_STATIC', os.path.join(WEBROOT, 'torrent'))
-TRACKER_ANNOUNCE = ['http://tracker.bitiso.org','udp://tracker.bitiso.org']
-TORRENT_FILES = os.getenv('TORRENT_FILES', os.path.join(WEBROOT, 'torrent', 'meta'))
-ENFORCE_CREATE = os.getenv('ENFORCE_CREATE', 'True')

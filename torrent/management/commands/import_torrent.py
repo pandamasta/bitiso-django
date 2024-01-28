@@ -25,23 +25,24 @@ class Command(BaseCommand):
             else:
                 print("Torrent " + t.infohash + " doesn't exist")
 
-                # Insérer le tracker de bitiso
+                # Ajouter votre tracker personnalisé à la liste des trackers
                 t.trackers.append([settings.TRACKER_ANNOUNCE])
-                print("Tracker list after insert: " + str(t.trackers))
 
-                # Écrire le .torrent dans le dossier "meta/external"
-                torrent_folder = os.path.join(settings.BITISO_TORRENT_STATIC, "meta", "external")
-                if not os.path.exists(torrent_folder):
-                    os.makedirs(torrent_folder)
+                # Afficher le contenu de l'objet Torrenttorf pour le débogage
+                print("Contenu de l'objet Torrenttorf avant l'écriture :")
+                print("Name:", t.name)
+                print("Trackers:", t.trackers)
 
-                # Écrire le .torrent dans le dossier "meta/external"
-                torrent_file_path = os.path.join(settings.BITISO_TORRENT_STATIC, "meta", "external", i)
+               # torrent_folder = os.path.join(settings.BITISO_TORRENT_STATIC, "meta")
+               # if not os.path.exists(torrent_folder):
+               #     os.makedirs(torrent_folder)
+
+                torrent_file_path = os.path.join(settings.BITISO_TORRENT_STATIC, i)
                 if os.path.exists(torrent_file_path):
                     print("Le fichier existe déjà. Remove")
                     os.remove(torrent_file_path)
                 else:
                     print("Le fichier n'existe pas.")
-
 
                 # Écrire le fichier torrent
                 t.write(torrent_file_path)
@@ -84,9 +85,9 @@ class Command(BaseCommand):
                     t.save()
 
                 # Copier le torrent original dans "meta/external"
-                original_torrent_path = os.path.join(settings.TORRENT_EXTERNAL, i)
-                destination_torrent_path = os.path.join(settings.BITISO_TORRENT_STATIC, "meta", "external", i)
-                shutil.copyfile(original_torrent_path, destination_torrent_path)
-                print("Copied original torrent to: " + destination_torrent_path)
+                #original_torrent_path = os.path.join(settings.TORRENT_EXTERNAL, i)
+                #destination_torrent_path = os.path.join(settings.BITISO_TORRENT_STATIC,     i)
+                #shutil.copyfile(original_torrent_path, destination_torrent_path)
+                #print("Copied original torrent to: " + destination_torrent_path)
                 # Supprimer le fichier torrent original
                 #os.remove(original_torrent_path)
