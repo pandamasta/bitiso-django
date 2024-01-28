@@ -26,8 +26,6 @@ class Command(BaseCommand):
 
         # Calculate the SHA-256 hash of the file
         sha256_hash_value = hashlib.sha256()
-        # Calcul du hachage SHA-256 du fichier
-        sha256_hash_value = hashlib.sha256()
         with open(file_path, "rb") as f:
             for byte_block in iter(lambda: f.read(4096), b""):
                 sha256_hash_value.update(byte_block)
@@ -109,8 +107,7 @@ class Command(BaseCommand):
         print("Moving file {} to: {}".format(file_path, dst_path))
         shutil.move(file_path, dst_path)
 
-    def create_torrent_for_directory_and_move(self, dir_path, hash_signature):
-
+    def create_torrent_for_directory_and_move(self, dir_path):
         print("Creating torrent for directory: {}".format(dir_path))
 
         # Check if the directory is empty
@@ -190,6 +187,13 @@ class Command(BaseCommand):
         for tracker_id in list_of_tracker_id:
             obj.trackers.add(tracker_id)
 
+        # Move data to the torrent client path
+        src_path = dir_path
+        dst_path = settings.TORRENT_DATA
+
+        print("Moving directory {} to: {}".format(dir_path, dst_path))
+        shutil.move(dir_path, dst_path)
+
     def handle(self, *args, **kwargs):
         # Get the path from the command line arguments or use the default
         torrent_data = kwargs.get('path') or settings.TORRENT_DATA_TMP
@@ -219,5 +223,6 @@ class Command(BaseCommand):
 
             # Check if it's a directory
             if os.path.isdir(item_path):
-                hash_signature = hashlib.sha256()  # Calcul du hachage SHA-256
-                self.create_torrent_for_directory_and_move(item_path, hash_signature)
+                self.create_torrent_for_directory_and_move(item_path)
+
+# Exécutez la commande pour créer les torrents
