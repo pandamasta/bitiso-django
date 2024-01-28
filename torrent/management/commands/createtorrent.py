@@ -7,123 +7,144 @@ import shutil
 import datetime
 import re
 import hashlib
-from django.conf import settings
 
 class Command(BaseCommand):
+
     help = "Create a torrent (metainfo file) from a file or a directory"
+
     def add_arguments(self, parser):
-
         # Optional argument
-        parser.add_argument('-p', '--path', type=str, help='Define path of data to be created as torrent', )
+        parser.add_argument('-p', '--path', type=str, help='Define path of data to be created as torrent')
 
+    def create_torrent_and_move(self, file_path):
+        # Check if the file is empty
+        if os.stat(file_path).st_size == 0:
+            print("File: {} is empty. Skip".format(file_path))
+            return
 
-    def handle(self, *args, **kwargs):
+        # Check if the torrent file already exists
+        torrent_filename = os.path.basename(file_path) + ".torrent"
+        absolute_path_torrent = os.path.join(settings.BITISO_TORRENT_STATIC, torrent_filename)
+        if os.path.isfile(absolute_path_torrent):
+            print("File: {} already exists. Skip".format(absolute_path_torrent))
+            return
 
-        torrent_data=settings.TORRENT_DATA_TMP
-        #torrent_data=settings.TORRENT_DATA
+        # Hash the file with SHA-256
+        sha256_hash = hashlib.sha256()
+        with open(file_path, "rb") as f:
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        sha256 = sha256_hash.hexdigest()
+        print("File hash {}: {}".format(file_path, sha256))
 
-        for i in os.listdir(torrent_data):
-           absolute_path = os.path.join(torrent_data,i)
-           torrent_filename = i+".torrent"
-           absolute_path_torrent = settings.BITISO_TORRENT_STATIC + '/' + torrent_filename 
+        # Create the metainfo file (.torrent)
+        now = datetime.datetime.now()
+        t = Torrenttorf(
+            file_path,
+            trackers=settings.TRACKER_ANNOUNCE,
+            comment='',
+            created_by='Bitiso.org',
+            creation_date=now
+        )
+        t.private = True
+        t.generate()
 
-           # Check if file not null, not existing, and not a directory
+        # Check if infohash exists in the database
+        if Torrent.objects.filter(info_hash=t.infohash).exists():
+            print("Info hash {} already exists in DB".format(t.infohash))
+            return
 
-           if os.stat(absolute_path).st_size == 0:
-             print("File: " + absolute_path + " is empty. Skip")
-             continue
+        if not os.path.exists(settings.TORRENT_FILES):
+            os.makedirs(settings.TORRENT_FILES)
 
-           if os.path.isfile(absolute_path_torrent):
-             print("File: " + os.path.join(absolute_path_torrent + ' already exist. Skip' ))
-             continue
+        # Path to the torrent file
+        torrent_file_path = os.path.join(settings.TORRENT_FILES, t.name + '.torrent')
 
-           if os.path.isdir(absolute_path):
-             print("File: " + absolute_path + " is a directory. Skip")
-             continue
+        # Check if the torrent file already exists
+        if os.path.isfile(torrent_file_path):
+            print("The torrent file already exists and will be replaced: {}".format(torrent_file_path))
+            os.remove(torrent_file_path)
 
-           # Hash 256
- 
-           sha256_hash = hashlib.sha256()
-           with open(absolute_path,"rb") as f:
-               # Read and update hash string value in blocks of 4K
-               for byte_block in iter(lambda: f.read(4096),b""):
-                   sha256_hash.update(byte_block)
-               sha256=sha256_hash.hexdigest()
+        t.write(torrent_file_path)
+        print("Write torrent: {}".format(t.name + '.torrent'))
 
-           print("File hash " + absolute_path + " " + sha256)
-
-           ## Create the metainfo file .torrent
-
-           now = datetime.datetime.now()
-
-           t = Torrenttorf(absolute_path, 
-                       trackers=settings.TRACKER_ANNOUNCE,
-                       comment='',
-                       created_by='Bitiso.org',
-                       creation_date=now)
-
-
-           t.private = True
-           t.generate()
-
-
-           # Check if infohash exit in DB
-
-           if Torrent.objects.filter(info_hash=t.infohash).exists():
-             print("Info hash " + t.infohash + " already exist in DB")
-             continue
-
-
-           t.write(os.path.join(settings.TORRENT_FILES,t.name+'.torrent'))
-           t.write(os.path.join(settings.BITISO_TORRENT_STATIC,t.name+'.torrent'))
-           print("Write torrent: " + t.name+'.torrent')
-
-
-           # Insert unknown tracker in DB
-
-           list_of_tracker_id=[]
-           print(t.trackers)
-           for tracker_url in t.trackers:
-
-             tracker_url_sanitized=re.search('\'(.*)\'', str(tracker_url), re.IGNORECASE).group(1)
-
-             if not Tracker.objects.filter(url=tracker_url_sanitized).exists():
-
-                print('Insert new tracker: '+ str(tracker_url_sanitized))
-                tracker=Tracker(url=tracker_url_sanitized)
+        # Insert unknown trackers into the database
+        list_of_tracker_id = []
+        for tracker_url in t.trackers:
+            tracker_url_sanitized = re.search('\'(.*)\'', str(tracker_url), re.IGNORECASE).group(1)
+            if not Tracker.objects.filter(url=tracker_url_sanitized).exists():
+                print('Insert new tracker: {}'.format(tracker_url_sanitized))
+                tracker = Tracker(url=tracker_url_sanitized)
                 tracker.save()
                 list_of_tracker_id.append(tracker.id)
+            list_of_tracker_id.append(Tracker.objects.get(url=tracker_url_sanitized).id)
+        print(list_of_tracker_id)
 
-             list_of_tracker_id.append(Tracker.objects.get(url=tracker_url_sanitized).id)
-           print(list_of_tracker_id)
+        # Format file list
+        file_list = ''
+        for i in t.files:
+            file_list += '{};{}\n'.format(i.name, i.size)
 
-           # Format file list
-           file_list=''
-           for i in t.files:
-               file_list+=str(i.name + ';' +  str(i.size) + '\n')
-               print(file_list)
+        # Insert general metadata into the database
+        obj = Torrent(
+            info_hash=t.infohash,
+            name=t.name,
+            size=t.size,
+            pieces=t.pieces,
+            piece_size=t.piece_size,
+            magnet=t.magnet(),
+            torrent_filename=t.name + '.torrent',
+            metainfo_file='torrent/' + t.name + '.torrent',
+            file_list=file_list,
+            file_nbr=len(t.files),
+            hash_signature=sha256
+        )
+        obj.save()
 
-           # Insert general metadata in DB
-           obj = Torrent(info_hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size, magnet=t.magnet(),torrent_filename=t.name + '.torrent',metainfo_file='torrent/'+ t.name + '.torrent', file_list=file_list, file_nbr=len(t.files), hash_signature=sha256)
-           
-           obj.save()
+        for tracker_id in list_of_tracker_id:
+            obj.trackers.add(tracker_id)
 
-           for tracker_id in list_of_tracker_id:
-             obj.trackers.add(tracker_id)
+        # Move data to the torrent client path
+        src_path = os.path.dirname(file_path)
+        dst_path = settings.TORRENT_DATA
 
-           # Move data to torrent client path
+        print("Moving file {} to: {}".format(file_path, dst_path))
+        shutil.move(file_path, dst_path)
 
-           # absolute path
-           src_path = absolute_path
-           dst_path = settings.TORRENT_DATA + "/" 
+    def create_torrent_for_directory_and_move(self, dir_path):
+        print("Creating torrents for files inside directory: {}".format(dir_path))
+        for root, dirs, files in os.walk(dir_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                self.create_torrent_and_move(file_path)
 
-           print ("Move file " + src_path)
-           print ("To :" + dst_path)
+    def handle(self, *args, **kwargs):
+        # Get the path from the command line arguments or use the default
+        torrent_data = kwargs.get('path') or settings.TORRENT_DATA_TMP
 
-           shutil.move(src_path, dst_path)
+        # Check if the path is defined
+        if not torrent_data:
+            print("The path to the torrent folder is not defined.")
+            return
 
+        enforce_create = settings.ENFORCE_CREATE
 
-           #self.stdout.write(absolute_path)
+        # Check if the directory exists and create it if necessary
+        if not os.path.exists(torrent_data):
+            if enforce_create:
+                os.makedirs(torrent_data)
+            else:
+                print("The directory does not exist: {} and ENFORCE_CREATE is disabled.".format(torrent_data))
+                return
 
-        #path = kwargs['path']
+        # Process files and directories
+        for item in os.listdir(torrent_data):
+            item_path = os.path.join(torrent_data, item)
 
+            # Check if it's a file
+            if os.path.isfile(item_path):
+                self.create_torrent_and_move(item_path)
+
+            # Check if it's a directory
+            if os.path.isdir(item_path):
+                self.create_torrent_for_directory_and_move(item_path)

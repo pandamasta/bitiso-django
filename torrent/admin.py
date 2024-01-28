@@ -49,6 +49,7 @@ class ExternalTorrentAdmin(admin.ModelAdmin):
         return self.url
 
     def download_torrent(self, request, queryset):
+        self.ensure_directory_exists(settings.TORRENT_EXTERNAL)
 
         print("In download_torrent")
         for obj in queryset:
@@ -56,6 +57,10 @@ class ExternalTorrentAdmin(admin.ModelAdmin):
             call_command('download_torrent', obj.url)
 
     download_torrent.short_description = "Download torrent file"
+    @staticmethod
+    def ensure_directory_exists(path):
+        if not os.path.exists(path):
+            os.makedirs(path)
 
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Torrent, TorrentAdmin)
