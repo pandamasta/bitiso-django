@@ -1,118 +1,92 @@
+import os
+import shutil
 from django.core.management.base import BaseCommand
 from django.conf import settings
-import os
 from torf import Torrent as Torrenttorf
 from torrent.models import Torrent, Tracker
-import shutil
-import re
-
 
 class Command(BaseCommand):
     help = "Import torrent from existing one"
 
-    def add_arguments(self, parser):
-
-        # Optional argument
-        parser.add_argument('-p', '--path', type=str, help='Define path of data to be created as torrent', )
-
     def handle(self, *args, **kwargs):
-
-        t = Torrenttorf.read
-
+        # Chemin du dossier contenant les torrents externes
         torrent_file_tmp = settings.TORRENT_EXTERNAL
-
 
         for i in os.listdir(torrent_file_tmp):
             absolute_path = os.path.join(torrent_file_tmp, i)
             print("Read Torrent: " + absolute_path)
 
-            # Read meta info from .torrent
-
+            # Lire les métadonnées du .torrent existant
             t = Torrenttorf.read(absolute_path)
 
-            # Check if info_hash exit in DB
-
+            # Vérifier si info_hash existe déjà dans la base de données
             if Torrent.objects.filter(info_hash=t.infohash).exists():
-                print("Info hash " + t.infohash + " already exist in DB. skip")
+                print("Info hash " + t.infohash + " already exists in DB. Skip")
             else:
                 print("Torrent " + t.infohash + " doesn't exist")
-                #continue
 
-                # Insert bitiso tracker
-
-                print("Insert bitiso tracker")
-                print("Current Trackers in the torrent")
-                print(t.trackers)
-                print("Insert tracker from settings.TRACKER_ANNOUNCE ")
-                t.trackers.insert(len(t.trackers), settings.TRACKER_ANNOUNCE)
+                # Insérer le tracker de bitiso
+                t.trackers.append([settings.TRACKER_ANNOUNCE])
                 print("Tracker list after insert: " + str(t.trackers))
 
-                # Write the .torrent
+                # Écrire le .torrent dans le dossier "meta/external"
+                torrent_folder = os.path.join(settings.BITISO_TORRENT_STATIC, "meta", "external")
+                if not os.path.exists(torrent_folder):
+                    os.makedirs(torrent_folder)
 
-                # print("Write torrent to:" + os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
-                # t.write(os.path.join(settings.TORRENT_FILES, t.name + '.torrent'))
-                #torrent_file_path=os.path.join(settings.TORRENT_FILES, t.name + '.torrent')
-                torrent_file_path=os.path.join(settings.BITISO_TORRENT_STATIC, t.name + '.torrent')
+                # Écrire le .torrent dans le dossier "meta/external"
+                torrent_file_path = os.path.join(settings.BITISO_TORRENT_STATIC, "meta", "external", i)
                 if os.path.exists(torrent_file_path):
                     print("Le fichier existe déjà. Remove")
                     os.remove(torrent_file_path)
                 else:
                     print("Le fichier n'existe pas.")
 
-                # Écrivez le fichier torrent
+
+                # Écrire le fichier torrent
                 t.write(torrent_file_path)
                 print("Fichier torrent " + torrent_file_path + " écrit avec succès.")
 
-                # Insert unknown tracker in DB
-
+                # Insérer le tracker inconnu dans la base de données
                 list_of_tracker_id = []
                 print("Insert unknown tracker in DB")
                 for sublist in t.trackers:
                     level = t.trackers.index(sublist)
                     for tracker_url in sublist:
-                        print("tracker_url : " + str(tracker_url) + "level: " + str(level))
+                        print("tracker_url : " + str(tracker_url) + " level: " + str(level))
                         if not Tracker.objects.filter(url=tracker_url).exists():
                             print('Insert new tracker: ' + str(tracker_url))
                             tracker = Tracker(url=tracker_url)
                             tracker.save()
-                            list_of_tracker_id.append([tracker.id,level])
+                            list_of_tracker_id.append([tracker.id, level])
                         else:
                             list_of_tracker_id.append([Tracker.objects.get(url=tracker_url).id, level])
 
                         print(list_of_tracker_id)
 
-                # Insert torrent metadata in DB
-
+                # Format de la liste des fichiers dans le torrent
                 file_list = ''
                 for file in t.files:
                     file_list += str(file.name + ';' + str(file.size) + '\n')
                 print("File in torrent: " + file_list)
+
+                # Insérer les métadonnées du torrent dans la base de données
                 obj = Torrent(info_hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size,
                               magnet=t.magnet(), torrent_filename=t.name + '.torrent',
                               metainfo_file='torrent/' + t.name + '.torrent', file_list=file_list, file_nbr=len(t.files))
                 obj.save()
 
-
-                # Attach tracker to torrent and set the tracker level
-
+                # Attacher le tracker au torrent et définir le niveau du tracker
                 for tracker_id in list_of_tracker_id:
                     obj.trackers.add(tracker_id[0])
-                    # obj.save()
-                    t=obj.trackerstat_set.get(tracker_id=tracker_id[0])
-                    t.level=tracker_id[1]
+                    t = obj.trackerstat_set.get(tracker_id=tracker_id[0])
+                    t.level = tracker_id[1]
                     t.save()
 
-
-# #          # Move data to torrent client path
-# #
-# #
-#            # absolute path
-#            src_path = absolute_path
-#            dst_path = settings.TORRENT_FILES_TMP_OK
-#
-#            print ("Move file " + src_path)
-#            print ("To :" + dst_path)
-#
-#            shutil.move(src_path, dst_path + '/' + t.name  + '.torrent')
-#
-#            #self.stdout.write(absolute_path)
+                # Copier le torrent original dans "meta/external"
+                original_torrent_path = os.path.join(settings.TORRENT_EXTERNAL, i)
+                destination_torrent_path = os.path.join(settings.BITISO_TORRENT_STATIC, "meta", "external", i)
+                shutil.copyfile(original_torrent_path, destination_torrent_path)
+                print("Copied original torrent to: " + destination_torrent_path)
+                # Supprimer le fichier torrent original
+                #os.remove(original_torrent_path)

@@ -164,7 +164,7 @@ TORRENT_DATA_TMP = os.getenv('TORRENT_DATA_TMP', os.path.join(WEBROOT, 'torrent'
 TORRENT_DATA = os.getenv('TORRENT_DATA', os.path.join(WEBROOT, 'torrent', 'data'))
 
 
-BITISO_TORRENT_STATIC = os.getenv('BITISO_TORRENT_STATIC', os.path.join(WEBROOT, 'torrent', 'static'))
+BITISO_TORRENT_STATIC = os.getenv('BITISO_TORRENT_STATIC', os.path.join(WEBROOT, 'torrent'))
 TRACKER_ANNOUNCE = ['http://tracker.bitiso.org','udp://tracker.bitiso.org']
 TORRENT_FILES = os.getenv('TORRENT_FILES', os.path.join(WEBROOT, 'torrent', 'meta'))
 ENFORCE_CREATE = os.getenv('ENFORCE_CREATE', 'True')
