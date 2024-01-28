@@ -73,7 +73,7 @@ class Command(BaseCommand):
 
                 # Insérer les métadonnées du torrent dans la base de données
                 obj = Torrent(info_hash=t.infohash, name=t.name, size=t.size, pieces=t.pieces, piece_size=t.piece_size,
-                              magnet=t.magnet(), torrent_filename=t.name + '.torrent',
+                              magnet=t.magnet(), torrent_filename=t.name + '.torrent', is_bitiso=False,
                               metainfo_file='torrent/' + t.name + '.torrent', file_list=file_list, file_nbr=len(t.files))
                 obj.save()
 
