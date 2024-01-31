@@ -13,26 +13,25 @@ class Command(BaseCommand):
 
         # Scrape and build a dictionary with tracker_id as key
 
-        hashes=[]
-        scrape_dict={}
+        hashes = []
+        scrape_dict = {}
         for tracker in Tracker.objects.all():
-            scrape_dict[tracker.id]={}
+            scrape_dict[tracker.id] = {}
             for torrent in TrackerStat.objects.filter(tracker_id=tracker.id):
                 hashes.append(torrent.torrent.info_hash)
             try:
                 if not hashes:
                     print("No Torrent for tracker: " + str(tracker))
+                elif tracker.url.startswith("http://tracker.bitiso.org"):
+                    print(f"No scrape support for tracker: {tracker.url}")
                 else:
-                    scrape_dict[tracker.id]=scrape(tracker=tracker.url,hashes=hashes)
-            except(TimeoutError):
+                    scrape_dict[tracker.id] = scrape(tracker=tracker.url, hashes=hashes)
+            except TimeoutError:
                 print("timeout")
-
             except BencodeDecodeError:
                 print(f"Error: Invalid bencoded data received from tracker: {tracker.url}")
             finally:
                 hashes = []  # Clearing the hashes list for the next iteration
-
-        # scrape_dict={5: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 33, 'peers': 0, 'complete': 47}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 15, 'peers': 0, 'complete': 15}}, 6: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 33, 'peers': 0, 'complete': 47}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 15, 'peers': 0, 'complete': 15}}, 7: {'0062ffdee976404615a8b9f4c2eaa6d6717c7c65': {'seeds': 0, 'peers': 0, 'complete': 0}, '6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 1, 'peers': 0, 'complete': 1}}, 8: {'6fa58258c686ef73df6b4fb34b6d2c07cf0afadd': {'seeds': 1, 'peers': 0, 'complete': 1}}}
 
         # Parse the scraping result and update the DB
         for tracker_id in scrape_dict:
@@ -46,12 +45,10 @@ class Command(BaseCommand):
 
         # Update the torrent seed and leech with tracker stat level 0
 
-        torrents=Torrent.objects.all()
+        torrents = Torrent.objects.all()
 
         for t in torrents:
-            t_stats=TrackerStat.objects.filter(torrent_id=t.id, level=0)[0]
+            t_stats = TrackerStat.objects.filter(torrent_id=t.id, level=0)[0]
             t.seed = t_stats.seed
             t.leech = t_stats.leech
             t.save()
-
-           #self.stdout.write(absolute_path)
