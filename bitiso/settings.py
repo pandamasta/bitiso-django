@@ -154,7 +154,7 @@ CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
 
 # APP
 
-TRACKER_ANNOUNCE = ['http://tracker.bitiso.org:6969','udp://tracker.bitiso.org:6969']
+TRACKER_ANNOUNCE = os.getenv('TORRENT_TRACKER_ANNOUNCE', '').split(',')
 
 TORRENT_FILES = os.getenv('TORRENT_FILES', os.path.join(WEBROOT, 'torrent', 'media'))
 ENFORCE_CREATE = os.getenv('ENFORCE_CREATE', 'True')

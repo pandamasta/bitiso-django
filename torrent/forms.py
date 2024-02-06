@@ -1,4 +1,5 @@
 from django import forms
+from .models import Category
 
 class SearchForm(forms.Form):
     query = forms.CharField(label="Search", max_length=100, min_length=2)
@@ -8,3 +9,7 @@ class SearchForm(forms.Form):
         if len(query) < 2:
             raise forms.ValidationError("La recherche doit contenir au moins 2 caractères.")
         return query
+
+
+class SetCategoryForm(forms.Form):
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), required=True, label="Category")
