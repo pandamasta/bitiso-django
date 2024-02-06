@@ -1,5 +1,5 @@
 from django import forms
-from .models import Category
+from .models import Category, Project
 
 class SearchForm(forms.Form):
     query = forms.CharField(label="Search", max_length=100, min_length=2)
@@ -13,3 +13,11 @@ class SearchForm(forms.Form):
 
 class SetCategoryForm(forms.Form):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=True, label="Category")
+
+
+class SetProjectForm(forms.Form):
+    project = forms.ModelChoiceField(
+        queryset=Project.objects.all(),
+        required=True,
+        label="Project"
+    )
