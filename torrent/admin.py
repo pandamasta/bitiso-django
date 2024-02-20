@@ -10,9 +10,12 @@ from django.core.management import call_command
 from django.urls import reverse
 
 
-@admin.action(description='Show torrent in frontend')
-def make_published(modeladmin, request, queryset):
+@admin.action(description='Show in frontend')
+def pub(modeladmin, request, queryset):
     queryset.update(is_active=True)
+@admin.action(description='Hide in frontend')
+def unpub(modeladmin, request, queryset):
+    queryset.update(is_active=False)
 
 class TrackerStatInline(admin.TabularInline):
     model = TrackerStat
@@ -20,7 +23,7 @@ class TrackerStatInline(admin.TabularInline):
 
 class TorrentAdmin(admin.ModelAdmin):
     list_display = ['name', 'is_active', 'is_bitiso', 'seed','leech', 'pieces', 'piece_size','metainfo_file']
-    actions = [make_published, 'set_category', 'set_project']  # Ajoutez l'action 'set_project'
+    actions = [pub,unpub, 'set_category', 'set_project']  # Ajoutez l'action 'set_project'
     inlines = [TrackerStatInline]
 
     def get_urls(self):
@@ -87,11 +90,11 @@ class TorrentAdmin(admin.ModelAdmin):
 
 class TrackerAdmin(admin.ModelAdmin):
     list_display = ['url']
-    actions = [make_published]
+    actions = [pub]
 
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['name','description','small_image']
-    actions = [make_published]
+    actions = [pub]
 
 class CategoryAdmin(admin.ModelAdmin):
     ordering = ['category_parent_id', 'name']
