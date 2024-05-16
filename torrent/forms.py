@@ -1,5 +1,5 @@
 from django import forms
-from .models import Category, Project
+from .models import Category, Project, Torrent
 
 class SearchForm(forms.Form):
     query = forms.CharField(label="Search", max_length=100, min_length=2)
@@ -21,3 +21,6 @@ class SetProjectForm(forms.Form):
         required=True,
         label="Project"
     )
+
+class FileUploadForm(forms.Form):
+    file = forms.FileField(label='Select a file')

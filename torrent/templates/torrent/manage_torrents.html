@@ -1,0 +1,30 @@
+{% extends "torrent/base.html" %}
+
+{% block content %}
+    <h2>Gérer mes Torrents</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom du fichier</th>
+                <th>Date d'upload</th>
+                <th>Visible</th>
+                <th>Approuvé</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for torrent in torrents %}
+            <tr>
+                <td>{{ torrent.file.name }}</td>
+                <td>{{ torrent.upload_date }}</td>
+                <td>{{ torrent.is_visible|yesno:"Oui,Non" }}</td>
+                <td>{{ torrent.is_approved|yesno:"Oui,Non" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Aucun torrent uploadé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

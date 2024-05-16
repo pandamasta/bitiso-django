@@ -62,6 +62,7 @@ class Project(models.Model):
     # id = models.AutoField(primary_key=True)
     name = models.CharField(_(u'Project name'), max_length=128, null=False)
     slug = models.SlugField(blank=True, null=True)
+
     is_active = models.BooleanField(_(u'Show in the front end'), null=False, default=False)
     description = models.TextField(_(u'Description of project'), blank=True, null=True, default='')
     website_url = models.CharField(_(u'URL of official website'), max_length=2000, blank=True, null=True)

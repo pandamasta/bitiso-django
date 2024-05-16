@@ -1,10 +1,16 @@
 from .models import Torrent, Project, Category
 from django.http import HttpResponse
 from django.core.management import call_command
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .forms import SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .ratelimit import RateLimit, RateLimitExceeded
+from .forms import FileUploadForm
+from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from django.contrib import messages
+
 
 # def project_detail(request, project_id):
 #     project = get_object_or_404(Project, pk=project_id)
@@ -130,3 +136,26 @@ def torrent_list_view(request):
 def category_list(request):
     categories = Category.objects.filter(category_parent_id__isnull=True)
     return render(request, 'torrent/category_list.html', {'categories': categories})
+
+def manage_torrents(request):
+    user_torrents = Torrent.objects.filter(uploader=request.user)
+    return render(request, 'torrent/manage_torrents.html', {'torrents': user_torrents})
+
+
+def file_upload(request):
+    if request.method == 'POST':
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['file']
+            fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+            filename = fs.save(file.name, file)
+            messages.success(request, "Upload succeed")
+            return redirect('manage_torrents')
+    else:
+        form = FileUploadForm()
+    return render(request, 'torrent/upload.html', {'form': form})
+
+
+
+def file_upload_success(request):
+    return render(request, 'torrent/upload_success.html')
