@@ -10,6 +10,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from .forms import CustomAuthenticationForm
 
 
 # def project_detail(request, project_id):
@@ -159,3 +163,21 @@ def file_upload(request):
 
 def file_upload_success(request):
     return render(request, 'torrent/upload_success.html')
+
+def login_view(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('dashboard')
+    else:
+        form = CustomAuthenticationForm()
+    return render(request, 'torrent/login.html', {'form': form})
+
+@login_required
+def dashboard(request):
+    return render(request, 'torrent/dashboard.html')
