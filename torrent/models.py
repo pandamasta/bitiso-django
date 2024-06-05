@@ -179,8 +179,14 @@ class Torrent(models.Model):
 
     creation = models.DateTimeField(auto_now_add=True)
     deletion = models.DateTimeField(_(u'Delete?'), blank=True, null=True)
-    uploader = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_(u'Uploader'), null=True, blank=True,
-                                 default='', on_delete=models.PROTECT)
+    uploader = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name='Uploader',
+        null=True,
+        blank=True,
+        default='',
+        on_delete=models.PROTECT
+    )
 
     # Stats
 

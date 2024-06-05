@@ -4,5 +4,38 @@
 <div class="container">
         <h2>Welcome to your Dashboard</h2>
         <p>Hello, {{ user.username }}!</p>
+        <p>You have {{ torrent_count }} torrents.</p>
+
+        <h3>Your Torrents:</h3>
+    <div class="scrollable-container">
+<table class="pure-table pure-table-horizontal torrent-table">
+                <tr>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Pieces</th>
+                    <th>Piece Size</th>
+                    <th>Seeds</th>
+                    <th>Leeches</th>
+                    <th>Downloads</th>
+                    <th>Completed</th>
+                    <th>Added At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for torrent in torrents %}
+                    <tr>
+                        <td>{{ torrent.name }}</td>
+                        <td>{{ torrent.size }}</td>
+                        <td>{{ torrent.pieces }}</td>
+                        <td>{{ torrent.piece_size }}</td>
+                        <td>{{ torrent.seed }}</td>
+                        <td>{{ torrent.leech }}</td>
+                        <td>{{ torrent.dl_number }}</td>
+                        <td>{{ torrent.dl_completed }}</td>
+                        <td>{{ torrent.creation }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 </div>
 {% endblock %}

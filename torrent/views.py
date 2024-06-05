@@ -180,4 +180,8 @@ def login_view(request):
 
 @login_required
 def dashboard(request):
-    return render(request, 'torrent/dashboard.html')
+    user = request.user
+    torrents = Torrent.objects.filter(uploader=user)
+    torrent_count = torrents.count()
+    return render(request, 'torrent/dashboard.html', {'torrents': torrents, 'torrent_count': torrent_count})
+    #return render(request, 'torrent/dashboard.html')
