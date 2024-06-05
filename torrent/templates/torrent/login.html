@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-    <link rel="stylesheet" href="">
-</head>
-<body>
+{% extends "torrent/base.html" %}
+{% block title %}Bitiso.org | Login {% endblock %}
+{% block content %}
     <div class="container">
         <h2>Login</h2>
         <form method="post">
@@ -12,6 +8,5 @@
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
-    </div>
-</body>
-</html>
+</div>
+{% endblock %}
