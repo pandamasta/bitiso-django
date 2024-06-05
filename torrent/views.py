@@ -185,3 +185,12 @@ def dashboard(request):
     torrent_count = torrents.count()
     return render(request, 'torrent/dashboard.html', {'torrents': torrents, 'torrent_count': torrent_count})
     #return render(request, 'torrent/dashboard.html')
+
+
+@login_required
+def delete_torrents(request):
+    if request.method == 'POST':
+        torrent_ids = request.POST.getlist('torrent_ids')
+        if torrent_ids:
+            Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).delete()
+    return redirect('dashboard')

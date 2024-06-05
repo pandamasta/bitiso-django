@@ -24,6 +24,7 @@ urlpatterns = [
     path('manage/', views.manage_torrents, name='manage_torrents'),
     path('login/', views.login_view, name='login'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('delete_torrents/', views.delete_torrents, name='delete_torrents'),
 
 ]
 admin.site.index_template = 'admin/index.html'

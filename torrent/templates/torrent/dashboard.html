@@ -9,33 +9,48 @@
         <h3>Your Torrents:</h3>
     <div class="scrollable-container">
 <table class="pure-table pure-table-horizontal torrent-table">
-                <tr>
-                    <th>Name</th>
-                    <th>Size</th>
-                    <th>Pieces</th>
-                    <th>Piece Size</th>
-                    <th>Seeds</th>
-                    <th>Leeches</th>
-                    <th>Downloads</th>
-                    <th>Completed</th>
-                    <th>Added At</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for torrent in torrents %}
+        <h2>Welcome to your Dashboard</h2>
+        <p>Hello, {{ user.username }}!</p>
+        <p>You have {{ torrent_count }} torrents.</p>
+
+        <h3>Your Torrents:</h3>
+        <form method="post" action="{% url 'delete_torrents' %}">
+            {% csrf_token %}
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td>{{ torrent.name }}</td>
-                        <td>{{ torrent.size }}</td>
-                        <td>{{ torrent.pieces }}</td>
-                        <td>{{ torrent.piece_size }}</td>
-                        <td>{{ torrent.seed }}</td>
-                        <td>{{ torrent.leech }}</td>
-                        <td>{{ torrent.dl_number }}</td>
-                        <td>{{ torrent.dl_completed }}</td>
-                        <td>{{ torrent.creation }}</td>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Pieces</th>
+                        <th>Piece Size</th>
+                        <th>Seeds</th>
+                        <th>Leeches</th>
+                        <th>Downloads</th>
+                        <th>Completed</th>
+                        <th>Added At</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for torrent in torrents %}
+                        <tr>
+                            <td><input type="checkbox" name="torrent_ids" value="{{ torrent.id }}"></td>
+                            <td>{{ torrent.name }}</td>
+                            <td>{{ torrent.size }}</td>
+                            <td>{{ torrent.pieces }}</td>
+                            <td>{{ torrent.piece_size }}</td>
+                            <td>{{ torrent.seed }}</td>
+                            <td>{{ torrent.leech }}</td>
+                            <td>{{ torrent.dl_number }}</td>
+                            <td>{{ torrent.dl_completed }}</td>
+                            <td>{{ torrent.creation }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-danger">Delete Selected</button>
+        </form>
+    </div>
 </div>
+
 {% endblock %}
