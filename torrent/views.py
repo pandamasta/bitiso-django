@@ -180,7 +180,7 @@ def delete_torrents(request):
         torrent_ids = request.POST.getlist('torrent_ids')
         if torrent_ids:
             Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).delete()
-    return redirect('torrent/dashboard')
+    return redirect('dashboard')
 
 @login_required
 def file_upload(request):
@@ -199,29 +199,31 @@ def file_upload(request):
                 else:
                     t.trackers.append([settings.TRACKER_ANNOUNCE])
                     file_list = ''.join([f"{file.name};{file.size}\n" for file in t.files])
+                    magnet_uri = str(t.magnet())  # Ensure magnet URI is a string
                     obj = Torrent(
-                        info_hash=t.infohash,
-                        name=t.name,
+                        info_hash=t.infohash[:40],  # Truncate to fit the database field length
+                        name=t.name[:128],  # Truncate to fit the database field length
                         size=t.size,
                         pieces=t.pieces,
                         piece_size=t.piece_size,
-                        magnet=t.magnet(),
-                        torrent_filename=t.name + '.torrent',
+                        magnet=magnet_uri[:2048],  # Truncate to fit the database field length
+                        torrent_filename=(t.name + '.torrent')[:128],  # Truncate to fit the database field length
                         is_bitiso=False,
-                        metainfo_file='torrent/' + t.name + '.torrent',
-                        file_list=file_list,
+                        metainfo_file='torrent/' + (t.name + '.torrent')[:128],  # Truncate to fit the database field length
+                        file_list=file_list[:2048],  # Truncate to fit the database field length
                         file_nbr=len(t.files),
                         uploader=request.user,
-                        comment="Default comment",
+                        comment="Default comment"[:256],  # Truncate to fit the database field length
+                        slug=t.name[:50],  # Truncate to fit the database field length
                         category=None,
                         is_active=True,
-                        description="Default description",
-                        website_url="",
-                        website_url_download="",
-                        website_url_repo="",
-                        version="1.0",
+                        description="Default description"[:2000],  # Truncate to fit the database field length
+                        website_url=""[:2000],  # Truncate to fit the database field length
+                        website_url_download=""[:2000],  # Truncate to fit the database field length
+                        website_url_repo=""[:2000],  # Truncate to fit the database field length
+                        version="1.0"[:16],  # Truncate to fit the database field length
                         gpg_signature=None,
-                        hash_signature="",
+                        hash_signature=""[:128],  # Truncate to fit the database field length
                         seed=0,
                         leech=0,
                         dl_number=0,

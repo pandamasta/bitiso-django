@@ -39,7 +39,7 @@
                         <tr>
                             <td><input type="checkbox" name="torrent_ids" value="{{ torrent.id }}"></td>
                             <td>{{ torrent.name }}</td>
-                            <td>{{ torrent.size }}</td>
+                            <td>{{ torrent.size | filesizeformat  }}</td>
                             <td>{{ torrent.pieces }}</td>
                             <td>{{ torrent.piece_size }}</td>
                             <td>{{ torrent.seed }}</td>

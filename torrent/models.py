@@ -147,9 +147,7 @@ class Torrent(models.Model):
         return u'%s (Hash %s)' % (self.name, self.info_hash)
 
     # Fields extracted from .torrent file with management import2db.py
-    # id = models.AutoField(primary_key=True)
     info_hash = models.CharField(_(u'SHA1 of torrent'), max_length=40, unique=True)
-   #  info_hash = models.CharField(_(u'SHA1 of torrent'), max_length=40, primary_key=True)
     name = models.CharField(_(u'Name'), max_length=128, null=False)
     slug = models.SlugField(blank=True, null=True)
 
@@ -159,13 +157,12 @@ class Torrent(models.Model):
     magnet = models.TextField(_(u'Magnet URI'), null=False, default="NONAME")
     torrent_filename = models.CharField(_(u'Torrent file name'), max_length=128, null=False, default="NONAME")
     comment = models.CharField(_(u'Comment'), max_length=256, null=False, default="NONAME")
-    trackers = models.ManyToManyField(Tracker, through="TrackerStat")
+    trackers = models.ManyToManyField('Tracker', through="TrackerStat")
     file_list = models.TextField(_(u'List of files'), null=False, default="NONAME")
     file_nbr = models.IntegerField(_(u'Number of file'), null=False, default=1)
 
     # Other field that describe the torrent
-
-    category = models.ForeignKey(Category, verbose_name=_(u'Category'), null=True, on_delete=models.PROTECT)
+    category = models.ForeignKey('Category', verbose_name=_(u'Category'), null=True, on_delete=models.PROTECT)
     is_active = models.BooleanField(_(u'Show in the front end'), null=False, default=False)
     is_bitiso = models.BooleanField(_(u'Created by bitiso ?'), null=False, default=True)
     description = models.TextField(_(u'Description'), blank=True, null=True, default='')
@@ -189,22 +186,20 @@ class Torrent(models.Model):
     )
 
     # Stats
-
     seed = models.IntegerField(_(u'Number of seed'), default=0)
     leech = models.IntegerField(_(u'Number of leech'), default=0)
     dl_number = models.IntegerField(_(u'Number of download'), default=0)
     dl_completed = models.IntegerField(_(u'Number of completed'), default=0)
 
     # Project
-
-    project = models.ForeignKey(Project, verbose_name=_(u'Project'), null=True, on_delete=models.PROTECT)
+    project = models.ForeignKey('Project', verbose_name=_(u'Project'), null=True, on_delete=models.PROTECT)
 
     def _generate_unique_slug(self):
         value = self.name
         slug_candidate = slugify(value)
         unique_slug = slug_candidate
         number = 1
-        while Category.objects.filter(slug=unique_slug).exists():
+        while Torrent.objects.filter(slug=unique_slug).exists():
             unique_slug = '{}-{}'.format(slug_candidate, number)
             number += 1
         return unique_slug
@@ -212,9 +207,9 @@ class Torrent(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = self._generate_unique_slug()
-            # self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+        
 class TrackerStat(models.Model):
     """
     Torrent statistic on trackers
