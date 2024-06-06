@@ -1,3 +1,4 @@
+import os
 from .models import Torrent, Project, Category
 from django.http import HttpResponse
 from django.core.management import call_command
@@ -14,7 +15,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from .forms import CustomAuthenticationForm
-
+from torf import Torrent as Torrenttorf, BdecodeError
+from torrent.models import Torrent, Tracker
 
 # def project_detail(request, project_id):
 #     project = get_object_or_404(Project, pk=project_id)
@@ -146,20 +148,6 @@ def manage_torrents(request):
     return render(request, 'torrent/manage_torrents.html', {'torrents': user_torrents})
 
 
-def file_upload(request):
-    if request.method == 'POST':
-        form = FileUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            file = request.FILES['file']
-            fs = FileSystemStorage(location=settings.MEDIA_ROOT)
-            filename = fs.save(file.name, file)
-            messages.success(request, "Upload succeed")
-            return redirect('manage_torrents')
-    else:
-        form = FileUploadForm()
-    return render(request, 'torrent/upload.html', {'form': form})
-
-
 
 def file_upload_success(request):
     return render(request, 'torrent/upload_success.html')
@@ -183,9 +171,8 @@ def dashboard(request):
     user = request.user
     torrents = Torrent.objects.filter(uploader=user)
     torrent_count = torrents.count()
-    return render(request, 'torrent/dashboard.html', {'torrents': torrents, 'torrent_count': torrent_count})
-    #return render(request, 'torrent/dashboard.html')
-
+    form = FileUploadForm()
+    return render(request, 'torrent/dashboard.html', {'torrents': torrents, 'torrent_count': torrent_count, 'form': form})
 
 @login_required
 def delete_torrents(request):
@@ -193,4 +180,75 @@ def delete_torrents(request):
         torrent_ids = request.POST.getlist('torrent_ids')
         if torrent_ids:
             Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).delete()
+    return redirect('torrent/dashboard')
+
+@login_required
+def file_upload(request):
+    if request.method == 'POST':
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['file']
+            fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+            filename = fs.save(file.name, file)
+            try:
+                torrent_file_path = os.path.join(settings.MEDIA_ROOT, filename)
+                t = Torrenttorf.read(torrent_file_path)
+
+                if Torrent.objects.filter(info_hash=t.infohash).exists():
+                    messages.warning(request, "Info hash " + t.infohash + " already exists in the database.")
+                else:
+                    t.trackers.append([settings.TRACKER_ANNOUNCE])
+                    file_list = ''.join([f"{file.name};{file.size}\n" for file in t.files])
+                    obj = Torrent(
+                        info_hash=t.infohash,
+                        name=t.name,
+                        size=t.size,
+                        pieces=t.pieces,
+                        piece_size=t.piece_size,
+                        magnet=t.magnet(),
+                        torrent_filename=t.name + '.torrent',
+                        is_bitiso=False,
+                        metainfo_file='torrent/' + t.name + '.torrent',
+                        file_list=file_list,
+                        file_nbr=len(t.files),
+                        uploader=request.user,
+                        comment="Default comment",
+                        category=None,
+                        is_active=True,
+                        description="Default description",
+                        website_url="",
+                        website_url_download="",
+                        website_url_repo="",
+                        version="1.0",
+                        gpg_signature=None,
+                        hash_signature="",
+                        seed=0,
+                        leech=0,
+                        dl_number=0,
+                        dl_completed=0,
+                        project=None
+                    )
+                    obj.save()
+
+                    list_of_tracker_id = []
+                    for sublist in t.trackers:
+                        level = t.trackers.index(sublist)
+                        for tracker_url in sublist:
+                            if not Tracker.objects.filter(url=tracker_url).exists():
+                                tracker = Tracker(url=tracker_url)
+                                tracker.save()
+                                list_of_tracker_id.append([tracker.id, level])
+                            else:
+                                list_of_tracker_id.append([Tracker.objects.get(url=tracker_url).id, level])
+
+                    for tracker_id in list_of_tracker_id:
+                        obj.trackers.add(tracker_id[0])
+                        tracker_stat = obj.trackerstat_set.get(tracker_id=tracker_id[0])
+                        tracker_stat.level = tracker_id[1]
+                        tracker_stat.save()
+
+                    messages.success(request, "Upload and import succeeded.")
+            except BdecodeError:
+                messages.error(request, "Invalid torrent file format.")
+            return redirect('dashboard')
     return redirect('dashboard')

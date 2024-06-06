@@ -19,13 +19,11 @@ urlpatterns = [
     path('faq/', TemplateView.as_view(template_name="torrent/faq.html")),
     path('contact/', TemplateView.as_view(template_name="torrent/contact.html")),
     path('categories/', views.category_list, name='category_list'),
-    path('upload/', views.file_upload, name='file_upload'),
-    path('upload_success/', views.file_upload_success, name='file_upload_success'),
     path('manage/', views.manage_torrents, name='manage_torrents'),
     path('login/', views.login_view, name='login'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('delete_torrents/', views.delete_torrents, name='delete_torrents'),
-
+    path('upload/', views.file_upload, name='file_upload'),
 ]
 admin.site.index_template = 'admin/index.html'
 admin.autodiscover()

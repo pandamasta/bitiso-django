@@ -6,12 +6,15 @@
         <p>Hello, {{ user.username }}!</p>
         <p>You have {{ torrent_count }} torrents.</p>
 
-        <h3>Your Torrents:</h3>
-    <div class="scrollable-container">
-<table class="pure-table pure-table-horizontal torrent-table">
-        <h2>Welcome to your Dashboard</h2>
-        <p>Hello, {{ user.username }}!</p>
-        <p>You have {{ torrent_count }} torrents.</p>
+        {% if messages %}
+            <div class="alert alert-dismissible">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <h3>Your Torrents:</h3>
         <form method="post" action="{% url 'delete_torrents' %}">
@@ -43,14 +46,20 @@
                             <td>{{ torrent.leech }}</td>
                             <td>{{ torrent.dl_number }}</td>
                             <td>{{ torrent.dl_completed }}</td>
-                            <td>{{ torrent.creation }}</td>
+                            <td>{{ torrent.added_at }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <button type="submit" class="btn btn-danger">Delete Selected</button>
         </form>
-    </div>
+
+        <h3>Upload a Torrent</h3>
+        <form method="post" action="{% url 'file_upload' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
 </div>
 
 {% endblock %}
