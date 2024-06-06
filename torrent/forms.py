@@ -41,3 +41,6 @@ class CustomAuthenticationForm(AuthenticationForm):
         label=_("Password"),
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
+
+class URLDownloadForm(forms.Form):
+    url = forms.URLField(label='URL to Download')

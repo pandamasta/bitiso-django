@@ -24,6 +24,8 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('delete_torrents/', views.delete_torrents, name='delete_torrents'),
     path('upload/', views.file_upload, name='file_upload'),
+    path('download_torrent/', views.download_torrent, name='download_torrent'),
+
 ]
 admin.site.index_template = 'admin/index.html'
 admin.autodiscover()
