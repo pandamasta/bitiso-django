@@ -464,3 +464,7 @@ a:active {
 .torrent-table {
     margin-top: 5px;
 }
+
+.form-group {
+    display: none;
+

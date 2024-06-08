@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
 
+
 class SearchForm(forms.Form):
     query = forms.CharField(label="Search", max_length=100, min_length=2)
 
@@ -26,10 +27,6 @@ class SetProjectForm(forms.Form):
         label="Project"
     )
 
-class FileUploadForm(forms.Form):
-    file = forms.FileField(label='Select a file')
-
-
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
@@ -42,5 +39,29 @@ class CustomAuthenticationForm(AuthenticationForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
 
+
+class FileUploadForm(forms.Form):
+    file = forms.FileField(label='Select a file')
+
 class URLDownloadForm(forms.Form):
     url = forms.URLField(label='URL to Download')
+
+
+
+class TorrentActionForm(forms.Form):
+    torrent_ids = forms.MultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple,
+        choices=[],
+        required=False
+    )
+    action = forms.ChoiceField(
+        choices=[('delete', 'Delete'), ('set_category', 'Set Category'), ('set_project', 'Set Project')],
+        required=True
+    )
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False)
+    project = forms.ModelChoiceField(queryset=Project.objects.all(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        torrent_choices = kwargs.pop('torrent_choices', [])
+        super().__init__(*args, **kwargs)
+        self.fields['torrent_ids'].choices = torrent_choices

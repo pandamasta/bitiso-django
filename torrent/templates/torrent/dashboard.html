@@ -1,7 +1,7 @@
 {% extends "torrent/base.html" %}
 {% block title %}Bitiso.org | Dashboard{% endblock %}
 {% block content %}
-<div class="container">
+    <div class="container">
         <h2>Welcome to your Dashboard</h2>
         <p>Hello, {{ user.username }}!</p>
         <p>You have {{ torrent_count }} torrents.</p>
@@ -17,7 +17,7 @@
         {% endif %}
 
         <h3>Your Torrents:</h3>
-        <form method="post" action="{% url 'delete_torrents' %}">
+        <form method="post" action="{% url 'dashboard' %}" class="pure-form">
             {% csrf_token %}
             <table class="table table-striped">
                 <thead>
@@ -46,27 +46,47 @@
                             <td>{{ torrent.leech }}</td>
                             <td>{{ torrent.dl_number }}</td>
                             <td>{{ torrent.dl_completed }}</td>
-                            <td>{{ torrent.added_at }}</td>
+                            <td>{{ torrent.creation }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <button type="submit" class="btn btn-danger">Delete Selected</button>
+            <button type="submit" name="delete" class="pure-button pure-button-danger"">Delete Selected</button>
+            <br><br>
+            <div class="form-group" style="max-width: 200px">
+                <label for="category">Set Category:</label>
+                <select name="category" class="form-control">
+                    <option value="">-- Select Category --</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" name="set_category">Set Category</button>
+            </div>
+            <div class="form-group" style="max-width: 200px">
+                <label for="project">Set Project:</label>
+                <select name="project" class="form-control">
+                    <option value="">-- Select Project --</option>
+                    {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" name="set_project" >Set Project</button>
+            </div>
         </form>
 
         <h3>Upload a Torrent</h3>
-        <form method="post" action="{% url 'file_upload' %}" enctype="multipart/form-data">
+        <form class="pure-form" method="post" action="{% url 'file_upload' %}" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">Upload</button>
         </form>
 
         <h3>Download a Torrent</h3>
-        <form method="post" action="{% url 'download_torrent' %}">
+        <form class="pure-form" method="post" action="{% url 'download_torrent' %}">
             {% csrf_token %}
             {{ url_form.as_p }}
             <button type="submit" class="btn btn-primary">Download</button>
         </form>
-</div>
-
+    </div>
 {% endblock %}

@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from .forms import CustomAuthenticationForm
+from .forms import CustomAuthenticationForm, TorrentActionForm
 from torf import Torrent as Torrenttorf, BdecodeError
 from torrent.models import Torrent, Tracker
 from django.core.files.base import ContentFile
@@ -163,23 +163,53 @@ def login_view(request):
                 return redirect('dashboard')
     else:
         form = CustomAuthenticationForm()
-    return render(request, 'login.html', {'form': form})
-
+    return render(request, 'torrent/login.html', {'form': form})
 
 @login_required
 def dashboard(request):
     user = request.user
     torrents = Torrent.objects.filter(uploader=user)
     torrent_count = torrents.count()
+    categories = Category.objects.all()
+    projects = Project.objects.all()
+
+    if request.method == 'POST':
+        torrent_ids = request.POST.getlist('torrent_ids')
+        if 'delete' in request.POST:
+            if torrent_ids:
+                Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).delete()
+                messages.success(request, "Selected torrents have been deleted.")
+            else:
+                messages.warning(request, "No torrents were selected for deletion.")
+        elif 'set_category' in request.POST:
+            category_id = request.POST.get('category')
+            if category_id and torrent_ids:
+                category = Category.objects.get(id=category_id)
+                Torrent.objects.filter(id__in=torrent_ids).update(category=category)
+                messages.success(request, "Category set successfully.")
+            else:
+                messages.warning(request, "No torrents or category were selected.")
+        elif 'set_project' in request.POST:
+            project_id = request.POST.get('project')
+            if project_id and torrent_ids:
+                project = Project.objects.get(id=project_id)
+                Torrent.objects.filter(id__in=torrent_ids).update(project=project)
+                messages.success(request, "Project set successfully.")
+            else:
+                messages.warning(request, "No torrents or project were selected.")
+        return redirect('dashboard')
+
     form = FileUploadForm()
     url_form = URLDownloadForm()
+
     return render(request, 'torrent/dashboard.html', {
         'torrents': torrents,
         'torrent_count': torrent_count,
         'form': form,
-        'url_form': url_form
+        'url_form': url_form,
+        'categories': categories,
+        'projects': projects
     })
-
 
 @login_required
 def delete_torrents(request):
