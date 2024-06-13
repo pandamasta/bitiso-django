@@ -13,9 +13,9 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import CustomAuthenticationForm, TorrentActionForm
+from .forms import CustomAuthenticationForm, TorrentActionForm, RegisterForm
 from torf import Torrent as Torrenttorf, BdecodeError
 from torrent.models import Torrent, Tracker
 from django.core.files.base import ContentFile
@@ -164,6 +164,21 @@ def login_view(request):
     else:
         form = CustomAuthenticationForm()
     return render(request, 'torrent/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+def register_view(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('dashboard')
+    else:
+        form = RegisterForm()
+    return render(request, 'torrent/register.html', {'form': form})
 
 @login_required
 def dashboard(request):

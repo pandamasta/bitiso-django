@@ -4,6 +4,8 @@ from .models import Category, Project, Torrent
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 
 
 class SearchForm(forms.Form):
@@ -39,6 +41,13 @@ class CustomAuthenticationForm(AuthenticationForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
 
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "password1", "password2"]
 
 class FileUploadForm(forms.Form):
     file = forms.FileField(label='Select a file')

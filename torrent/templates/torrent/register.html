@@ -1,0 +1,47 @@
+{% extends "torrent/base.html" %}
+{% block title %}Bitiso.org | Dashboard{% endblock %}
+{% block content %}
+    <div class="container">
+        <title>Register</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .pure-form input, .pure-form select {
+            background-color: #2e2e2e;
+            color: #e0e0e0;
+            border: 1px solid #6200ee;
+        }
+        .pure-form input:focus, .pure-form select:focus {
+            background-color: #2e2e2e;
+            color: #e0e0e0;
+            border-color: #3700b3;
+        }
+        .pure-button {
+            background-color: #6200ee;
+            color: #fff;
+            border: none;
+        }
+        .pure-button:hover {
+            background-color: #3700b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        <form method="post" action="{% url 'register' %}" class="pure-form pure-form-stacked">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="pure-button pure-button-primary">Register</button>
+        </form>
+    </div>
+    </div>
+
+{% endblock %}
