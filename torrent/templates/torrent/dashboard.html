@@ -23,14 +23,18 @@
                 <thead>
                     <tr>
                         <th></th>
+                        <th>Frontend</th>
+
                         <th>Name</th>
                         <th>Size</th>
                         <th>Pieces</th>
                         <th>Piece Size</th>
                         <th>Seeds</th>
                         <th>Leeches</th>
-                        <th>Downloads</th>
-                        <th>Completed</th>
+                        <th>Category</th>
+                        <th>Project</th>
+
+
                         <th>Added At</th>
                     </tr>
                 </thead>
@@ -38,20 +42,27 @@
                     {% for torrent in torrents %}
                         <tr>
                             <td><input type="checkbox" name="torrent_ids" value="{{ torrent.id }}"></td>
+                            <td>{{ torrent.is_active }}</td>
+
                             <td>{{ torrent.name }}</td>
+
                             <td>{{ torrent.size | filesizeformat  }}</td>
                             <td>{{ torrent.pieces }}</td>
                             <td>{{ torrent.piece_size }}</td>
                             <td>{{ torrent.seed }}</td>
                             <td>{{ torrent.leech }}</td>
-                            <td>{{ torrent.dl_number }}</td>
-                            <td>{{ torrent.dl_completed }}</td>
+                            <td>{{ torrent.category }}</td>
+                            <td>{{ torrent.project }}</td>
+
+
                             <td>{{ torrent.creation }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <button type="submit" name="delete" class="pure-button pure-button-danger"">Delete Selected</button>
+            <button type="submit" name="activate" class="pure-button pure-button-primary">Activate Selected</button>
+            <button type="submit" name="deactivate" class="pure-button pure-button-primary">Deactivate Selected</button>
             <br><br>
             <div class="form-group" style="max-width: 200px">
                 <label for="category">Set Category:</label>

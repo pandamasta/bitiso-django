@@ -212,7 +212,20 @@ def dashboard(request):
                 messages.success(request, "Project set successfully.")
             else:
                 messages.warning(request, "No torrents or project were selected.")
+        elif 'activate' in request.POST:
+            if torrent_ids:
+                Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).update(is_active=True)
+                messages.success(request, "Selected torrents have been activated.")
+            else:
+                messages.warning(request, "No torrents were selected for activation.")
+        elif 'deactivate' in request.POST:
+            if torrent_ids:
+                Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).update(is_active=False)
+                messages.success(request, "Selected torrents have been deactivated.")
+            else:
+                messages.warning(request, "No torrents were selected for deactivation.")
         return redirect('dashboard')
+
 
     form = FileUploadForm()
     url_form = URLDownloadForm()
@@ -347,6 +360,26 @@ def download_torrent(request):
                     t.trackers.append([settings.TRACKER_ANNOUNCE])
                     file_list = ''.join([f"{file.name};{file.size}\n" for file in t.files])
                     magnet_uri = str(t.magnet())  # Ensure magnet URI is a string
+
+                    torrent_name_with_extension = (t.name + '.torrent')[:128]  # Truncate to fit the database field length
+
+                    # Écrire le fichier torrent dans media/torrent
+                    torrent_dir = os.path.join(settings.MEDIA_ROOT, 'torrent')
+                    if not os.path.exists(torrent_dir):
+                        os.makedirs(torrent_dir)
+
+                    torrent_file_path = os.path.join(torrent_dir, torrent_name_with_extension)
+
+                    if os.path.exists(torrent_file_path):
+                        print("Le fichier existe déjà. Remove")
+                        os.remove(torrent_file_path)
+                    else:
+                        print("Le fichier n'existe pas.")
+
+                    t.write(torrent_file_path)
+                    print("Fichier torrent " + torrent_file_path + " écrit avec succès.")
+
+
                     obj = Torrent(
                         info_hash=t.infohash[:40],  # Truncate to fit the database field length
                         name=t.name[:128],  # Truncate to fit the database field length
@@ -364,7 +397,7 @@ def download_torrent(request):
                         comment="Default comment"[:256],  # Truncate to fit the database field length
                         slug=t.name[:50],  # Truncate to fit the database field length
                         category=None,
-                        is_active=True,
+                        is_active=False,
                         description="Default description"[:2000],  # Truncate to fit the database field length
                         website_url="",  # Leave empty
                         website_url_download=url[:2000],  # Store the download URL
