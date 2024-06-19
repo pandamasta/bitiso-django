@@ -4,6 +4,7 @@ from tracker_scraper import scrape
 from bencodepy.exceptions import BencodeDecodeError
 
 from urllib.parse import urlparse
+import urllib3
 
 
 class Command(BaseCommand):
@@ -27,13 +28,17 @@ class Command(BaseCommand):
                 else:
                     scrape_dict[tracker.id] = scrape(tracker=tracker.url, hashes=hashes)
             except TimeoutError:
-                print("timeout")
+                print("Timeout Error with tracker: " + str(tracker.url))
             except BencodeDecodeError:
                 print(f"Error: Invalid bencoded data received from tracker: {tracker.url}")
+            except ConnectionRefusedError:
+                print(f"Connection Refused Error: Could not connect to tracker: {tracker.url}")
+            except urllib3.exceptions.NewConnectionError as e:
+                print(f"Network Error: Failed to establish a new connection to {tracker.url}: {str(e)}")
+            except Exception as e:
+                print(f"Unexpected Error: {str(e)}")
             finally:
-                hashes = []  # Clearing the hashes list for the next iteration
-
-        # Parse the scraping result and update the DB
+                hashes = []  # Clearing the hashes list for the next iteration scraping result and update the DB
         for tracker_id in scrape_dict:
             for info_hash in scrape_dict[tracker_id]:
                 torrent_obj = Torrent.objects.get(info_hash=info_hash)
