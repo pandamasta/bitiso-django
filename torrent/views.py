@@ -8,14 +8,13 @@ from .forms import SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .ratelimit import RateLimit, RateLimitExceeded
 from .forms import URLDownloadForm, FileUploadForm
-from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import CustomAuthenticationForm, TorrentActionForm, RegisterForm
+from .forms import CustomAuthenticationForm, TorrentActionForm, RegisterForm, ProjectForm
 from torf import Torrent as Torrenttorf, BdecodeError
 from torrent.models import Torrent, Tracker
 from django.core.files.base import ContentFile
@@ -238,6 +237,30 @@ def dashboard(request):
         'categories': categories,
         'projects': projects
     })
+
+@login_required
+def dashboard_project(request):
+    user = request.user
+    projects = Project.objects.filter(user=user)
+    project_count = projects.count()
+
+    if request.method == 'POST':
+        project_form = ProjectForm(request.POST, request.FILES)
+        if project_form.is_valid():
+            new_project = project_form.save(commit=False)
+            new_project.uploader = user
+            new_project.save()
+            messages.success(request, "New project has been created.")
+            return redirect('dashboard_project')
+    else:
+        project_form = ProjectForm()
+
+    return render(request, 'torrent/dashboard_project.html', {
+        'projects': projects,
+        'project_count': project_count,
+        'project_form': project_form,
+    })
+
 
 @login_required
 def delete_torrents(request):

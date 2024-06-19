@@ -31,3 +31,23 @@ source ../bin/activate
 (bitiso) source .env; python manage.py createsuperuser --settings=settings.base
 (bitiso) source .env; python manage.py runserver x.x.x.x:8080 --settings=settings.base
 ```
+
+### Postgrsql settings
+
+
+If some error on  DB privilège ensure that the user of the DB has full privilege on following object
+
+```
+postgres=# GRANT ALL PRIVILEGES ON DATABASE <db_name> TO <user>;
+GRANT
+postgres=# \c <db_name>
+You are now connected to database "<db_name>" user "postgres".
+
+<db_name>=# GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO <user>;
+GRANT
+<db_name=># GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO <user>;
+GRANT
+<db_name>=# GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO <user>;
+GRANT
+<bitiso_dev>=# ALTER TABLE <table> OWNER TO <user>;
+```

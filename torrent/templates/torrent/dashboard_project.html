@@ -1,0 +1,21 @@
+{% extends "torrent/base.html" %}
+
+{% block content %}
+<h1>Project Dashboard</h1>
+
+<h2>My Projects</h2>
+<p>You have {{ project_count }} projects.</p>
+
+<ul>
+    {% for project in projects %}
+    <li>{{ project.name }} - {{ project.description }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Create a New Project</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ project_form.as_p }}
+    <button type="submit">Create Project</button>
+</form>
+{% endblock %}

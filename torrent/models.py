@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 import os
 from django.conf import settings
+from django.contrib.auth.models import User
+
 
 class Category(models.Model):
     """
@@ -77,6 +79,14 @@ class Project(models.Model):
     small_image = models.ImageField(upload_to='img/project/small/', blank=True)
     medium_image = models.ImageField(upload_to='img/project/medium/', blank=True)
     large_image = models.ImageField(upload_to='img/project/large/', blank=True)
+    #user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects', default=1)
+
+    creation = models.DateTimeField(auto_now_add=True)
+    deletion = models.DateTimeField(_(u'Delete?'), blank=True, null=True)
+
+
+
 
 
     def __str__(self):
@@ -209,7 +219,7 @@ class Torrent(models.Model):
             self.slug = self._generate_unique_slug()
         super().save(*args, **kwargs)
 
-        
+
 class TrackerStat(models.Model):
     """
     Torrent statistic on trackers

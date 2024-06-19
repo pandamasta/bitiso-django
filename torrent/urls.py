@@ -4,9 +4,6 @@ from django.urls import path
 from django.views.generic import TemplateView
 from django.contrib import admin
 
-
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', views.torrent_list_view),
     # path('', search, name='torrent/index.html'),
@@ -21,9 +18,12 @@ urlpatterns = [
     path('categories/', views.category_list, name='category_list'),
     path('manage/', views.manage_torrents, name='manage_torrents'),
     path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'), 
+    path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/torrent/', views.dashboard, name='dashboard_torrent'),
+    path('dashboard/project/', views.dashboard_project, name='dashboard_project'),
+
     path('delete_torrents/', views.delete_torrents, name='delete_torrents'),
     path('upload/', views.file_upload, name='file_upload'),
     path('download_torrent/', views.download_torrent, name='download_torrent'),

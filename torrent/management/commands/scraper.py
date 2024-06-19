@@ -22,8 +22,8 @@ class Command(BaseCommand):
             try:
                 if not hashes:
                     print("No Torrent for tracker: " + str(tracker))
-                elif tracker.url.startswith("http://tracker.bitiso.org"):
-                    print(f"No scrape support for tracker: {tracker.url}")
+                #elif tracker.url.startswith("http://tracker.bitiso.org"):
+                #    print(f"No scrape support for tracker: {tracker.url}")
                 else:
                     scrape_dict[tracker.id] = scrape(tracker=tracker.url, hashes=hashes)
             except TimeoutError:

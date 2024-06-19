@@ -1,7 +1,6 @@
 from django import forms
 from .models import Category, Project, Torrent
 
-from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
@@ -55,8 +54,6 @@ class FileUploadForm(forms.Form):
 class URLDownloadForm(forms.Form):
     url = forms.URLField(label='URL to Download')
 
-
-
 class TorrentActionForm(forms.Form):
     torrent_ids = forms.MultipleChoiceField(
         widget=forms.CheckboxSelectMultiple,
@@ -74,3 +71,11 @@ class TorrentActionForm(forms.Form):
         torrent_choices = kwargs.pop('torrent_choices', [])
         super().__init__(*args, **kwargs)
         self.fields['torrent_ids'].choices = torrent_choices
+
+from django import forms
+from .models import Project
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ['name', 'description', 'website_url', 'website_url_download', 'website_url_repo', 'image']
