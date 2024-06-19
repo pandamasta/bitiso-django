@@ -245,12 +245,34 @@ def dashboard_project(request):
     project_count = projects.count()
 
     if request.method == 'POST':
-        project_form = ProjectForm(request.POST, request.FILES)
-        if project_form.is_valid():
-            new_project = project_form.save(commit=False)
-            new_project.uploader = user
-            new_project.save()
-            messages.success(request, "New project has been created.")
+        if 'create' in request.POST:
+            project_form = ProjectForm(request.POST, request.FILES)
+            if project_form.is_valid():
+                new_project = project_form.save(commit=False)
+                new_project.uploader = user
+                new_project.save()
+                messages.success(request, "New project has been created.")
+                return redirect('dashboard_project')
+        else:
+            project_ids = request.POST.getlist('project_ids')
+            if 'delete' in request.POST:
+                if project_ids:
+                    Project.objects.filter(id__in=project_ids, user=user).delete()
+                    messages.success(request, "Selected projects have been deleted.")
+                else:
+                    messages.warning(request, "No projects were selected for deletion.")
+            elif 'activate' in request.POST:
+                if project_ids:
+                    Project.objects.filter(id__in=project_ids, user=user).update(is_active=True)
+                    messages.success(request, "Selected projects have been activated.")
+                else:
+                    messages.warning(request, "No projects were selected for activation.")
+            elif 'deactivate' in request.POST:
+                if project_ids:
+                    Project.objects.filter(id__in=project_ids, user=user).update(is_active=False)
+                    messages.success(request, "Selected projects have been deactivated.")
+                else:
+                    messages.warning(request, "No projects were selected for deactivation.")
             return redirect('dashboard_project')
     else:
         project_form = ProjectForm()
@@ -260,6 +282,7 @@ def dashboard_project(request):
         'project_count': project_count,
         'project_form': project_form,
     })
+
 
 
 @login_required
