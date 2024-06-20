@@ -115,9 +115,9 @@ class Project(models.Model):
         from PIL import Image
         sizes = {
             'mini': (13, 13),
-            'small': (150, 150),
-            'medium': (600, 600),
-            'large': (900, 900),
+            'small': (40, 40),
+            'medium': (150, 150),
+            'large': (300, 300),
         }
     
         for size_name, size in sizes.items():
@@ -202,7 +202,9 @@ class Torrent(models.Model):
     dl_completed = models.IntegerField(_(u'Number of completed'), default=0)
 
     # Project
-    project = models.ForeignKey('Project', verbose_name=_(u'Project'), null=True, on_delete=models.PROTECT)
+    #project = models.ForeignKey('Project', verbose_name=_(u'Project'), null=True, on_delete=models.PROTECT)
+    #roject = models.ForeignKey('Project', verbose_name='Project', null=True, on_delete=models.PROTECT, related_name='torrents')
+    project = models.ForeignKey('Project', verbose_name='Project', null=True, on_delete=models.PROTECT, related_name='torrents')
 
     def _generate_unique_slug(self):
         value = self.name

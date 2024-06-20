@@ -1,0 +1,13 @@
+{% extends "torrent/base.html" %}
+
+{% block content %}
+<h1>Torrents for {{ project.name }}</h1>
+
+<ul>
+    {% for torrent in torrents %}
+    <li>{{ torrent.name }} - {{ torrent.description }}</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'dashboard_project' %}">Back to Project Dashboard</a>
+{% endblock %}

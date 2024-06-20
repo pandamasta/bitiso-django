@@ -23,6 +23,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/torrent/', views.dashboard, name='dashboard_torrent'),
     path('dashboard/project/', views.dashboard_project, name='dashboard_project'),
+    path('dashboard/project/<int:project_id>/torrents/', views.list_torrents, name='list_torrents'),
 
     path('delete_torrents/', views.delete_torrents, name='delete_torrents'),
     path('upload/', views.file_upload, name='file_upload'),

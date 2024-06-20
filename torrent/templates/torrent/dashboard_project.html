@@ -12,27 +12,30 @@
         <thead>
             <tr>
                 <th>Select</th>
-                                <th>Thumbnail</th>
-
-                <th>Project Name</th>
+                <th>Thumbnail</th>
                 <th>Is Active</th>
+                <th>Project Name</th>
+                <th>Torrents</th>
                 <th>Description</th>
+
             </tr>
         </thead>
         <tbody>
-            {% for project in projects %}
+            {% for project, torrent_count in projects %}
             <tr>
                 <td><input type="checkbox" name="project_ids" value="{{ project.id }}"></td>
-                                <td>
+                <td>
                     {% if project.mini_image %}
-                    <img src="{{ project.mini_image.url }}" alt="{{ project.name }}" style="width: 50px; height: 50px;">
+                    <img src="{{ project.small_image.url }}" alt="{{ project.name }}" style="width: 50px; height: 50px;">
                     {% else %}
                     No Image
                     {% endif %}
                 </td>
-                <td>{{ project.name }}</td>
                 <td>{{ project.is_active }}</td>
+                <td>{{ project.name }}</td>
+                <td><a href="{% url 'list_torrents' project.id %}">{{ torrent_count }}</a></td>
                 <td>{{ project.description }}</td>
+
             </tr>
             {% endfor %}
         </tbody>

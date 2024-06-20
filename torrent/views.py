@@ -249,7 +249,7 @@ def dashboard_project(request):
             project_form = ProjectForm(request.POST, request.FILES)
             if project_form.is_valid():
                 new_project = project_form.save(commit=False)
-                new_project.uploader = user
+                new_project.user = user
                 new_project.save()
                 messages.success(request, "New project has been created.")
                 return redirect('dashboard_project')
@@ -277,13 +277,29 @@ def dashboard_project(request):
     else:
         project_form = ProjectForm()
 
+    project_torrents = [(project, project.torrents.count()) for project in projects]
+
     return render(request, 'torrent/dashboard_project.html', {
-        'projects': projects,
+        'projects': project_torrents,
         'project_count': project_count,
         'project_form': project_form,
     })
 
+def list_torrents(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    torrents = project.torrents.all()
+    return render(request, 'torrent/list_torrents.html', {
+        'project': project,
+        'torrents': torrents,
+    })
 
+def list_torrents(request, project_id):
+    project = Project.objects.get(id=project_id)
+    torrents = project.torrents.all()
+    return render(request, 'torrent/list_torrents.html', {
+        'project': project,
+        'torrents': torrents,
+    })
 
 @login_required
 def delete_torrents(request):
@@ -295,7 +311,6 @@ def delete_torrents(request):
         else:
             messages.warning(request, "No torrents were selected for deletion.")
     return redirect('dashboard')
-
 
 @login_required
 def file_upload(request):
@@ -332,7 +347,7 @@ def file_upload(request):
                         comment="Default comment"[:256],  # Truncate to fit the database field length
                         slug=t.name[:50],  # Truncate to fit the database field length
                         category=None,
-                        is_active=True,
+                        is_active=False,
                         description="Default description"[:2000],  # Truncate to fit the database field length
                         website_url="",  # Leave empty
                         website_url_download="",  # Leave empty
@@ -370,7 +385,6 @@ def file_upload(request):
                 messages.error(request, "Invalid torrent file format.")
             return redirect('dashboard')
     return redirect('dashboard')
-
 
 @login_required
 def download_torrent(request):
