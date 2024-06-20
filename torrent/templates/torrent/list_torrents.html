@@ -1,13 +1,63 @@
 {% extends "torrent/base.html" %}
 
 {% block content %}
-<h1>Torrents for {{ project.name }}</h1>
+<h1>{{ project.name }}</h1>
 
-<ul>
-    {% for torrent in torrents %}
-    <li>{{ torrent.name }} - {{ torrent.description }}</li>
-    {% endfor %}
-</ul>
+<div class="project-details pure-g">
+    <div class="project-image pure-u-1-4">
+        {% if project.medium_image %}
+        <img src="{{ project.medium_image.url }}" alt="{{ project.name }}">
+        {% else %}
+        <img src="https://via.placeholder.com/150" alt="{{ project.name }}">
+        {% endif %}
+    </div>
+    <div class="project-info pure-u-3-4">
+        <p>{{ project.description }}</p>
+        <p><strong>Website:</strong> <a href="{{ project.website_url }}">{{ project.website_url }}</a></p>
+        <p><strong>Download Page:</strong> <a href="{{ project.website_url_download }}">{{ project.website_url_download }}</a></p>
+        <p><strong>Repository:</strong> <a href="{{ project.website_url_repo }}">{{ project.website_url_repo }}</a></p>
+    </div>
+</div>
 
-<a href="{% url 'dashboard_project' %}">Back to Project Dashboard</a>
+<h2>Torrents</h2>
+
+<table class="pure-table pure-table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Seed</th>
+            <th>Leech</th>
+            <th>Date Added</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for torrent in torrents %}
+        <tr>
+            <td>{{ torrent.name }}</td>
+            <td>{{ torrent.size|filesizeformat }}</td>
+            <td>{{ torrent.seed }}</td>
+            <td>{{ torrent.leech }}</td>
+            <td>{{ torrent.creation|date:"d M Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard_project' %}" class="pure-button pure-button-primary">Back to Project Dashboard</a>
 {% endblock %}
+
+<style>
+    .project-details {
+        margin-bottom: 20px;
+    }
+    .project-image img {
+        max-width: 150px;
+        max-height: 150px;
+        margin-right: 20px;
+    }
+    .project-info p {
+        margin: 0;
+        padding: 5px 0;
+    }
+</style>
