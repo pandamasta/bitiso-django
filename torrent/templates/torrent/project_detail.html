@@ -1,32 +1,27 @@
 {% extends "torrent/base.html" %}
+{% load static %}
+
 
 {% block content %}
-<div class="pure-g project-container">
-    <div class="pure-u-1">
+
         <h1>{{ project.name }}</h1>
-    </div>
-    <div class="pure-u-1 project-details">
-        <div class="project-image-container">
+>
             {% if project.medium_image %}
-            <img src="{{ project.medium_image.url }}" alt="{{ project.name }}" class="project-image">
+            <img src="{{ project.medium_image.url }}" alt="{{ project.name }}" class="">
             {% else %}
-            <img src="https://via.placeholder.com/150" alt="{{ project.name }}" class="project-image">
+            <img src="https://via.placeholder.com/150" alt="{{ project.name }}" class="">
             {% endif %}
-        </div>
-        <div class="project-info-container">
             <p>{{ project.description }}</p>
             <p><strong>Website:</strong> <a href="{{ project.website_url }}">{{ project.website_url }}</a></p>
             <p><strong>Download Page:</strong> <a href="{{ project.website_url_download }}">{{ project.website_url_download }}</a></p>
             <p><strong>Repository:</strong> <a href="{{ project.website_url_repo }}">{{ project.website_url_repo }}</a></p>
-        </div>
-    </div>
-</div>
+
+<a href="{% url 'project_detail' %}" class="pure-button pure-button-primary">Back to Project List</a>
 
 <h2>Torrents</h2>
 
-<div class="pure-g">
-    <div class="pure-u-1">
-        <table class="pure-table pure-table-bordered">
+
+        <table class="">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -37,19 +32,37 @@
                 </tr>
             </thead>
             <tbody>
-                {% for torrent in torrents %}
-                <tr>
-                    <td>{{ torrent.name }}</td>
-                    <td>{{ torrent.size|filesizeformat }}</td>
-                    <td>{{ torrent.seed }}</td>
-                    <td>{{ torrent.leech }}</td>
-                    <td>{{ torrent.creation|date:"d M Y H:i" }}</td>
-                </tr>
-                {% endfor %}
+            {% for torrent in torrents %}
+            <tr>
+                <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.category_parent_id.name|default:"None"  }}</a></td>
+                {#<td>{{ torrent.category.category_parent_id.name|default:"None"  }}</td>#}
+
+                <td class="no-wrap">
+                    {% if torrent.project.mini_image %}
+                    <img src="{{ torrent.project.mini_image.url }}" alt="">
+                    {% endif %}
+                    <a href="/detail/{{ torrent.name }}">{{ torrent.name }}</a></td>
+                <td>{{ torrent.size | filesizeformat  }}</td>
+                <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
+{#                <td><a href="/media/{{ torrent.metainfo_file }}"><img src="{% static 'img/download7.png' %}" width="13" height="13" alt="Torrent"></a></td>#}
+                <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
+
+                <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+                <td class="seed">{{ torrent.seed }}</td>
+                <td class="leech">{{ torrent.leech }}</td>
+            </tr>
+            {% endfor %}
+{#                {% for torrent in torrents %}#}
+{#                <tr>#}
+{#                    <td>{{ torrent.name }}</td>#}
+{#                    <td>{{ torrent.size|filesizeformat }}</td>#}
+{#                    <td>{{ torrent.seed }}</td>#}
+{#                    <td>{{ torrent.leech }}</td>#}
+{#                    <td>{{ torrent.creation|date:"d M Y H:i" }}</td>#}
+{#                </tr>#}
+{#                {% endfor %}#}
             </tbody>
         </table>
-    </div>
-</div>
 
-<a href="{% url 'project_detail' %}" class="pure-button pure-button-primary">Back to Project Dashboard</a>
+
 {% endblock %}
