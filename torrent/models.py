@@ -85,10 +85,6 @@ class Project(models.Model):
     creation = models.DateTimeField(auto_now_add=True)
     deletion = models.DateTimeField(_(u'Delete?'), blank=True, null=True)
 
-
-
-
-
     def __str__(self):
         return self.name
 

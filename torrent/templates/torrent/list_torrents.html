@@ -6,9 +6,9 @@
 <div class="project-details pure-g">
     <div class="project-image pure-u-1-4">
         {% if project.medium_image %}
-        <img src="{{ project.medium_image.url }}" alt="{{ project.name }}">
+        <img src="{{ project.medium_image.url }}" alt="{{ project.name }}" width="300px" height="300px">
         {% else %}
-        <img src="https://via.placeholder.com/150" alt="{{ project.name }}">
+        <img src="https://via.placeholder.com/150" alt="{{ project.name }}" width="30px" height="30px">
         {% endif %}
     </div>
     <div class="project-info pure-u-3-4">

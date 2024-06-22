@@ -9,13 +9,14 @@ urlpatterns = [
     # path('', search, name='torrent/index.html'),
     path('detail/<torrent_name>/', views.detail),
     path('category/<category_id>/', views.category),
-    path('project/<int:project_id>/', views.project_detail, name='torrent/project_detail.html'),
-    path('project/', views.project),
+    path('project/<int:project_id>/', views.project_detail, name='project_detail'),
+    path('project/', views.project, name='project_detail'),
 
     path('about/', TemplateView.as_view(template_name="torrent/about.html")),
     path('faq/', TemplateView.as_view(template_name="torrent/faq.html")),
     path('contact/', TemplateView.as_view(template_name="torrent/contact.html")),
     path('categories/', views.category_list, name='category_list'),
+
     path('manage/', views.manage_torrents, name='manage_torrents'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
