@@ -7,7 +7,7 @@
         <h1>{{ project.name }}</h1>
 >
             {% if project.medium_image %}
-            <img src="{{ project.medium_image.url }}" alt="{{ project.name }}" class="">
+            <img src="{{ project.medium_image.url }}" alt="{{ project.name }}" class="" width="100px" height="100px">
             {% else %}
             <img src="https://via.placeholder.com/150" alt="{{ project.name }}" class="">
             {% endif %}
