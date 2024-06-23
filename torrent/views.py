@@ -473,7 +473,7 @@ def download_torrent(request):
                 print(f"Filename obtained: {filename}")
 
                 # Sauvegarder le fichier temporairement pour l'importation
-                fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+                fs = FileSystemStorage(location=settings.MEDIA_TORRENT)
                 temp_file_path = fs.save(filename, content)
                 temp_file_full_path = os.path.join(settings.MEDIA_TORRENT, temp_file_path)
                 print(f"File saved temporarily at {temp_file_full_path}")
@@ -494,7 +494,7 @@ def download_torrent(request):
                     torrent_name_with_extension = (t.name + '.torrent')[:128]  # Truncate to fit the database field length
 
                     # Écrire le fichier torrent dans media/torrent
-                    torrent_dir = os.path.join(settings.MEDIA_ROOT, 'torrent')
+                    torrent_dir = os.path.join(settings.MEDIA_TORRENT)
                     if not os.path.exists(torrent_dir):
                         os.makedirs(torrent_dir)
 
@@ -509,7 +509,6 @@ def download_torrent(request):
                     t.write(torrent_file_path)
                     print("Fichier torrent " + torrent_file_path + " écrit avec succès.")
 
-
                     obj = Torrent(
                         info_hash=t.infohash[:40],  # Truncate to fit the database field length
                         name=t.name[:128],  # Truncate to fit the database field length
@@ -519,8 +518,7 @@ def download_torrent(request):
                         magnet=magnet_uri[:2048],  # Truncate to fit the database field length
                         torrent_filename=(t.name + '.torrent')[:128],  # Truncate to fit the database field length
                         is_bitiso=False,
-                        metainfo_file='torrent/' + (t.name + '.torrent')[:128],
-                        # Truncate to fit the database field length
+                        metainfo_file='torrent/' + (t.name + '.torrent')[:128],  # Truncate to fit the database field length
                         file_list=file_list[:2048],  # Truncate to fit the database field length
                         file_nbr=len(t.files),
                         uploader=request.user,
