@@ -87,7 +87,7 @@
         </form>
 
         <h3>Upload a Torrent</h3>
-        <form class="pure-form" method="post" action="{% url 'file_upload' %}" enctype="multipart/form-data">
+            <form class="pure-form" method="post" action="{% url 'file_upload' %}" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="">Upload</button>

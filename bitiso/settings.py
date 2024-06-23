@@ -164,3 +164,6 @@ TORRENT_DATA = os.getenv('TORRENT_DATA', os.path.join(WEBROOT, 'torrent', 'data'
 
 TORRENT_EXTERNAL = os.getenv('DJANGO_TORRENT_EXTERNAL', os.path.join(WEBROOT, 'torrent','external'))
 BITISO_TORRENT_STATIC = os.getenv('BITISO_TORRENT_STATIC', os.path.join(WEBROOT, 'media', 'torrent'))
+
+
+MEDIA_TORRENT = os.getenv('MEDIA_TORRENT', os.path.join(WEBROOT, 'media', 'torrent'))
