@@ -5,6 +5,7 @@ from django.utils.text import slugify
 import os
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.dispatch import receiver
 
 
 class Category(models.Model):
@@ -138,6 +139,7 @@ class Project(models.Model):
             setattr(self, f'{size_name}_image', new_path_relative)
     
         super().save(update_fields=['mini_image', 'small_image', 'medium_image', 'large_image'])
+
 
 class Torrent(models.Model):
     """
