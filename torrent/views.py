@@ -19,6 +19,9 @@ from torf import Torrent as Torrenttorf, BdecodeError,  ReadError, WriteError
 from torrent.models import Torrent, Tracker
 from django.core.files.base import ContentFile
 from urllib.parse import urlparse
+from django.db.models import ProtectedError
+
+
 import uuid
 
 # def project_detail(request, project_id):
@@ -261,8 +264,14 @@ def dashboard_project(request):
             project_ids = request.POST.getlist('project_ids')
             if 'delete' in request.POST:
                 if project_ids:
-                    Project.objects.filter(id__in=project_ids, user=user).delete()
-                    messages.success(request, "Selected projects have been deleted.")
+                    for project_id in project_ids:
+                        project = get_object_or_404(Project, id=project_id, user=user)
+                        try:
+                            project.delete()
+                            messages.success(request, f"Project '{project.name}' has been deleted.")
+                        except ProtectedError:
+                            torrent_count = project.torrents.count()
+                            messages.error(request, f"Cannot delete the project '{project.name}' because it is referenced by {torrent_count} torrents.")
                 else:
                     messages.warning(request, "No projects were selected for deletion.")
             elif 'activate' in request.POST:
@@ -571,3 +580,17 @@ def download_torrent(request):
                 messages.error(request, "Invalid torrent file format.")
             return redirect('dashboard')
     return redirect('dashboard')
+
+@login_required
+def delete_project(request, project_id):
+    try:
+        project = Project.objects.get(id=project_id)
+        project.delete()
+        messages.success(request, f"The project '{project.name}' was successfully deleted.")
+    except ProtectedError as e:
+        referenced_objects = e.protected_objects
+        num_referenced = referenced_objects.count()
+        messages.error(request, f"Cannot delete the project '{project.name}' because it is referenced by {num_referenced} torrents.")
+    except Project.DoesNotExist:
+        messages.error(request, "The project you are trying to delete does not exist.")
+    return redirect('project_list')  # Assurez-vous de rediriger vers la bonne vue

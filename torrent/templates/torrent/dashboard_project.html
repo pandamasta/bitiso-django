@@ -4,6 +4,17 @@
 <h1>Project Dashboard</h1>
 
 <h2>My Projects</h2>
+
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <p>You have {{ project_count }} projects.</p>
 
 <form method="post">
@@ -17,7 +28,6 @@
                 <th>Project Name</th>
                 <th>Torrents</th>
                 <th>Description</th>
-
             </tr>
         </thead>
         <tbody>
@@ -35,7 +45,6 @@
                 <td>{{ project.name }}</td>
                 <td><a href="{% url 'list_torrents' project.id %}">{{ torrent_count }}</a></td>
                 <td>{{ project.description }}</td>
-
             </tr>
             {% endfor %}
         </tbody>

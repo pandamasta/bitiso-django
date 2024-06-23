@@ -11,6 +11,7 @@ urlpatterns = [
     path('category/<category_id>/', views.category),
     path('project/<int:project_id>/', views.project_detail, name='project_detail'),
     path('project/', views.project, name='project_detail'),
+    path('project/delete/<int:project_id>/', views.delete_project, name='delete_project'),
 
     path('about/', TemplateView.as_view(template_name="torrent/about.html")),
     path('faq/', TemplateView.as_view(template_name="torrent/faq.html")),
