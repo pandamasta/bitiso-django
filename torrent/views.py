@@ -189,7 +189,7 @@ def register_view(request):
 @login_required
 def dashboard(request):
     user = request.user
-    torrents = Torrent.objects.filter(uploader=user)
+    torrents = Torrent.objects.filter(uploader=user).order_by('-creation')
     torrent_count = torrents.count()
     categories = Category.objects.all()
     projects = Project.objects.all()
