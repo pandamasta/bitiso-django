@@ -9,8 +9,9 @@ urlpatterns = [
     # path('', search, name='torrent/index.html'),
     path('detail/<torrent_name>/', views.detail),
     path('category/<category_id>/', views.category),
-    path('project/<int:project_id>/', views.project_detail, name='project_detail'),
     path('project/', views.project, name='project_detail'),
+    path('project/<str:identifier>/', views.project_detail, name='project_detail'),
+
     path('project/delete/<int:project_id>/', views.delete_project, name='delete_project'),
 
     path('about/', TemplateView.as_view(template_name="torrent/about.html")),

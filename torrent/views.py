@@ -31,7 +31,7 @@ import uuid
 def index(request):
 
     try:
-      torrent_list =  Torrent.objects.filter(is_active=True).order_by('-creation')
+      torrent_list =  Torrent.objects.filter(is_active=True).order_by('seed')
     except Torrent.DoesNotExist:
       torrent_list = None
 
@@ -72,15 +72,19 @@ def project(request):
 
     return render(request, 'torrent/project.html', context)
 
+#
+def project_detail(request, identifier):
+    if identifier.isdigit():
+        project = get_object_or_404(Project, id=identifier)
+    else:
+        project = get_object_or_404(Project, slug=identifier)
 
-def project_detail(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    torrents = project.torrents.all()
+    torrents = project.torrents.all()  # Utiliser le nom de la relation définie dans related_name
+
     return render(request, 'torrent/project_detail.html', {
         'project': project,
         'torrents': torrents,
     })
-# Admin custom
 
 def custom_admin_page(request):
     return render(request, 'admin/custom_admin_page.html')
