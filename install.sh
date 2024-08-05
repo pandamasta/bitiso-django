@@ -47,12 +47,11 @@ else
 fi
 
 print_message $CYAN "Running migrations..."
+python3 manage.py makemigrations torrent
 python3 manage.py migrate
-python3 manage.py migrate torrent
 
 print_message $CYAN "Creating superuser..."
 python3 manage.py createsuperuser
-
 
 print_message $GREEN "Setup complete! Please edit .env and then run ./run <port>"
 
