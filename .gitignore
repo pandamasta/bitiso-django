@@ -2,10 +2,8 @@ venv/
 webroot/
 *.pyc
 bitiso/__pycache__/
-db.sqlite3
 .env
 .env_systemd
 *.swp
 .idea
-run.sh
-*.sqlite
+*.sqlite*
