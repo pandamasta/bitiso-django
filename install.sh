@@ -48,14 +48,11 @@ fi
 
 print_message $CYAN "Running migrations..."
 python3 manage.py migrate
+python3 manage.py torrent
 
 print_message $CYAN "Creating superuser..."
 python3 manage.py createsuperuser
 
-# Start the server
-DEFAULT_IP=$(hostname -I | awk '{print $1}')
-print_message $CYAN "Starting the server at $DEFAULT_IP:8080..."
-python3 manage.py runserver $DEFAULT_IP:8080
 
-print_message $GREEN "Setup complete! The server is running at http://$DEFAULT_IP:8080"
+print_message $GREEN "Setup complete! Please edit .env and then run ./run <port>"
 
