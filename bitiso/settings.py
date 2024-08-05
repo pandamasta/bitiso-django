@@ -138,17 +138,23 @@ MEDIA_ROOT = os.getenv('DJANGO_MEDIA_ROOT', os.path.join(WEBROOT, 'media'))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.getenv('DJANGO_DB_NAME', 'your_database_name'),
+#        'USER': os.getenv('DJANGO_DB_USER', 'your_username'),
+#        'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'your_password'),
+#        'HOST': os.getenv('DJANGO_DB_HOST', 'localhost'),
+#        'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
+#    }
+#}
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DJANGO_DB_NAME', 'your_database_name'),
-        'USER': os.getenv('DJANGO_DB_USER', 'your_username'),
-        'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'your_password'),
-        'HOST': os.getenv('DJANGO_DB_HOST', 'localhost'),
-        'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'bitiso.sqlite',  
     }
 }
-
 
 CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
 
