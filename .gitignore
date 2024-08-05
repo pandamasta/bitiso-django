@@ -4,8 +4,8 @@ webroot/
 bitiso/__pycache__/
 db.sqlite3
 .env
-.env*
 .env_systemd
 *.swp
 .idea
 run.sh
+*.sqlite

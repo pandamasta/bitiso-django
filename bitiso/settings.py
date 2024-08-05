@@ -84,6 +84,24 @@ WSGI_APPLICATION = 'bitiso.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+if DB_ENGINE == 'postgresql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DJANGO_DB_NAME', 'your_database_name'),
+            'USER': os.getenv('DJANGO_DB_USER', 'your_username'),
+            'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'your_password'),
+            'HOST': os.getenv('DJANGO_DB_HOST', 'localhost'),
+            'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
+        }
+    }
+else:  # Default to SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'bitiso.sqlite',
+        }
+    }
 
 
 # Password validation
@@ -104,7 +122,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -115,7 +132,6 @@ TIME_ZONE = os.getenv('DJANGO_TIME_ZONE', 'UTC')
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -137,28 +153,9 @@ MEDIA_ROOT = os.getenv('DJANGO_MEDIA_ROOT', os.path.join(WEBROOT, 'media'))
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': os.getenv('DJANGO_DB_NAME', 'your_database_name'),
-#        'USER': os.getenv('DJANGO_DB_USER', 'your_username'),
-#        'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'your_password'),
-#        'HOST': os.getenv('DJANGO_DB_HOST', 'localhost'),
-#        'PORT': os.getenv('DJANGO_DB_PORT', '5432'),
-#    }
-#}
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'bitiso.sqlite',  
-    }
-}
-
 CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
 
-# APP
+# APP - Bitiso env
 
 TRACKER_ANNOUNCE = os.getenv('TORRENT_TRACKER_ANNOUNCE', '').split(',')
 
@@ -170,6 +167,5 @@ TORRENT_DATA = os.getenv('TORRENT_DATA', os.path.join(WEBROOT, 'torrent', 'data'
 
 TORRENT_EXTERNAL = os.getenv('DJANGO_TORRENT_EXTERNAL', os.path.join(WEBROOT, 'torrent','external'))
 BITISO_TORRENT_STATIC = os.getenv('BITISO_TORRENT_STATIC', os.path.join(WEBROOT, 'media', 'torrent'))
-
 
 MEDIA_TORRENT = os.getenv('MEDIA_TORRENT', os.path.join(WEBROOT, 'media', 'torrent'))
