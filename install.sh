@@ -48,7 +48,7 @@ fi
 
 print_message $CYAN "Running migrations..."
 python3 manage.py migrate
-python3 manage.py torrent
+python3 manage.py migrate torrent
 
 print_message $CYAN "Creating superuser..."
 python3 manage.py createsuperuser
