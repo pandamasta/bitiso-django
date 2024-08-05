@@ -1,15 +1,18 @@
 # Bitiso.org
 
-Tracker for project bitiso.org
+Official bitiso.org website
 
-This is a django project that can be run out of the box to host a tracker.
+You can use this Django project to run your own Bittorent website.
+
+It tend to be generic but at the moment I focus to build it on top of bitiso.org
+
+All feedbacks are welcome :)
 
 ## How to run
 
 ### Create a virtual env
 ```
 python3 -m venv bitiso 
-cd bitiso
 git clone https://github.com/pandamasta/bitiso-django.git
 cd bitiso-django
 ```
