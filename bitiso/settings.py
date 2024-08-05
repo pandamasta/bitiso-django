@@ -84,7 +84,9 @@ WSGI_APPLICATION = 'bitiso.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if DB_ENGINE == 'postgresql':
+DJANGO_DB_ENGINE = os.getenv('DJANGO_DB_ENGINE', 'sqlite')
+
+if DJANGO_DB_ENGINE == 'postgresql':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
