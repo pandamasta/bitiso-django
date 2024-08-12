@@ -28,28 +28,6 @@ import uuid
 #     project = get_object_or_404(Project, pk=project_id)
 #     return render(request, 'path_to_your_template.html', {'project': project})
 
-def index(request):
-
-    try:
-      torrent_list =  Torrent.objects.filter(is_active=True).order_by('seed')
-    except Torrent.DoesNotExist:
-      torrent_list = None
-
-    paginator = Paginator(torrent_list, 10)
-
-    # Get page number in GET
-    page = request.GET.get('page')
-
-    try:
-        torrents = paginator.page(page)
-    except PageNotAnInteger:
-        torrents = paginator.page(1)
-    except EmptyPage:
-        torrents = paginator.page(paginator.num_pages)
-
-    context = {'torrent_list': torrent_list}
-    return render(request, 'torrent/index.html', context)
-
 def detail(request, torrent_name):
 
     torrent_detail = Torrent.objects.get(name=torrent_name)
@@ -129,12 +107,15 @@ def torrent_list_view(request):
     form = SearchForm(request.GET or None)
     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
 
+    # Get the top 10 torrents with the most seeds
+    top_seeded_torrents = Torrent.objects.filter(is_active=True).order_by('-seed')[:10]
+
     if form.is_valid() and form.cleaned_data['query']:
         query = form.cleaned_data['query']
         torrents = torrents.filter(name__icontains=query)
 
     # Pagination
-    paginator = Paginator(torrents, 60)  # 10 torrents par page, ajustez si nécessaire
+    paginator = Paginator(torrents, 40)  # 10 torrents par page, ajustez si nécessaire
 
     page = request.GET.get('page')
     try:
@@ -148,7 +129,8 @@ def torrent_list_view(request):
 
     context = {
         'form': form,
-        'torrent_list': torrents
+        'torrent_list': torrents,
+        'top_seeded_torrent_list': top_seeded_torrents, 
     }
     return render(request, 'torrent/index.html', context)
 
@@ -310,13 +292,6 @@ def list_torrents(request, project_id):
         'torrents': torrents,
     })
 
-def list_torrents(request, project_id):
-    project = Project.objects.get(id=project_id)
-    torrents = project.torrents.all()
-    return render(request, 'torrent/list_torrents.html', {
-        'project': project,
-        'torrents': torrents,
-    })
 
 @login_required
 def delete_torrents(request):

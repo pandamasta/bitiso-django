@@ -10,6 +10,52 @@
     </form>
 </div>
 
+
+<!-- Top 10 Torrents by Seed -->
+<h2 style="text-align: center;">Top 10 Torrents by Seed</h2>
+<div class="scrollable-container">
+
+<table class="pure-table pure-table-horizontal torrent-table">
+    <thead>
+        <tr>
+            <th>Cat</th>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Creation</th>
+            <th>Torrent</th>
+            <th>Magnet</th>
+            <th>Seed</th>
+            <th>Leech</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if top_seeded_torrent_list %}
+        {% for torrent in top_seeded_torrent_list %}
+        <tr>
+            <td><a href="/category/{{ torrent.category.id }}" class="badge tag" title="{{ torrent.category.category_parent_id.name|default:"None" }}">{{ torrent.category.category_parent_id.name|default:"None" }}</a></td>
+            <td class="no-wrap">
+                {% if torrent.project.mini_image %}
+                <img src="{{ torrent.project.mini_image.url }}" alt="">
+                {% endif %}
+                <a href="/detail/{{ torrent.name }}">{{ torrent.name }}</a>
+            </td>
+            <td>{{ torrent.size | filesizeformat }}</td>
+            <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
+            <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
+            <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+            <td class="seed">{{ torrent.seed }}</td>
+            <td class="leech">{{ torrent.leech }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+</div>
+
+<!-- New Torrents -->
+
+<h2 style="text-align: center;">New torrents</h2>
+
     <div class="scrollable-container">
 <table class="pure-table pure-table-horizontal torrent-table">
     <thead>
@@ -28,7 +74,9 @@
 {% if torrent_list %}
 {% for torrent in torrent_list %}
             <tr>
-                <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.category_parent_id.name|default:"None"  }}</a></td>
+                <td><a href="{{ torrent.category.category_parent_id }}">{{ torrent.category.category_parent_id.name|default:"None"  }}</a></td>
+                <!-- <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.category_parent_id.name|default:"None"  }}</a></td> -->
+
                 {#<td>{{ torrent.category.category_parent_id.name|default:"None"  }}</td>#}
 
                 <td class="no-wrap">

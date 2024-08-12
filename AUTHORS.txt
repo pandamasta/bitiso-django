@@ -1,0 +1,7 @@
+Project initiator:
+
+  Aurelien Martin <contact@bitiso.org>
+
+Development contributors, in last name alphabetical order:
+
+  ficobaa
