@@ -4,61 +4,19 @@
 {% block content %}
 
 <div class="search-container">
-    <form method="get" action="" class="centered-form">
-        <input type="text" class="search-input" placeholder="Search" name="query" value="{{ request.GET.query|default:'' }}" maxlength="30">
-        <button type="submit" class="search-btn">Search</button>
+    <form method="get" action="{% url 'torrent_search' %}">
+        <input type="text" name="query" placeholder="Search..." value="{{ form.query.value|default_if_none:'' }}">
+        <button type="submit">Search</button>
     </form>
 </div>
+
 
 
 <!-- Top 10 Torrents by Seed -->
 <h2 style="text-align: center;">Top 10 Torrents by Seed</h2>
 <div class="scrollable-container">
-
-<table class="pure-table pure-table-horizontal torrent-table">
-    <thead>
-        <tr>
-            <th>Cat</th>
-            <th>Name</th>
-            <th>Size</th>
-            <th>Creation</th>
-            <th>Torrent</th>
-            <th>Magnet</th>
-            <th>Seed</th>
-            <th>Leech</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% if top_seeded_torrent_list %}
-        {% for torrent in top_seeded_torrent_list %}
-        <tr>
-            <td><a href="/category/{{ torrent.category.id }}" class="badge tag" title="{{ torrent.category.category_parent_id.name|default:"None" }}">{{ torrent.category.category_parent_id.name|default:"None" }}</a></td>
-            <td class="no-wrap">
-                {% if torrent.project.mini_image %}
-                <img src="{{ torrent.project.mini_image.url }}" alt="">
-                {% endif %}
-                <a href="/detail/{{ torrent.name }}">{{ torrent.name }}</a>
-            </td>
-            <td>{{ torrent.size | filesizeformat }}</td>
-            <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
-            <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
-            <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
-            <td class="seed">{{ torrent.seed }}</td>
-            <td class="leech">{{ torrent.leech }}</td>
-        </tr>
-        {% endfor %}
-        {% endif %}
-    </tbody>
-</table>
-</div>
-
-<!-- New Torrents -->
-
-<h2 style="text-align: center;">New torrents</h2>
-
-    <div class="scrollable-container">
-<table class="pure-table pure-table-horizontal torrent-table">
-    <thead>
+    <table class="pure-table pure-table-horizontal torrent-table">
+        <thead>
             <tr>
                 <th>Cat</th>
                 <th>Name</th>
@@ -69,41 +27,77 @@
                 <th>Seed</th>
                 <th>Leech</th>
             </tr>
-    </thead>
+        </thead>
         <tbody>
-{% if torrent_list %}
-{% for torrent in torrent_list %}
+            {% if top_seeded_torrent_list %}
+            {% for torrent in top_seeded_torrent_list %}
             <tr>
-                <td><a href="{{ torrent.category.category_parent_id }}">{{ torrent.category.category_parent_id.name|default:"None"  }}</a></td>
-                <!-- <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.category_parent_id.name|default:"None"  }}</a></td> -->
-
-                {#<td>{{ torrent.category.category_parent_id.name|default:"None"  }}</td>#}
-
+                <td><a href="/category/{{ torrent.category.id }}" class="badge tag" title="{{ torrent.category.category_parent_id.name|default:"None" }}">{{ torrent.category.category_parent_id.name|default:"None" }}</a></td>
                 <td class="no-wrap">
                     {% if torrent.project.mini_image %}
                     <img src="{{ torrent.project.mini_image.url }}" alt="">
                     {% endif %}
-                    <a href="/detail/{{ torrent.name }}">{{ torrent.name }}</a></td>
-                <td>{{ torrent.size | filesizeformat  }}</td>
+                    <a href="/detail/{{ torrent.name }}">{{ torrent.name }}</a>
+                </td>
+                <td>{{ torrent.size | filesizeformat }}</td>
                 <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
-{#                <td><a href="/media/{{ torrent.metainfo_file }}"><img src="{% static 'img/download7.png' %}" width="13" height="13" alt="Torrent"></a></td>#}
                 <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
-
                 <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
                 <td class="seed">{{ torrent.seed }}</td>
                 <td class="leech">{{ torrent.leech }}</td>
             </tr>
-{% endfor %}
-{% endif %}
+            {% endfor %}
+            {% endif %}
         </tbody>
-</table>
-    </div>
+    </table>
+</div>
+
+<!-- New Torrents -->
+
+<h2 style="text-align: center;">New torrents</h2>
+<div class="scrollable-container">
+    <table class="pure-table pure-table-horizontal torrent-table">
+        <thead>
+            <tr>
+                <th>Cat</th>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Creation</th>
+                <th>Torrent</th>
+                <th>Magnet</th>
+                <th>Seed</th>
+                <th>Leech</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if torrent_list %}
+            {% for torrent in torrent_list %}
+            <tr>
+                <td><a href="{{ torrent.category.category_parent_id }}">{{ torrent.category.category_parent_id.name|default:"None" }}</a></td>
+                <td class="no-wrap">
+                    {% if torrent.project.mini_image %}
+                    <img src="{{ torrent.project.mini_image.url }}" alt="">
+                    {% endif %}
+                    <a href="/detail/{{ torrent.name }}">{{ torrent.name }}</a>
+                </td>
+                <td>{{ torrent.size | filesizeformat }}</td>
+                <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
+                <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
+                <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+                <td class="seed">{{ torrent.seed }}</td>
+                <td class="leech">{{ torrent.leech }}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
 
 
 <div class="pagination">
     {% if torrent_list.has_previous %}
-        <a href="?page=1" class="pure-button">&laquo; première</a>
-        <a href="?page={{ torrent_list.previous_page_number }}" class="pure-button">précédent</a>
+        <a href="?page=1" class="pure-button">&laquo; First</a>
+        <a href="?page={{ torrent_list.previous_page_number }}" class="pure-button">Previous</a>
     {% endif %}
 
     {% with total_pages=torrent_list.paginator.num_pages %}
@@ -123,9 +117,10 @@
     {% endwith %}
 
     {% if torrent_list.has_next %}
-        <a href="?page={{ torrent_list.next_page_number }}" class="pure-button">suivant</a>
-        <a href="?page={{ torrent_list.paginator.num_pages }}" class="pure-button">&raquo; dernière</a>
+        <a href="?page={{ torrent_list.next_page_number }}" class="pure-button">Next</a>
+        <a href="?page={{ torrent_list.paginator.num_pages }}" class="pure-button">&raquo; Last</a>
     {% endif %}
 </div>
+
 
 {% endblock %}

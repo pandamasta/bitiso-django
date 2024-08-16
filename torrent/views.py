@@ -21,7 +21,6 @@ from django.core.files.base import ContentFile
 from urllib.parse import urlparse
 from django.db.models import ProtectedError
 
-
 import uuid
 
 # def project_detail(request, project_id):
@@ -90,41 +89,52 @@ def run_management_script(request, script):
     # projects = Project.objects.all()
     return render(request, 'upload_image.html')
 
-def torrent_list_view(request):
-    try:
-        RateLimit(
-            key=f"{request.user.id}:torrent_list",
-            limit=20,  # par exemple, limitez à 5 requêtes par minute
-            period=60,  # en secondes
-            request=request,
-        ).check()
-    except RateLimitExceeded as e:
-        return HttpResponse(
-            f"Rate limit exceeded. You have used {e.usage} requests, limit is {e.limit}.",
-            status=429,
-        )
+def search_view(request):
+    form = SearchForm(request.GET or None)
+    torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
 
+    if form.is_valid() and form.cleaned_data['query']:
+        query = form.cleaned_data['query']
+        torrents = torrents.filter(name__icontains=query)
+
+    # Pagination for search results
+    paginator = Paginator(torrents, 40)  # Adjust number of torrents per page as needed
+    page = request.GET.get('page')
+    try:
+        torrents = paginator.page(page)
+    except PageNotAnInteger:
+        torrents = paginator.page(1)
+    except EmptyPage:
+        torrents = paginator.page(paginator.num_pages)
+
+    context = {
+        'form': form,
+        'torrent_list': torrents,
+    }
+    return render(request, 'torrent/search_results.html', context)
+
+def torrent_list_view(request):
     form = SearchForm(request.GET or None)
     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
 
     # Get the top 10 torrents with the most seeds
     top_seeded_torrents = Torrent.objects.filter(is_active=True).order_by('-seed')[:10]
 
+    # Check if it's a search query
     if form.is_valid() and form.cleaned_data['query']:
         query = form.cleaned_data['query']
         torrents = torrents.filter(name__icontains=query)
+        # Redirect to the search view
+        return redirect('torrent_search')  # Add this line
 
     # Pagination
-    paginator = Paginator(torrents, 40)  # 10 torrents par page, ajustez si nécessaire
-
+    paginator = Paginator(torrents, 40)  # 40 torrents per page
     page = request.GET.get('page')
     try:
         torrents = paginator.page(page)
     except PageNotAnInteger:
-        # Si la page n'est pas un entier, donnez la première page.
         torrents = paginator.page(1)
     except EmptyPage:
-        # Si la page est en dehors de la plage (par exemple, 9999), donnez la dernière page des résultats.
         torrents = paginator.page(paginator.num_pages)
 
     context = {
@@ -133,6 +143,7 @@ def torrent_list_view(request):
         'top_seeded_torrent_list': top_seeded_torrents, 
     }
     return render(request, 'torrent/index.html', context)
+
 
 def category_list(request):
     categories = Category.objects.filter(category_parent_id__isnull=True)

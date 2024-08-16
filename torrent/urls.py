@@ -5,8 +5,9 @@ from django.views.generic import TemplateView
 from django.contrib import admin
 
 urlpatterns = [
-    path('', views.torrent_list_view),
+    path('', views.torrent_list_view, name='torrent_list'),
     # path('', search, name='torrent/index.html'),
+    path('search/', views.search_view, name='torrent_search'),
     path('detail/<torrent_name>/', views.detail),
     path('category/<category_id>/', views.category),
     path('project/', views.project, name='project_detail'),
