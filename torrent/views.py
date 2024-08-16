@@ -90,6 +90,19 @@ def run_management_script(request, script):
     return render(request, 'upload_image.html')
 
 def search_view(request):
+    try:
+        RateLimit(
+            key=f"{request.user.id}:torrent_list",
+            limit=20,  # Limit to 20 requests per minute
+            period=60,  # Period in seconds
+            request=request,
+        ).check()
+    except RateLimitExceeded as e:
+        return HttpResponse(
+            f"Rate limit exceeded. You have used {e.usage} requests, limit is {e.limit}.",
+            status=429,
+    )
+
     form = SearchForm(request.GET or None)
     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
 
@@ -114,6 +127,18 @@ def search_view(request):
     return render(request, 'torrent/search_results.html', context)
 
 def torrent_list_view(request):
+    try:
+        RateLimit(
+            key=f"{request.user.id}:torrent_list",
+            limit=20,  # Limit to 20 requests per minute
+            period=60,  # Period in seconds
+            request=request,
+        ).check()
+    except RateLimitExceeded as e:
+        return HttpResponse(
+            f"Rate limit exceeded. You have used {e.usage} requests, limit is {e.limit}.",
+            status=429,
+    )
     form = SearchForm(request.GET or None)
     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
 
