@@ -468,3 +468,50 @@ a:active {
 .form-group {
     display: none;
 
+
+
+
+.torrent-table-wrapper {
+    overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
+    margin: 20px 0; /* Adds margin around the table for spacing */
+}
+
+.torrent-table {
+    width: 100%;
+    border-collapse: collapse; /* Removes extra spacing between cells */
+}
+
+.torrent-table th,
+.torrent-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #eee; /* Light border for row separation */
+}
+
+.torrent-table th {
+    font-weight: bold;
+    background-color: #f5f5f5; /* Light background for headers */
+}
+
+.torrent-table tr:hover {
+    background-color: #f9f9f9; /* Light background on row hover */
+}
+
+.torrent-table .no-wrap {
+    white-space: nowrap; /* Prevents text wrapping in this cell */
+}
+
+.torrent-table img {
+    vertical-align: middle;
+    margin-right: 8px;
+    width: 20px; /* Adjust the size of the image as needed */
+}
+
+.torrent-table .center-content-magnet {
+    text-align: center;
+}
+
+.torrent-table .seed,
+.torrent-table .leech {
+    text-align: center;
+}
