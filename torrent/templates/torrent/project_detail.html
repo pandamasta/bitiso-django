@@ -3,9 +3,17 @@
 
 
 {% block content %}
+<style>
 
-<div class="project-container">
-    <style>
+/* Adjusting project container for larger screens */
+.project-container,
+.torrent-table-wrapper {
+    max-width: 1000px; /* Constrain the width */
+    margin: 0 auto; /* Center the container */
+    padding: 0 20px; /* Add some padding for smaller screens */
+}
+
+/* Existing project container styles */
 .project-container {
     display: flex;
     align-items: center;
@@ -49,7 +57,65 @@
     }
 }
 
+/* Ensure the torrent table does not stretch too wide on large screens */
+.torrent-table-wrapper {
+    max-width: 1000px; /* Constrain the width of the table wrapper */
+    margin: 0 auto; /* Center the table on the page */
+    padding: 0 20px; /* Add some padding for smaller screens */
+    overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
+}
+
+.torrent-table {
+    width: 100%;
+    border-collapse: collapse; /* Removes extra spacing between cells */
+}
+
+.torrent-table th,
+.torrent-table td {
+    padding: .5em 1em; /* Adjusted padding */
+    text-align: left;
+    border-bottom: 1px solid #eee; /* Light border for row separation */
+    /* border-left: 1px solid #cbcbcb; /* Left border */
+    border-width: 0 0 0 1px; /* Border width adjusted */
+    font-size: inherit; /* Inherit font size */
+    margin: 0; /* Reset margin */
+    overflow: visible; /* Ensure overflow is visible */
+}
+
+.torrent-table th {
+    font-weight: bold;
+    background-color: rgb(63, 68, 71)
+   
+
+}
+/*
+.torrent-table tr:hover {
+    background-color: #f9f9f9; /* Light background on row hover 
+}
+*/
+
+.torrent-table .no-wrap {
+    white-space: nowrap; /* Prevents text wrapping in this cell */
+}
+
+.torrent-table img {
+    vertical-align: middle;
+    margin-right: 8px;
+    width: 20px; /* Adjust the size of the image as needed */
+}
+
+.torrent-table .center-content-magnet {
+    text-align: center;
+}
+
+.torrent-table .seed,
+.torrent-table .leech {
+    text-align: center;
+}
+
 </style>
+
+<div class="project-container">
 
     <div class="project-image-container">
         {% if project.medium_image %}
@@ -70,58 +136,6 @@
 
 
 <div class="torrent-table-wrapper">
-    <style>
-        .torrent-table-wrapper {
-            overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
-            margin: 20px 0; /* Adds margin around the table for spacing */
-        }
-
-        .torrent-table {
-            width: 100%;
-            border-collapse: collapse; /* Removes extra spacing between cells */
-        }
-
-        .torrent-table th,
-        .torrent-table td {
-            padding: .5em 1em; /* Adjusted padding */
-            text-align: left;
-            border-bottom: 1px solid #eee; /* Light border for row separation */
-            border-left: 1px solid #cbcbcb; /* Left border */
-            border-width: 0 0 0 1px; /* Border width adjusted */
-            font-size: inherit; /* Inherit font size */
-            margin: 0; /* Reset margin */
-            overflow: visible; /* Ensure overflow is visible */
-        }
-
-        .torrent-table th {
-            font-weight: bold;
-            background-color: #f5f5f5; /* Light background for headers */
-        }
-
-        .torrent-table tr:hover {
-            background-color: #f9f9f9; /* Light background on row hover */
-        }
-
-        .torrent-table .no-wrap {
-            white-space: nowrap; /* Prevents text wrapping in this cell */
-        }
-
-        .torrent-table img {
-            vertical-align: middle;
-            margin-right: 8px;
-            width: 20px; /* Adjust the size of the image as needed */
-        }
-
-        .torrent-table .center-content-magnet {
-            text-align: center;
-        }
-
-        .torrent-table .seed,
-        .torrent-table .leech {
-            text-align: center;
-        }
-    </style>
-
     <table class="torrent-table">
         <thead>
             <tr>
