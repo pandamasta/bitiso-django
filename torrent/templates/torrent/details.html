@@ -21,14 +21,14 @@
     
     <h1 style="text-align: center">{{ torrent_detail.name }}</h1>
     
-    <!-- Project Information Section -->
-    <div class="project-info" style="display: flex; align-items: center; margin-bottom: 20px;">
+    <!-- Centered Project Information Section with Medium Image -->
+    <div class="project-info" style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
         <div class="project-logo" style="flex-shrink: 0; margin-right: 20px;">
-            {% if torrent_detail.project.mini_image %}
-                <img src="{{ torrent_detail.project.mini_image.url }}" alt="{{ torrent_detail.project.name }}" style="width: 50px; height: 50px; object-fit: contain;">
+            {% if torrent_detail.project.medium_image %}
+                <img src="{{ torrent_detail.project.medium_image.url }}" alt="{{ torrent_detail.project.name }}" style="width: 100px; height: 100px; object-fit: contain;">
             {% endif %}
         </div>
-        <div class="project-details">
+        <div class="project-details" style="text-align: center;">
             <h3 style="margin: 0;"><a href="/project/{{ torrent_detail.project.id }}">{{ torrent_detail.project.name }}</a></h3>
             <p style="margin: 0; font-size: 14px;">{{ torrent_detail.project.description }}</p>
         </div>
