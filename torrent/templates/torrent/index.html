@@ -18,7 +18,6 @@
     <table class="pure-table pure-table-horizontal torrent-table">
         <thead>
             <tr>
-                <th>Cat</th>
                 <th>Name</th>
                 <th>Size</th>
                 <th>Creation</th>
@@ -32,7 +31,6 @@
             {% if top_seeded_torrent_list %}
             {% for torrent in top_seeded_torrent_list %}
             <tr>
-                <td><a href="/category/{{ torrent.category.id }}" class="badge tag" title="{{ torrent.category.category_parent_id.name|default:"None" }}">{{ torrent.category.category_parent_id.name|default:"None" }}</a></td>
                 <td class="no-wrap">
                     {% if torrent.project.mini_image %}
                     <img src="{{ torrent.project.mini_image.url }}" alt="">
@@ -59,7 +57,6 @@
     <table class="pure-table pure-table-horizontal torrent-table">
         <thead>
             <tr>
-                <th>Cat</th>
                 <th>Name</th>
                 <th>Size</th>
                 <th>Creation</th>
@@ -73,7 +70,6 @@
             {% if torrent_list %}
             {% for torrent in torrent_list %}
             <tr>
-                <td><a href="{{ torrent.category.category_parent_id }}">{{ torrent.category.category_parent_id.name|default:"None" }}</a></td>
                 <td class="no-wrap">
                     {% if torrent.project.mini_image %}
                     <img src="{{ torrent.project.mini_image.url }}" alt="">
