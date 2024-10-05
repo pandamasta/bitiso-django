@@ -17,53 +17,7 @@
     {% else %}
         <h2 style="text-align: center;">Search Results</h2>
     {% endif %}
-
-    <div class="scrollable-container">
-        {% if torrent_list %}
-            <table class="pure-table pure-table-horizontal torrent-table">
-                <thead>
-                    <tr>
-                        <th>Cat</th>
-                        <th>Name</th>
-                        <th>Size</th>
-                        <th>Creation</th>
-                        <th>Torrent</th>
-                        <th>Magnet</th>
-                        <th>Seed</th>
-                        <th>Leech</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for torrent in torrent_list %}
-                        <tr>
-                            <td><a href="/category/{{ torrent.category.id }}" class="badge tag" title="{{ torrent.category.category_parent_id.name|default:"None" }}">{{ torrent.category.category_parent_id.name|default:"None" }}</a></td>
-                            <td class="no-wrap">
-                                {% if torrent.project.mini_image %}
-                                    <img src="{{ torrent.project.mini_image.url }}" alt="">
-                                {% endif %}
-                                <a href="/detail/{{ torrent.name }}">{{ torrent.name }}</a>
-                            </td>
-                            <td>{{ torrent.size | filesizeformat }}</td>
-                            <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
-                            <td><a href="/media/{{ torrent.metainfo_file }}">Torrent</a></td>
-                            <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
-                            <td class="seed">{{ torrent.seed }}</td>
-                            <td class="leech">{{ torrent.leech }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div class="pagination">
-                {% if torrent_list.has_previous %}
-                    <a href="?page={{ torrent_list.previous_page_number }}" class="pure-button">&laquo; Previous</a>
-                {% endif %}
-                <span class="current-page">Page {{ torrent_list.number }} of {{ torrent_list.paginator.num_pages }}</span>
-                {% if torrent_list.has_next %}
-                    <a href="?page={{ torrent_list.next_page_number }}" class="pure-button">Next &raquo;</a>
-                {% endif %}
-            </div>
-        {% else %}
-            <p style="text-align: center;">No results found for "{{ form.cleaned_data.query }}"</p>
-        {% endif %}
-    </div>
+    <!-- Search Result -->
+    {% include 'shared/torrent_table.html' with torrent_list=torrent_list %}
+    
 {% endblock %}

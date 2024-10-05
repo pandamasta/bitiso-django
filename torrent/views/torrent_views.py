@@ -25,9 +25,15 @@ class TorrentListView(RateLimitMixin, ListView):
     limit = 20  # requests per minute
     period = 60  # time period in seconds
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        context['top_seeded_torrent_list'] = Torrent.objects.filter(is_active=True).order_by('-seed')[:10]
+        return context
+
     def get_queryset(self):
         torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
-        form = SearchForm(self.request.GET or None)
+        form = self.get_form()
 
         # Handle search query
         if form.is_valid() and form.cleaned_data['query']:
@@ -36,11 +42,9 @@ class TorrentListView(RateLimitMixin, ListView):
 
         return torrents
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = SearchForm(self.request.GET or None)
-        context['top_seeded_torrent_list'] = Torrent.objects.filter(is_active=True).order_by('-seed')[:10]
-        return context
+    def get_form(self):
+        return SearchForm(self.request.GET or None)
+
 
 class TorrentDetailView(DetailView):
     model = Torrent
