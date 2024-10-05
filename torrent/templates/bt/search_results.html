@@ -8,7 +8,10 @@
             <button type="submit">Search</button>
         </form>
     </div>
-
+    {% if query %}
+    <h2>Search results for "{{ query }}"</h2>
+    <p>Total results: {{ total_results }}</p>
+    {% endif %}
     {% if form.cleaned_data.query %}
         <h2 style="text-align: center;">Search Results for "{{ form.cleaned_data.query }}"</h2>
     {% else %}
