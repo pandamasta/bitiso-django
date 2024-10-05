@@ -44,4 +44,4 @@ def search_view(request):
         'form': form,
         'torrent_list': torrents,
     }
-    return render(request, 'torrent/search_results.html', context)
+    return render(request, 'bt/search_results.html', context)
