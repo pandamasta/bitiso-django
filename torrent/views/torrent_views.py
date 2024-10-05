@@ -46,8 +46,18 @@ class TorrentDetailView(DetailView):
     model = Torrent
     template_name = 'bt/torrent_detail.html'
     context_object_name = 'torrent_detail'
-    # def get_object(self):
-    #     return get_object_or_404(Torrent, slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        # Get the existing context from the parent class
+        context = super().get_context_data(**kwargs)
+
+        # Get the current torrent object
+        torrent = self.object
+
+        # Add tracker details to the context (assuming a reverse relation through `TrackerStat`)
+        context['tracker_detail'] = torrent.trackerstat_set.all()
+
+        return context
     
 class TorrentCreateView(LoginRequiredMixin, CreateView):
     model = Torrent

@@ -5,20 +5,6 @@
 
 
 {% block content %}
-<script>
-    function toggleAdditionalInfo() {
-        var additionalInfo = document.getElementById("additionalInfo");
-        var moreInfoLink = document.querySelector('a[onclick="toggleAdditionalInfo()"]');
-    
-        if (additionalInfo.style.display === "none") {
-            additionalInfo.style.display = "table";
-            moreInfoLink.textContent = "Less Info";
-        } else {
-            additionalInfo.style.display = "none";
-            moreInfoLink.textContent = "More Info";
-        }
-    }
-    </script>
     <!-- Torrent Detail Header with Project Logo and Name Only -->
     <div class="torrent-header" style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
         <div class="project-logo" style="margin-right: 20px;">
@@ -64,16 +50,6 @@
                     <td><strong>File Number</strong></td>
                     <td>{{ torrent_detail.file_nbr }}</td>
                 </tr>
-                <tr>
-                    <td><a href="javascript:void(0);" onclick="toggleAdditionalInfo()">More Info</a></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Additional Information Section, initially hidden -->
-        <table id="additionalInfo" class="pure-table pure-table-bordered" style="display: none; margin-top: 10px;">
-            <tbody>
                 <tr>
                     <td><strong>Pieces</strong></td>
                     <td>{{ torrent_detail.pieces }}</td>
