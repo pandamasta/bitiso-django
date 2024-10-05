@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Bitiso.org - {{ torrent_detail.name }}{% endblock %}
+
+
+{% block content %}
+<script>
+    function toggleAdditionalInfo() {
+        var additionalInfo = document.getElementById("additionalInfo");
+        var moreInfoLink = document.querySelector('a[onclick="toggleAdditionalInfo()"]');
+    
+        if (additionalInfo.style.display === "none") {
+            additionalInfo.style.display = "table";
+            moreInfoLink.textContent = "Less Info";
+        } else {
+            additionalInfo.style.display = "none";
+            moreInfoLink.textContent = "More Info";
+        }
+    }
+    </script>
+    <!-- Torrent Detail Header with Project Logo and Name Only -->
+    <div class="torrent-header" style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+        <div class="project-logo" style="margin-right: 20px;">
+            {% if torrent_detail.project.medium_image %}
+                <img src="{{ torrent_detail.project.medium_image.url }}" alt="{{ torrent_detail.project.name }}" style="width: 100px; height: 100px; object-fit: contain;">
+            {% endif %}
+        </div>
+        <div class="torrent-details" style="text-align: center;">
+            <h1>{{ torrent_detail.name }}</h1>
+            <h3 style="margin: 0;"><a href="/project/{{ torrent_detail.project.id }}">{{ torrent_detail.project.name }}</a></h3>
+        </div>
+    </div>
+
+    <!-- Torrent Info Table -->
+    <div class="scrollable-container">
+        <table class="pure-table pure-table-bordered">
+            <tbody>
+                <tr>
+                    <td><strong>Info hash</strong></td>
+                    <td>{{ torrent_detail.info_hash }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Name</strong></td>
+                    <td>{{ torrent_detail.name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Size</strong></td>
+                    <td>{{ torrent_detail.size | filesizeformat }} ({{ torrent_detail.size }} byte)</td>
+                </tr>
+                <tr>
+                    <td><strong>Metainfo File</strong></td>
+                    <td><a href="/media/{{ torrent_detail.metainfo_file }}">{{ torrent_detail.torrent_filename }}</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Magnet</strong></td>
+                    <td><a href="{{ torrent_detail.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+                </tr>
+                <tr>
+                    <td><strong>Creation Date</strong></td>
+                    <td>{{ torrent_detail.creation }}</td>
+                </tr>
+                <tr>
+                    <td><strong>File Number</strong></td>
+                    <td>{{ torrent_detail.file_nbr }}</td>
+                </tr>
+                <tr>
+                    <td><a href="javascript:void(0);" onclick="toggleAdditionalInfo()">More Info</a></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Additional Information Section, initially hidden -->
+        <table id="additionalInfo" class="pure-table pure-table-bordered" style="display: none; margin-top: 10px;">
+            <tbody>
+                <tr>
+                    <td><strong>Pieces</strong></td>
+                    <td>{{ torrent_detail.pieces }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Piece Size</strong></td>
+                    <td>{{ torrent_detail.piece_size }}</td>
+                </tr>
+                {% if torrent_detail.gpg_signature %}
+                <tr>
+                    <td><strong>GPG Signature</strong></td>
+                    <td>{{ torrent_detail.gpg_signature }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td><strong>Created by Bitiso</strong></td>
+                    <td>{% if torrent_detail.is_bitiso %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td><strong>Trackers</strong></td>
+                    <td>
+                        {% for tracker in tracker_detail %}
+                            {{ tracker.tracker.url }} <span class="seed">{{ tracker.seed }}</span> <span class="leech">{{ tracker.leech }}</span><br/>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+

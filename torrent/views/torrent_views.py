@@ -16,7 +16,7 @@ from ..mixins import RateLimitMixin  # Custom mixin for rate-limiting
 
 class TorrentListView(RateLimitMixin, ListView):
     model = Torrent
-    template_name = 'torrent/torrent_list.html'
+    template_name = 'bt/torrent_list.html'
     context_object_name = 'torrent_list'
     paginate_by = 40  # Built-in pagination support
 
@@ -44,8 +44,11 @@ class TorrentListView(RateLimitMixin, ListView):
 
 class TorrentDetailView(DetailView):
     model = Torrent
-    template_name = 'torrent/torrent_detail.html'
-
+    template_name = 'bt/torrent_detail.html'
+    context_object_name = 'torrent_detail'
+    # def get_object(self):
+    #     return get_object_or_404(Torrent, slug=self.kwargs['slug'])
+    
 class TorrentCreateView(LoginRequiredMixin, CreateView):
     model = Torrent
     fields = ['name', 'size', 'pieces', 'category']

@@ -1,0 +1,44 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bittorrent tracker that indexes open-source and free content">
+    <title>{% block title %}Bitiso.org{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/pure-min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">  -->
+</head>
+
+<body>
+
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <span></span>
+    </a>
+
+    <!-- Conditional Menu Include -->
+    {% if user.is_authenticated %}
+        {% include "includes/menu_logged_in.html" %}
+    {% else %}
+        {% include "includes/menu_logged_out.html" %}
+    {% endif %}
+
+    <div id="main">
+        {% include "includes/header.html" %}
+        
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+        
+        {% include "includes/footer.html" %}
+    </div>
+</div>
+
+<script src="{% static 'js/ui.js' %}"></script>
+
+</body>
+</html>
