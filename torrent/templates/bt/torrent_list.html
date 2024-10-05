@@ -9,20 +9,14 @@
         <button type="submit">Search</button>
     </form>
 </div>
+    <!-- Top 10 Torrents by Seed -->
+    <h2 style="text-align: center;">Top 10 Torrents by Seed</h2>
+    {% include 'shared/torrent_table.html' with torrent_list=top_seeded_torrent_list %}
 
-
-
-<!-- Top 10 Torrents by Seed -->
-<h2 style="text-align: center;">Top 10 Torrents by Seed</h2>
-    <!-- Include torrent table -->
-    {% include 'shared/torrent_table.html' %}
-
+    <!-- All Torrents -->
+    <h2 style="text-align: center;">All Torrents</h2>
+    {% include 'shared/torrent_table.html' with torrent_list=torrent_list %}
     
-<!-- New Torrents -->
-<h2 style="text-align: center;">New torrents</h2>
-    <!-- Include torrent table -->
-    {% include 'shared/torrent_table.html' %}
-
-    <!-- Include pagination -->
-    {% include 'includes/pagination.html' %}
+    <!-- Pagination for All Torrents -->
+    {% include 'shared/pagination.html' %}
 {% endblock %}
