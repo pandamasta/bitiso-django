@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from ..models import Torrent
 from ..forms import SearchForm
 from ..mixins import RateLimitMixin  # Custom mixin for rate-limiting
+from django.conf import settings
 
 # class TorrentListView(ListView):
 #     model = Torrent
@@ -44,7 +45,6 @@ class TorrentListView(RateLimitMixin, ListView):
 
     def get_form(self):
         return SearchForm(self.request.GET or None)
-
 
 class TorrentDetailView(DetailView):
     model = Torrent

@@ -7,9 +7,13 @@
     <meta name="description" content="Bittorrent tracker that indexes open-source and free content">
     <title>{% block title %}Bitiso.org{% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
-    <!-- <link rel="stylesheet" href="{% static 'css/pure-min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">  -->
+    <link rel="stylesheet" href="{% static 'css/pure-min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> 
 </head>
+
+{% if GTAG_ENABLE %}
+    {% include "includes/gtag.html" %}
+{% endif %}
 
 <body>
 
