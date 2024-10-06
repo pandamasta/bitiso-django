@@ -22,7 +22,6 @@ public_patterns = [
     path('login/', login_view, name='login'),
     path('register/', register_view, name='register'),
     path('logout/', logout_view, name='logout'),
-    # path('torrent/<slug:slug>/', TorrentDetailView.as_view(), name='torrent_detail'),
     path('torrents/search/', search_view, name='torrent_search'),  # Search
     path('torrent/<slug>/', TorrentDetailView.as_view(), name='torrent_detail'),
 

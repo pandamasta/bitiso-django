@@ -10,11 +10,9 @@
     <link rel="stylesheet" href="{% static 'css/pure-min.css' %}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}"> 
 </head>
-
 {% if GTAG_ENABLE %}
     {% include "includes/gtag.html" %}
 {% endif %}
-
 <body>
 
 <div id="layout">
@@ -23,12 +21,8 @@
         <span></span>
     </a>
 
-    <!-- Conditional Menu Include -->
-    {% if user.is_authenticated %}
-        {% include "includes/menu_logged_in.html" %}
-    {% else %}
-        {% include "includes/menu_logged_out.html" %}
-    {% endif %}
+     <!-- Menu Left -->
+    {% include "includes/menu_left.html" %}
 
     <div id="main">
         {% include "includes/header.html" %}

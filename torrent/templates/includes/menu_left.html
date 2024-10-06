@@ -1,0 +1,21 @@
+<div id="menu">
+    <div class="pure-menu">
+        <a class="pure-menu-heading" href="/">Bitiso.org</a>
+
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="/" class="pure-menu-link">Torrent</a></li>
+            <li class="pure-menu-item"><a href="/project" class="pure-menu-link">Projects</a></li>
+            <li class="pure-menu-item"><a href="/about" class="pure-menu-link">About</a></li>
+            <li class="pure-menu-item"><a href="/faq" class="pure-menu-link">FAQ</a></li>
+            <li class="pure-menu-item"><a href="/contact" class="pure-menu-link">Contact</a></li>
+        {% if user.is_authenticated %}
+            <li class="pure-menu-item"><a href="/dashboard/torrent" class="pure-menu-link">Your Torrents</a></li>
+            <li class="pure-menu-item"><a href="/dashboard/project" class="pure-menu-link">Your Projects</a></li>
+            <li class="pure-menu-item"><a href="/logout" class="pure-menu-link">Logout</a></li>
+        {% else %}
+            <li class="pure-menu-item"><a href="/login" class="pure-menu-link">Login</a></li>
+        {% endif %}
+    </ul>
+    </div>
+</div>
+
