@@ -11,6 +11,10 @@ from django.conf import settings
 # For all actions related to the user's personal dashboard (managing torrents, viewing stats, etc.).
 
 @login_required
+# def dashboard(request):
+#     # Fetch user-specific torrent management data
+#     torrents = Torrent.objects.filter(uploader=request.user).order_by('-creation')
+#     return render(request, 'user/dashboard.html', {'torrents': torrents})
 def dashboard(request):
     user_torrents = Torrent.objects.filter(uploader=request.user).order_by('-creation')
     torrent_count = user_torrents.count()

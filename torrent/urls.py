@@ -45,11 +45,15 @@ manage_patterns = [
 
 # Combine the public, management, and other routes
 urlpatterns = [
+    # Management routes (all under /torrent/manage/)
+    path('torrent/manage/', include((manage_patterns, 'manage'), namespace='manage')),
+
     # Public routes
     path('', include(public_patterns)),
 
-    # Management routes (all under /torrent/manage/)
-    path('torrent/manage/', include((manage_patterns, 'torrent_manage'))),
+    # Detail view (last, as it's the most general)
+    path('torrent/<slug>/', TorrentDetailView.as_view(), name='torrent_detail'),
+    
 ]
 # urlpatterns = [
 

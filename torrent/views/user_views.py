@@ -16,7 +16,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Welcome, {username}!")
-                return redirect('dashboard')
+                return redirect('manage:torrent_dashboard')
             else:
                 messages.error(request, "Invalid username or password.")
     else:
@@ -42,25 +42,25 @@ def register_view(request):
         form = RegisterForm()
     return render(request, 'user/register.html', {'form': form})
 
-@login_required
-def dashboard(request):
-    user_torrents = Torrent.objects.filter(uploader=request.user).order_by('-creation')
-    torrent_count = user_torrents.count()
-    # Handle POST actions like delete, activate, deactivate
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        torrent_ids = request.POST.getlist('torrent_ids')
-        if action == 'delete':
-            Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).delete()
-            messages.success(request, "Selected torrents have been deleted.")
-        elif action == 'activate':
-            Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).update(is_active=True)
-            messages.success(request, "Selected torrents have been activated.")
-        elif action == 'deactivate':
-            Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).update(is_active=False)
-            messages.success(request, "Selected torrents have been deactivated.")
-        return redirect('dashboard')
-    return render(request, 'user/dashboard.html', {
-        'torrents': user_torrents,
-        'torrent_count': torrent_count,
-    })
+# @login_required
+# def dashboard(request):
+#     user_torrents = Torrent.objects.filter(uploader=request.user).order_by('-creation')
+#     torrent_count = user_torrents.count()
+#     # Handle POST actions like delete, activate, deactivate
+#     if request.method == 'POST':
+#         action = request.POST.get('action')
+#         torrent_ids = request.POST.getlist('torrent_ids')
+#         if action == 'delete':
+#             Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).delete()
+#             messages.success(request, "Selected torrents have been deleted.")
+#         elif action == 'activate':
+#             Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).update(is_active=True)
+#             messages.success(request, "Selected torrents have been activated.")
+#         elif action == 'deactivate':
+#             Torrent.objects.filter(id__in=torrent_ids, uploader=request.user).update(is_active=False)
+#             messages.success(request, "Selected torrents have been deactivated.")
+#         return redirect('dashboard')
+#     return render(request, 'user/dashboard.html', {
+#         'torrents': user_torrents,
+#         'torrent_count': torrent_count,
+#     })
