@@ -16,7 +16,9 @@ from .project_views import (
     ProjectDetailView,
     ProjectCreateView,
     ProjectUpdateView,
-    ProjectDeleteView
+    ProjectDeleteView,
+    ProjectDetailByIdView,
+    ProjectDetailBySlugView
 )
 from .user_views import (
     login_view,

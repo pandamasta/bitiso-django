@@ -1,0 +1,39 @@
+{% load static %}
+    <table class="pure-table pure-table-horizontal torrent-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Creation</th>
+                <th>Torrent</th>
+                <th>Magnet</th>
+                <th>Seed</th>
+                <th>Leech</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if torrent_list %}
+                {% for torrent in torrent_list %}
+                <tr>
+                    <td class="no-wrap">
+                        {% if torrent.project.mini_image %}
+                        <img src="{{ torrent.project.mini_image.url }}" alt="">
+                        {% endif %}
+                        <a href="{% url 'torrent_detail' torrent.slug %}">{{ torrent.name }}</a>
+                    </td>
+                    <td>{{ torrent.size | filesizeformat }}</td>
+                    <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
+                    <td><a href="{{ MEDIA_URL }}{{ torrent.metainfo_file }}">Torrent</a></td>
+                    <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+                    <td class="seed">{{ torrent.seed }}</td>
+                    <td class="leech">{{ torrent.leech }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="7">No torrents found.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+

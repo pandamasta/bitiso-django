@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+
+/* Adjusting project container for larger screens */
+.project-container,
+.torrent-table-wrapper {
+    max-width: 1000px; /* Constrain the width */
+    margin: 0 auto; /* Center the container */
+    padding: 0 20px; /* Add some padding for smaller screens */
+}
+
+/* Existing project container styles */
+.project-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap; /* Prevent wrapping on larger screens */
+}
+
+.project-image-container {
+    flex-shrink: 0;
+    margin-right: 20px;
+    width: 150px; /* Reduced width for the image */
+    height: 150px; /* Reduced height for the image */
+}
+
+.project-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.project-details {
+    flex-grow: 1;
+    text-align: left;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .project-container {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        align-items: center; /* Center items horizontally */
+    }
+
+    .project-image-container {
+        margin-right: 0; /* Remove margin when stacking vertically */
+        margin-bottom: 10px; /* Add space below the image */
+        width: 100px; /* Smaller image on mobile */
+        height: 100px;
+    }
+
+    .project-details {
+        text-align: center; /* Center text on smaller screens */
+    }
+}
+
+/* Ensure the torrent table does not stretch too wide on large screens */
+.torrent-table-wrapper {
+    max-width: 1000px; /* Constrain the width of the table wrapper */
+    margin: 0 auto; /* Center the table on the page */
+    padding: 0 20px; /* Add some padding for smaller screens */
+    overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
+}
+
+.torrent-table {
+    width: 100%;
+    border-collapse: collapse; /* Removes extra spacing between cells */
+}
+
+.torrent-table th,
+.torrent-table td {
+    padding: .5em 1em; /* Adjusted padding */
+    text-align: left;
+    border-bottom: 1px solid #eee; /* Light border for row separation */
+    /* border-left: 1px solid #cbcbcb; /* Left border */
+    border-width: 0 0 0 1px; /* Border width adjusted */
+    font-size: inherit; /* Inherit font size */
+    margin: 0; /* Reset margin */
+    overflow: visible; /* Ensure overflow is visible */
+}
+
+.torrent-table th {
+    font-weight: bold;
+    background-color: rgb(63, 68, 71)
+
+
+}
+/*
+.torrent-table tr:hover {
+    background-color: #f9f9f9; /* Light background on row hover
+}
+*/
+
+.torrent-table .no-wrap {
+    white-space: nowrap; /* Prevents text wrapping in this cell */
+}
+
+.torrent-table img {
+    vertical-align: middle;
+    margin-right: 8px;
+    width: 20px; /* Adjust the size of the image as needed */
+}
+
+.torrent-table .center-content-magnet {
+    text-align: center;
+}
+
+.torrent-table .seed,
+.torrent-table .leech {
+    text-align: center;
+}
+
+</style>
+
+<div class="project-container">
+
+    <div class="project-image-container">
+
+        {% if project.medium_image %}
+        <img src="{{ project.medium_image.url }}" alt="{{ project.name }}">
+        {% else %}
+        <img src="" alt="{{ project.name }}">
+        {% endif %}
+    </div>
+    <div class="project-details">
+        <h1>{{ project.name }}</h1>
+        <p>{{ project.description }}</p>
+        <p><strong>Website:</strong> <a href="{{ project.website_url }}">{{ project.website_url }}</a></p>
+        <p><strong>Download Page:</strong> <a href="{{ project.website_url_download }}">{{ project.website_url_download }}</a></p>
+        <p><strong>Repository:</strong> <a href="{{ project.website_url_repo }}">{{ project.website_url_repo }}</a></p>
+        <a href="{% url 'project_list' %}" class="project-back-link">Back to Project List</a>
+    </div>
+</div>
+
+
+    <h2 style="text-align: center;">Torrents </h2>
+<div class="torrent-table-wrapper">
+    <table class="torrent-table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Date</th>
+                <th>T</th>
+                <th>M</th>
+                <th>Seed</th>
+                <th>Leech</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for torrent in torrents %}
+            <tr>
+                <td><a href="/category/{{ torrent.category.id }}">{{ torrent.category.category_parent_id.name|default:"None" }}</a></td>
+                <td class="no-wrap">
+                    {% if torrent.project.mini_image %}
+                    <img src="{{ torrent.project.mini_image.url }}" alt="">
+                    {% endif %}
+                    <a href="/torrents/{{ torrent.name }}">{{ torrent.name }}</a>
+                </td>
+                <td>{{ torrent.size | filesizeformat }}</td>
+                <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
+                <td><a href="{{ MEDIA_URL }}{{ torrent.metainfo_file }}">Torrent</a></td>
+                <td class="center-content-magnet"><a href="{{ torrent.magnet }}"><img src="{% static 'img/icon-magnet.gif' %}" alt="Magnet link"></a></td>
+                <td class="seed">{{ torrent.seed }}</td>
+                <td class="leech">{{ torrent.leech }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

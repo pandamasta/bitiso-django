@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from ..models import Torrent
+from ..models import Torrent, Project
 from ..forms import SearchForm
 from ..mixins import RateLimitMixin  # Custom mixin for rate-limiting
 from django.conf import settings

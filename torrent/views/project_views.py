@@ -28,6 +28,33 @@ class ProjectDetailView(DetailView):
         context['torrents'] = self.object.torrents.all().order_by('-creation')
         return context
 
+class ProjectDetailByIdView(DetailView):
+    model = Project
+    template_name = 'project/project_detail.html'
+    context_object_name = 'project'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Project, id=self.kwargs['id'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['torrents'] = self.object.torrents.all().order_by('-creation')
+        return context
+
+
+class ProjectDetailBySlugView(DetailView):
+    model = Project
+    template_name = 'project/project_detail.html'
+    context_object_name = 'project'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Project, slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['torrents'] = self.object.torrents.all().order_by('-creation')
+        return context
+
 class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project
     form_class = ProjectForm
@@ -57,3 +84,4 @@ class ProjectDeleteView(LoginRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Project deleted successfully.")
         return super().delete(request, *args, **kwargs)
+
