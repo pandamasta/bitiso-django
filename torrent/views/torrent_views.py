@@ -4,23 +4,16 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from ..models import Torrent, Project, Category
-from django.shortcuts import get_object_or_404
-from ..mixins import RateLimitMixin
-from django.http import Http404
+from ..models import Torrent
+
 from ..forms import SearchForm
 
 
-class TorrentListView(RateLimitMixin, ListView):
+class TorrentListView(ListView):
     model = Torrent
     template_name = 'bt/torrent_list.html'
     context_object_name = 'torrent_list'
     paginate_by = 40  # Pagination setting
-
-    # Rate-limit settings
-    rate_limit_key = 'torrent_list'
-    limit = 20  # requests per minute
-    period = 60  # time period in seconds
 
     def get_context_data(self, **kwargs):
         # Add search form to the context

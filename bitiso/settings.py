@@ -59,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'torrent.middleware.RateLimitMiddleware',  # Add the rate-limiting middleware here
+
 ]
 
 ROOT_URLCONF = 'bitiso.urls'
@@ -163,6 +165,11 @@ CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
 # GTAG
 GTAG_ENABLE = os.getenv('GTAG_ENABLE', 'False') == 'True'
 GTAG_ID = os.getenv('GTAG_ID', '')
+
+# Rate limiting
+
+ENABLE_RATE_LIMITING = False # Set to False to disable rate limiting
+
 
 # APP - Bitiso env
 
