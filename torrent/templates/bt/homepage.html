@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="search-container">
-    <form method="get" action="{% url 'torrent_search' %}">
+    <form method="get" action="{% url 'bitiso:torrent_search' %}">
         <input type="text" name="query" placeholder="Search..." value="{{ form.query.value|default_if_none:'' }}">
         <button type="submit">Search</button>
     </form>

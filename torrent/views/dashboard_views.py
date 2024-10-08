@@ -15,6 +15,7 @@ from django.conf import settings
 #     # Fetch user-specific torrent management data
 #     torrents = Torrent.objects.filter(uploader=request.user).order_by('-creation')
 #     return render(request, 'user/dashboard.html', {'torrents': torrents})
+
 def dashboard(request):
     user_torrents = Torrent.objects.filter(uploader=request.user).order_by('-creation')
     torrent_count = user_torrents.count()
@@ -46,7 +47,7 @@ def dashboard(request):
                 project = Project.objects.get(id=project_id)
                 Torrent.objects.filter(id__in=torrent_ids).update(project=project)
                 messages.success(request, "Project updated successfully.")
-        return redirect('dashboard')
+        return redirect('bitiso:manage_dashboard')
 
     form = FileUploadForm()
     url_form = URLDownloadForm()

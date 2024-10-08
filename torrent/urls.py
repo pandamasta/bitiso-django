@@ -20,38 +20,41 @@ from .views import (
     dashboard
 )
 
+app_name = 'bitiso'
+
+
 urlpatterns = [
     # Public routes (available to everyone)
-    path('', HomePageView.as_view(), name='homepage'),  # Home page
+    path('', HomePageView.as_view(), name='torrent_homepage'),  # Home page
     path('torrents/', TorrentListView.as_view(), name='torrent_list'),  # List all torrents
     path('torrents/search/', search_view, name='torrent_search'),  # Search torrents
     path('torrents/<slug>/', TorrentDetailView.as_view(), name='torrent_detail'),  # Torrent detail view
     path('projects/', ProjectListView.as_view(), name='project_list'),  # List all projects
-    path('projects/<slug:project_slug>/', ProjectDetailBySlugView.as_view(), name='project_detail_by_slug'),  # Project detail by slug
+    path('projects/<slug:project_slug>/', ProjectDetailBySlugView.as_view(), name='project_detail_by_slug'),
 
     # Static pages
-    path('about/', TemplateView.as_view(template_name="bt/about.html"), name='about'),  # About page
-    path('faq/', TemplateView.as_view(template_name="bt/faq.html"), name='faq'),  # FAQ page
-    path('contact/', TemplateView.as_view(template_name="bt/contact.html"), name='contact'),  # Contact page
+    path('about/', TemplateView.as_view(template_name="bt/about.html"), name='static_about'),  # About page
+    path('faq/', TemplateView.as_view(template_name="bt/faq.html"), name='static_faq'),  # FAQ page
+    path('contact/', TemplateView.as_view(template_name="bt/contact.html"), name='static_contact'),  # Contact page
 
     # Torrent management routes (authenticated)
-    path('manage/torrents/create/', TorrentCreateView.as_view(), name='torrent_create'),  # Create a new torrent
-    path('manage/torrents/<slug:slug>/edit/', TorrentUpdateView.as_view(), name='torrent_edit'),  # Edit an existing torrent
-    path('manage/torrents/<slug:slug>/delete/', TorrentDeleteView.as_view(), name='torrent_delete'),  # Delete a torrent
-    path('manage/torrents/upload/', file_upload, name='torrent_upload'),  # Upload a torrent file
-    path('manage/torrents/download/', download_torrent, name='torrent_download'),  # Download a torrent file
-    path('manage/torrents/delete/', delete_torrents, name='torrent_bulk_delete'),  # Bulk delete torrents
+    path('manage/torrents/create/', TorrentCreateView.as_view(), name='manage_torrent_create'),  # Create a new torrent
+    path('manage/torrents/<slug:slug>/edit/', TorrentUpdateView.as_view(), name='manage_torrent_edit'),  # Edit an existing torrent
+    path('manage/torrents/<slug:slug>/delete/', TorrentDeleteView.as_view(), name='manage_torrent_delete'),  # Delete a torrent
+    path('manage/torrents/upload/', file_upload, name='manage_torrent_upload'),  # Upload a torrent file
+    path('manage/torrents/download/', download_torrent, name='manage_torrent_download'),  # Download a torrent file
+    path('manage/torrents/delete/', delete_torrents, name='manage_torrent_bulk_delete'),  # Bulk delete torrents
 
     # Project management routes (authenticated)
-    path('manage/projects/create/', ProjectCreateView.as_view(), name='project_create'),  # Create a new project
-    path('manage/projects/<slug:slug>/edit/', ProjectUpdateView.as_view(), name='project_edit'),  # Edit an existing project
-    path('manage/projects/<slug:slug>/delete/', ProjectDeleteView.as_view(), name='project_delete'),  # Delete a project
+    path('manage/projects/create/', ProjectCreateView.as_view(), name='manage_project_create'),  # Create a new project
+    path('manage/projects/<slug:slug>/edit/', ProjectUpdateView.as_view(), name='manage_project_edit'),  # Edit an existing project
+    path('manage/projects/<slug:slug>/delete/', ProjectDeleteView.as_view(), name='manage_project_delete'),  # Delete a project
 
     # Management dashboard
-    path('manage/', dashboard, name='dashboard'),  # Management dashboard
+    path('manage/', dashboard, name='manage_dashboard'),  # Management dashboard
 
     # Authentication routes
-    path('login/', login_view, name='login'),  # User login
-    path('logout/', logout_view, name='logout'),  # User logout
-    path('register/', register_view, name='register'),  # User registration
+    path('login/', login_view, name='auth_login'),  # User login
+    path('logout/', logout_view, name='auth_logout'),  # User logout
+    path('register/', register_view, name='auth_register'),  # User registration
 ]

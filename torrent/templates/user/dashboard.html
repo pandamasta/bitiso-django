@@ -17,7 +17,7 @@
         {% endif %}
 
         <h3>Your Torrents:</h3>
-        <form method="post" action="{% url 'manage:dashboard' %}" class="pure-form">
+        <form method="post" action="{% url 'bitiso:manage_dashboard' %}" class="pure-form">
             {% csrf_token %}
             <table class="table table-striped">
                 <thead>
@@ -87,14 +87,14 @@
         </form>
 
         <h3>Upload a Torrent</h3>
-            <form class="pure-form" method="post" action="{% url 'manage:torrent_manage:torrent_upload' %}" enctype="multipart/form-data">
+            <form class="pure-form" method="post" action="{% url 'bitiso:manage_torrent_upload' %}" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="">Upload</button>
         </form>
 
         <h3>Download a Torrent</h3>
-        <form class="pure-form" method="post" action="{% url 'manage:torrent_manage:torrent_download' %}">
+        <form class="pure-form" method="post" action="{% url 'bitiso:manage_torrent_download' %}">
             {% csrf_token %}
             {{ url_form.as_p }}
             <button type="submit" class="">Download</button>

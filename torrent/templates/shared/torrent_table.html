@@ -22,7 +22,7 @@
                         {% if torrent.project.mini_image %}
                         <img src="{{ torrent.project.mini_image.url }}" alt="">
                         {% endif %}
-                        <a href="{% url 'torrent_detail' torrent.slug %}">{{ torrent.name }}</a>
+                        <a href="{% url 'bitiso:torrent_detail' torrent.slug %}">{{ torrent.name }}</a>
                     </td>
                     <td>{{ torrent.size | filesizeformat }}</td>
                     <td class="single-line">{{ torrent.creation | date:"M. j" }}</td>
