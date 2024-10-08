@@ -1,0 +1,5 @@
+<form class="pure-form" method="post" action="{% url 'bitiso:manage_torrent_upload' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="pure-button pure-button-primary">Upload</button>
+</form>

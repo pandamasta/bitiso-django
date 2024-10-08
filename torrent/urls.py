@@ -17,7 +17,7 @@ from .views import (
     login_view, logout_view, register_view,
 
     # Dashboard
-    dashboard
+    dashboard, dashboard_bulk_action, set_category, set_project
 )
 
 app_name = 'bitiso'
@@ -44,6 +44,10 @@ urlpatterns = [
     path('manage/torrents/upload/', file_upload, name='manage_torrent_upload'),  # Upload a torrent file
     path('manage/torrents/download/', download_torrent, name='manage_torrent_download'),  # Download a torrent file
     path('manage/torrents/delete/', delete_torrents, name='manage_torrent_bulk_delete'),  # Bulk delete torrents
+    # Torrent management routes (authenticated)
+    path('manage/torrents/bulk-action/', dashboard_bulk_action, name='manage_dashboard_bulk_action'),  # Bulk actions
+    path('manage/torrents/set-category/', set_category, name='manage_dashboard_set_category'),
+    path('manage/torrents/set-project/', set_project, name='manage_dashboard_set_project'),
 
     # Project management routes (authenticated)
     path('manage/projects/create/', ProjectCreateView.as_view(), name='manage_project_create'),  # Create a new project

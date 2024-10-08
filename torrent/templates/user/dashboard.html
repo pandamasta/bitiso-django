@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Bitiso.org | Dashboard{% endblock %}
+
 {% block content %}
-    <div class="container">
-        <h2>Welcome to your Dashboard</h2>
-        <p>Hello, {{ user.username }}!</p>
-        <p>You have {{ torrent_count }} torrents.</p>
+<div class="container">
+    <p>Hello, {{ user.username }}!</p>
+    <p>You have {{ torrent_count }} torrents.</p>
 
         {% if messages %}
             <div class="alert alert-dismissible">
@@ -16,88 +16,86 @@
             </div>
         {% endif %}
 
-        <h3>Your Torrents:</h3>
-        <form method="post" action="{% url 'bitiso:manage_dashboard' %}" class="pure-form">
-            {% csrf_token %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Frontend</th>
+    <h3>Your Torrents</h3>
 
-                        <th>Name</th>
-                        <th>Size</th>
-                        <th>Pieces</th>
-                        <th>Piece Size</th>
-                        <th>Seeds</th>
-                        <th>Leeches</th>
-                        <th>Category</th>
-                        <th>Project</th>
-
-
-                        <th>Added At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for torrent in torrents %}
-                        <tr>
-                            <td><input type="checkbox" name="torrent_ids" value="{{ torrent.id }}"></td>
-                            <td>{{ torrent.is_active }}</td>
-
-                            <td>{{ torrent.name }}</td>
-
-                            <td>{{ torrent.size | filesizeformat  }}</td>
-                            <td>{{ torrent.pieces }}</td>
-                            <td>{{ torrent.piece_size }}</td>
-                            <td>{{ torrent.seed }}</td>
-                            <td>{{ torrent.leech }}</td>
-                            <td>{{ torrent.category }}</td>
-                            <td>{{ torrent.project }}</td>
-
-
-                            <td>{{ torrent.creation }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <button type="submit" name="delete" class="pure-button pure-button-danger"">Delete Selected</button>
-            <button type="submit" name="activate" class="pure-button pure-button-primary">Activate Selected</button>
-            <button type="submit" name="deactivate" class="pure-button pure-button-primary">Deactivate Selected</button>
-            <br><br>
-            <div class="form-group" style="max-width: 200px">
-                <label for="category">Set Category:</label>
-                <select name="category" class="form-control">
-                    <option value="">-- Select Category --</option>
-                    {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" name="set_category">Set Category</button>
-            </div>
-            <div class="form-group" style="max-width: 200px">
-                <label for="project">Set Project:</label>
-                <select name="project" class="">
-                    <option value="">-- Select Project --</option>
-                    {% for project in projects %}
-                        <option value="{{ project.id }}">{{ project.name }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" name="set_project" >Set Project</button>
-            </div>
-        </form>
-
-        <h3>Upload a Torrent</h3>
-            <form class="pure-form" method="post" action="{% url 'bitiso:manage_torrent_upload' %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="">Upload</button>
-        </form>
-
-        <h3>Download a Torrent</h3>
-        <form class="pure-form" method="post" action="{% url 'bitiso:manage_torrent_download' %}">
-            {% csrf_token %}
-            {{ url_form.as_p }}
-            <button type="submit" class="">Download</button>
-        </form>
+<form method="post" action="{% url 'bitiso:manage_dashboard_bulk_action' %}" class="pure-form">
+    {% csrf_token %}
+    <div class="bulk-actions">
+        <select name="action">
+            <option value="delete">Delete Selected</option>
+            <option value="activate">Activate Selected</option>
+            <option value="deactivate">Deactivate Selected</option>
+        </select>
+        <button type="submit" class="pure-button pure-button-primary">Apply Action</button>
     </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Active</th>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Pieces</th>
+                <th>Seeds</th>
+                <th>Leeches</th>
+                <th>Category</th>
+                <th>Project</th>
+                <th>Added At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for torrent in torrents %}
+                <tr>
+                    <td><input type="checkbox" name="torrent_ids" value="{{ torrent.id }}"></td>
+                    <td>{{ torrent.is_active }}</td>
+                    <td>{{ torrent.name }}</td>
+                    <td>{{ torrent.size | filesizeformat }}</td>
+                    <td>{{ torrent.pieces }}</td>
+                    <td>{{ torrent.seed }}</td>
+                    <td>{{ torrent.leech }}</td>
+                    <td>{{ torrent.category }}</td>
+                    <td>{{ torrent.project }}</td>
+                    <td>{{ torrent.creation }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+<!-- Set Category Form -->
+<form method="post" action="{% url 'bitiso:manage_dashboard_set_category' %}">
+    {% csrf_token %}
+         <label for="category">Set Category:</label>
+        <select name="category" id="category" class="form-control">
+            <option value="">-- Select Category --</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    <button type="submit" name="set_category" class="btn btn-primary">Set Category</button>
+</form>
+
+<br>
+
+<!-- Set Project Form -->
+<form method="post" action="{% url 'bitiso:manage_dashboard_set_project' %}">
+    {% csrf_token %}
+        <label for="project">Set Project:</label>
+        <select name="project" id="project" class="form-control">
+            <option value="">-- Select Project --</option>
+            {% for project in projects %}
+                <option value="{{ project.id }}">{{ project.name }}</option>
+            {% endfor %}
+        </select>
+    <button type="submit" name="set_project" class="btn btn-primary">Set Project</button>
+</form>
+
+
+    <h3>Upload a Torrent</h3>
+    {% include 'includes/upload_torrent.html' %}
+
+    <h3>Download a Torrent</h3>
+    {% include 'includes/download_torrent_from_url.html' %}
+</div>
 {% endblock %}

@@ -27,7 +27,7 @@ from .user_views import (
     logout_view,
     register_view,
 )
-from .dashboard_views import dashboard, delete_torrents
+from .dashboard_views import dashboard, delete_torrents, dashboard_bulk_action, set_category, set_project
 from .upload_views import file_upload
 from .download_views import download_torrent
 from .search_views import search_view
@@ -52,4 +52,6 @@ __all__ = [
     "logout_view",
     "register_view",
     "dashboard",
+    'set_project',
+    'set_category',
 ]
