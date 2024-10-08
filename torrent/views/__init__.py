@@ -1,5 +1,7 @@
 # views/__init__.py
-
+from .homepage_views import (
+    HomePageView,
+)
 from .torrent_views import (
     TorrentListView,
     TorrentDetailView,

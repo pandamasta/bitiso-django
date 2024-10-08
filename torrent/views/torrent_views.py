@@ -4,39 +4,36 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from ..models import Torrent, Project
+from ..models import Torrent, Project, Category
+from django.shortcuts import get_object_or_404
+from ..mixins import RateLimitMixin
+from django.http import Http404
 from ..forms import SearchForm
-from ..mixins import RateLimitMixin  # Custom mixin for rate-limiting
-from django.conf import settings
 
-# class TorrentListView(ListView):
-#     model = Torrent
-#     template_name = 'torrent/torrent_list.html'
-#     context_object_name = 'torrent_list'
-#     paginate_by = 40
 
 class TorrentListView(RateLimitMixin, ListView):
     model = Torrent
     template_name = 'bt/torrent_list.html'
     context_object_name = 'torrent_list'
-    paginate_by = 40  # Built-in pagination support
+    paginate_by = 40  # Pagination setting
 
-    # Custom rate-limit settings
+    # Rate-limit settings
     rate_limit_key = 'torrent_list'
     limit = 20  # requests per minute
     period = 60  # time period in seconds
 
     def get_context_data(self, **kwargs):
+        # Add search form to the context
         context = super().get_context_data(**kwargs)
         context['form'] = self.get_form()
-        context['top_seeded_torrent_list'] = Torrent.objects.filter(is_active=True).order_by('-seed')[:10]
         return context
 
     def get_queryset(self):
+        # Query for active torrents, ordered by creation date
         torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
         form = self.get_form()
 
-        # Handle search query
+        # Handle search query if form is valid
         if form.is_valid() and form.cleaned_data['query']:
             query = form.cleaned_data['query']
             torrents = torrents.filter(name__icontains=query)
@@ -44,7 +41,9 @@ class TorrentListView(RateLimitMixin, ListView):
         return torrents
 
     def get_form(self):
+        # Get the search form, populate it with GET data if available
         return SearchForm(self.request.GET or None)
+
 
 class TorrentDetailView(DetailView):
     model = Torrent

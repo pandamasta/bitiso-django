@@ -1,35 +1,36 @@
 from django.urls import path, include
 from .views import (
-    # Torrent Views
-    TorrentListView, TorrentDetailView, TorrentCreateView,
-    TorrentUpdateView, TorrentDeleteView,
+    # Homepage
+    HomePageView,
 
-    # Project Views
-    ProjectListView, ProjectDetailView, ProjectCreateView,
-    ProjectUpdateView, ProjectDeleteView, ProjectDetailByIdView, ProjectDetailBySlugView,
+    # Torrent views
+    TorrentListView, TorrentDetailView, TorrentCreateView, TorrentUpdateView, TorrentDeleteView,
+    file_upload, download_torrent, delete_torrents, search_view,
 
-    # Auth Views
+    # Project views
+    ProjectListView, ProjectDetailBySlugView, ProjectCreateView, ProjectUpdateView, ProjectDeleteView,
+
+    # Auth views
     login_view, logout_view, register_view,
 
-    # Other Views
-    search_view, dashboard, file_upload, download_torrent, delete_torrents
+    # Dashboard
+    dashboard
 )
+
 from django.views.generic import TemplateView
 
 # Public routes (available to everyone)
-
 public_patterns = [
     # Torrent-related public views
-    path('', TorrentListView.as_view(), name='torrent_list'),  # Root for torrents
-    path('torrent/', TorrentListView.as_view(), name='torrent_list'),  # Root for torrents
+    path('', HomePageView.as_view(), name='homepage'),  # Home page
 
-    path('torrents/<slug>/', TorrentDetailView.as_view(), name='torrent_detail'),  # Detail view
-    path('torrents/search/', search_view, name='torrent_search'),  # Search
+    path('torrents/', TorrentListView.as_view(), name='torrent_list'),  # Redundant root for torrents
+    path('torrents/search/', search_view, name='torrent_search'),  # Search torrents
+    path('torrents/<slug>/', TorrentDetailView.as_view(), name='torrent_detail'),  # Torrent details
 
     # Project-related public views
     path('projects/', ProjectListView.as_view(), name='project_list'),  # List of projects
-    path('projects/<int:id>/', ProjectDetailByIdView.as_view(), name='project_detail_by_id'),
-    path('projects/<slug:slug>/', ProjectDetailBySlugView.as_view(), name='project_detail_by_slug'),
+    path('projects/<slug:project_slug>/', ProjectDetailBySlugView.as_view(), name='project_detail_by_slug'),  # Project detail view
 
     # Static Pages
     path('about/', TemplateView.as_view(template_name="bt/about.html"), name="about"),
@@ -54,11 +55,11 @@ project_manage_patterns = [
     path('<slug:slug>/delete/', ProjectDeleteView.as_view(), name='project_delete'),  # Delete a project
 ]
 
-# Combined manage patterns (for dashboard and torrent/project management)
+# Management patterns (for dashboard and torrent/project management)
 manage_patterns = [
-    path('torrents/', include((torrent_manage_patterns, 'torrent'), namespace='torrent_manage')),  # Torrent manage
-    path('projects/', include((project_manage_patterns, 'project'), namespace='project_manage')),  # Project manage
     path('', dashboard, name='dashboard'),  # Dashboard for managing
+    path('torrents/', include((torrent_manage_patterns, 'torrent_manage'))),  # Manage torrents
+    path('projects/', include((project_manage_patterns, 'project_manage'))),  # Manage projects
 ]
 
 # Auth routes (login, logout, register)
@@ -74,9 +75,8 @@ urlpatterns = [
     path('', include(public_patterns)),
 
     # Management routes (all under /manage/)
-    path('manage/', include((manage_patterns, 'manage'), namespace='manage')),
+    path('manage/', include((manage_patterns, 'manage'))),
 
     # Authentication routes
     path('', include(auth_patterns)),
 ]
-

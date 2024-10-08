@@ -9,8 +9,8 @@
             <li class="pure-menu-item"><a href="/faq" class="pure-menu-link">FAQ</a></li>
             <li class="pure-menu-item"><a href="/contact" class="pure-menu-link">Contact</a></li>
         {% if user.is_authenticated %}
-            <li class="pure-menu-item"><a href="/dashboard/torrent" class="pure-menu-link">Your Torrents</a></li>
-            <li class="pure-menu-item"><a href="/dashboard/project" class="pure-menu-link">Your Projects</a></li>
+            <li class="pure-menu-item"><a href="/manage/torrent" class="pure-menu-link">Your Torrents</a></li>
+            <li class="pure-menu-item"><a href="/manage/project" class="pure-menu-link">Your Projects</a></li>
             <li class="pure-menu-item"><a href="/logout" class="pure-menu-link">Logout</a></li>
         {% else %}
             <li class="pure-menu-item"><a href="/login" class="pure-menu-link">Login</a></li>

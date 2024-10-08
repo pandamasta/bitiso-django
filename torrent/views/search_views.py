@@ -27,28 +27,26 @@ def search_view(request):
             status=429,
         )
 
+    # Handle search query
     form = SearchForm(request.GET or None)
+    query = form.cleaned_data['query'] if form.is_valid() and form.cleaned_data.get('query') else None
     torrents = Torrent.objects.filter(is_active=True).order_by('-creation')
 
-    # Handle search query
-    query = None
-    if form.is_valid() and form.cleaned_data['query']:
-        query = form.cleaned_data['query']
+    if query:
         torrents = torrents.filter(name__icontains=query)
     else:
         messages.info(request, "Please enter a valid search query.")
 
-    # Pagination
-    paginator = Paginator(torrents, 40)  # Adjust number of torrents per page as needed
+    # Handle pagination
+    paginator = Paginator(torrents, 40)  # Number of torrents per page
     page = request.GET.get('page')
+
     try:
         torrents = paginator.page(page)
-    except PageNotAnInteger:
-        torrents = paginator.page(1)
-    except EmptyPage:
-        torrents = paginator.page(paginator.num_pages)
+    except (PageNotAnInteger, EmptyPage):
+        torrents = paginator.page(1) if isinstance(page, PageNotAnInteger) else paginator.page(paginator.num_pages)
 
-    # Context setup
+    # Pass the context to the template
     context = {
         'form': form,
         'torrent_list': torrents,

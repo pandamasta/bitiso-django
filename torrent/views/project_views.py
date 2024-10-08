@@ -1,13 +1,12 @@
 # views/project_views.py
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from ..models import Project, Torrent
+from ..models import Project
 from ..forms import ProjectForm
-from ..services.torrent_service import TorrentService
 
 class ProjectListView(ListView):
     model = Project
@@ -46,12 +45,12 @@ class ProjectDetailBySlugView(DetailView):
     model = Project
     template_name = 'project/project_detail.html'
     context_object_name = 'project'
-
-    def get_object(self, queryset=None):
-        return get_object_or_404(Project, slug=self.kwargs['slug'])
+    slug_field = 'slug'
+    slug_url_kwarg = 'project_slug'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Add the related torrents to the context
         context['torrents'] = self.object.torrents.all().order_by('-creation')
         return context
 
