@@ -20,60 +20,38 @@ from .views import (
     dashboard
 )
 
-# Public URL patterns for anyone to access
-public_patterns = [
-    # Homepage
+urlpatterns = [
+    # Public routes (available to everyone)
     path('', HomePageView.as_view(), name='homepage'),  # Home page
-
-    # Torrent-related views (public)
     path('torrents/', TorrentListView.as_view(), name='torrent_list'),  # List all torrents
     path('torrents/search/', search_view, name='torrent_search'),  # Search torrents
     path('torrents/<slug>/', TorrentDetailView.as_view(), name='torrent_detail'),  # Torrent detail view
-
-    # Project-related views (public)
-    path('projects/', ProjectListView.as_view(), name='project_list'),  # List of all projects
+    path('projects/', ProjectListView.as_view(), name='project_list'),  # List all projects
     path('projects/<slug:project_slug>/', ProjectDetailBySlugView.as_view(), name='project_detail_by_slug'),  # Project detail by slug
 
     # Static pages
-    path('about/', TemplateView.as_view(template_name="bt/about.html"), name="about"),  # About page
+    path('about/', TemplateView.as_view(template_name="bt/about.html"), name='about'),  # About page
     path('faq/', TemplateView.as_view(template_name="bt/faq.html"), name='faq'),  # FAQ page
     path('contact/', TemplateView.as_view(template_name="bt/contact.html"), name='contact'),  # Contact page
-]
 
-# Torrent management URLs (requires authentication)
-torrent_manage_patterns = [
-    path('create/', TorrentCreateView.as_view(), name='torrent_create'),  # Create a new torrent
-    path('<slug:slug>/edit/', TorrentUpdateView.as_view(), name='torrent_edit'),  # Edit an existing torrent
-    path('<slug:slug>/delete/', TorrentDeleteView.as_view(), name='torrent_delete'),  # Delete a torrent
-    path('upload/', file_upload, name='torrent_upload'),  # Upload a torrent file
-    path('download/', download_torrent, name='torrent_download'),  # Download a torrent file
-    path('delete/', delete_torrents, name='torrent_bulk_delete'),  # Bulk delete torrents
-]
+    # Torrent management routes (authenticated)
+    path('manage/torrents/create/', TorrentCreateView.as_view(), name='torrent_create'),  # Create a new torrent
+    path('manage/torrents/<slug:slug>/edit/', TorrentUpdateView.as_view(), name='torrent_edit'),  # Edit an existing torrent
+    path('manage/torrents/<slug:slug>/delete/', TorrentDeleteView.as_view(), name='torrent_delete'),  # Delete a torrent
+    path('manage/torrents/upload/', file_upload, name='torrent_upload'),  # Upload a torrent file
+    path('manage/torrents/download/', download_torrent, name='torrent_download'),  # Download a torrent file
+    path('manage/torrents/delete/', delete_torrents, name='torrent_bulk_delete'),  # Bulk delete torrents
 
-# Project management URLs (requires authentication)
-project_manage_patterns = [
-    path('create/', ProjectCreateView.as_view(), name='project_create'),  # Create a new project
-    path('<slug:slug>/edit/', ProjectUpdateView.as_view(), name='project_edit'),  # Edit an existing project
-    path('<slug:slug>/delete/', ProjectDeleteView.as_view(), name='project_delete'),  # Delete a project
-]
+    # Project management routes (authenticated)
+    path('manage/projects/create/', ProjectCreateView.as_view(), name='project_create'),  # Create a new project
+    path('manage/projects/<slug:slug>/edit/', ProjectUpdateView.as_view(), name='project_edit'),  # Edit an existing project
+    path('manage/projects/<slug:slug>/delete/', ProjectDeleteView.as_view(), name='project_delete'),  # Delete a project
 
-# Dashboard and management section (requires authentication)
-manage_patterns = [
-    path('', dashboard, name='dashboard'),  # Management dashboard
-    path('torrents/', include((torrent_manage_patterns, 'torrent_manage'))),  # Manage torrents
-    path('projects/', include((project_manage_patterns, 'project_manage'))),  # Manage projects
-]
+    # Management dashboard
+    path('manage/', dashboard, name='dashboard'),  # Management dashboard
 
-# Authentication-related routes (login, logout, registration)
-auth_patterns = [
+    # Authentication routes
     path('login/', login_view, name='login'),  # User login
     path('logout/', logout_view, name='logout'),  # User logout
     path('register/', register_view, name='register'),  # User registration
-]
-
-# Main URL patterns for the project
-urlpatterns = [
-    path('', include(public_patterns)),  # Public URLs
-    path('manage/', include((manage_patterns, 'manage'))),  # Management URLs under /manage/
-    path('', include(auth_patterns)),  # Authentication URLs
 ]
