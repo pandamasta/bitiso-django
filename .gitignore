@@ -8,3 +8,6 @@ bitiso/__pycache__/
 .idea
 *.sqlite*
 tmp/
+.env-*
+.env*
+.venv
