@@ -1,3 +1,12 @@
 from django.db import models
 
-# Create your models here.
+from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
+
+# Custom User model to add extra field 
+class CustomUser(AbstractUser):
+    # Additional fields to track
+    email = models.EmailField(_("email address"), unique=True)
+
+    def __str__(self):
+        return self.username
