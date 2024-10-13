@@ -73,6 +73,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                 # Add the custom project name context processor
+                'bitiso.context_processors.project_name',
             ],
         },
     },
@@ -152,7 +154,9 @@ CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Redirect when lougout
-
 LOGOUT_REDIRECT_URL = '/'
 
+# Redirect when login
 LOGIN_REDIRECT_URL = '/'
+
+PROJECT_NAME = 'Bitiso'

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Welcome to Bitiso!</h1>
+<h1>Welcome to {{ project_name }}!</h1>
   
   {% if user.is_authenticated %}
     <p>Welcome, {{ user.username }}!</p>
