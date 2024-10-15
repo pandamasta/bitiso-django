@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 
+
 # code from https://www.forgepackages.com/guides/rate-limiting-requests
 
 class RateLimitExceeded(PermissionDenied):

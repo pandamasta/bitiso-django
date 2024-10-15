@@ -1,38 +1,64 @@
+# urls.py
+
 from django.urls import path, include
-from . import views
-from django.urls import path
 from django.views.generic import TemplateView
-from django.contrib import admin
+from .views import (
+    # Homepage
+    HomePageView,
+
+    # Torrent views
+    TorrentListView, TorrentDetailView, TorrentCreateView, TorrentUpdateView, TorrentDeleteView,
+    file_upload, download_torrent, delete_torrents, search_view,
+
+    # Project views
+    ProjectListView, ProjectDetailBySlugView, ProjectCreateView, ProjectUpdateView, ProjectDeleteView,
+
+    # Auth views
+    login_view, logout_view, register_view,
+
+    # Dashboard
+    dashboard, dashboard_bulk_action, set_category, set_project
+)
+
+app_name = 'bitiso'
+
 
 urlpatterns = [
-    path('', views.torrent_list_view, name='torrent_list'),
-    # path('', search, name='torrent/index.html'),
-    path('search/', views.search_view, name='torrent_search'),
-    path('detail/<torrent_name>/', views.detail),
-    path('category/<category_id>/', views.category),
-    path('project/', views.project, name='project_detail'),
-    path('project/<str:identifier>/', views.project_detail, name='project_detail'),
+    # Public routes (available to everyone)
+    path('', HomePageView.as_view(), name='torrent_homepage'),  # Home page
+    path('torrents/', TorrentListView.as_view(), name='torrent_list'),  # List all torrents
+    path('torrents/search/', search_view, name='torrent_search'),  # Search torrents
+    path('torrents/<slug>/', TorrentDetailView.as_view(), name='torrent_detail'),  # Torrent detail view
+    path('projects/', ProjectListView.as_view(), name='project_list'),  # List all projects
+    path('projects/<slug:project_slug>/', ProjectDetailBySlugView.as_view(), name='project_detail_by_slug'),
 
-    path('project/delete/<int:project_id>/', views.delete_project, name='delete_project'),
+    # Static pages
+    path('about/', TemplateView.as_view(template_name="bt/about.html"), name='static_about'),  # About page
+    path('faq/', TemplateView.as_view(template_name="bt/faq.html"), name='static_faq'),  # FAQ page
+    path('contact/', TemplateView.as_view(template_name="bt/contact.html"), name='static_contact'),  # Contact page
 
-    path('about/', TemplateView.as_view(template_name="torrent/about.html")),
-    path('faq/', TemplateView.as_view(template_name="torrent/faq.html")),
-    path('contact/', TemplateView.as_view(template_name="torrent/contact.html")),
-    path('categories/', views.category_list, name='category_list'),
+    # Torrent management routes (authenticated)
+    path('manage/torrents/create/', TorrentCreateView.as_view(), name='manage_torrent_create'),  # Create a new torrent
+    path('manage/torrents/<slug:slug>/edit/', TorrentUpdateView.as_view(), name='manage_torrent_edit'),  # Edit an existing torrent
+    path('manage/torrents/<slug:slug>/delete/', TorrentDeleteView.as_view(), name='manage_torrent_delete'),  # Delete a torrent
+    path('manage/torrents/upload/', file_upload, name='manage_torrent_upload'),  # Upload a torrent file
+    path('manage/torrents/download/', download_torrent, name='manage_torrent_download'),  # Download a torrent file
+    path('manage/torrents/delete/', delete_torrents, name='manage_torrent_bulk_delete'),  # Bulk delete torrents
+    # Torrent management routes (authenticated)
+    path('manage/torrents/bulk-action/', dashboard_bulk_action, name='manage_dashboard_bulk_action'),  # Bulk actions
+    path('manage/torrents/set-category/', set_category, name='manage_dashboard_set_category'),
+    path('manage/torrents/set-project/', set_project, name='manage_dashboard_set_project'),
 
-    path('manage/', views.manage_torrents, name='manage_torrents'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
-    path('register/', views.register_view, name='register'),
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('dashboard/torrent/', views.dashboard, name='dashboard_torrent'),
-    path('dashboard/project/', views.dashboard_project, name='dashboard_project'),
-    path('dashboard/project/<int:project_id>/torrents/', views.list_torrents, name='list_torrents'),
+    # Project management routes (authenticated)
+    path('manage/projects/create/', ProjectCreateView.as_view(), name='manage_project_create'),  # Create a new project
+    path('manage/projects/<slug:slug>/edit/', ProjectUpdateView.as_view(), name='manage_project_edit'),  # Edit an existing project
+    path('manage/projects/<slug:slug>/delete/', ProjectDeleteView.as_view(), name='manage_project_delete'),  # Delete a project
 
-    path('delete_torrents/', views.delete_torrents, name='delete_torrents'),
-    path('upload/', views.file_upload, name='file_upload'),
-    path('download_torrent/', views.download_torrent, name='download_torrent'),
+    # Management dashboard
+    path('manage/', dashboard, name='manage_dashboard'),  # Management dashboard
 
+    # Authentication routes
+    path('login/', login_view, name='auth_login'),  # User login
+    path('logout/', logout_view, name='auth_logout'),  # User logout
+    path('register/', register_view, name='auth_register'),  # User registration
 ]
-admin.site.index_template = 'admin/index.html'
-admin.autodiscover()

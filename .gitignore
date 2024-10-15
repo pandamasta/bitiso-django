@@ -7,3 +7,4 @@ bitiso/__pycache__/
 *.swp
 .idea
 *.sqlite*
+tmp/

@@ -30,6 +30,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'change_me')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
+
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
 
 
@@ -58,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'torrent.middleware.RateLimitMiddleware',  # Add the rate-limiting middleware here
+
 ]
 
 ROOT_URLCONF = 'bitiso.urls'
@@ -73,6 +76,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                 # Custom context processor
+                'torrent.context_processors.gtag_processor',
             ],
         },
     },
@@ -156,6 +161,15 @@ MEDIA_ROOT = os.getenv('DJANGO_MEDIA_ROOT', os.path.join(WEBROOT, 'media'))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
+
+# GTAG
+GTAG_ENABLE = os.getenv('GTAG_ENABLE', 'False') == 'True'
+GTAG_ID = os.getenv('GTAG_ID', '')
+
+# Rate limiting
+
+ENABLE_RATE_LIMITING = False # Set to False to disable rate limiting
+
 
 # APP - Bitiso env
 
