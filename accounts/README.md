@@ -65,3 +65,6 @@ urlpatterns = [
 
 This `accounts` app is designed to be modular and reusable across different projects. You can extend the `CustomUser` model further if needed, and the URLs can easily be integrated into any project.
 
+### Password Reset and Email Verification
+
+For more details on how email verification and password reset are implemented, see [Email Verification and Password Reset](docs/accounts_verification_password_reset.md).

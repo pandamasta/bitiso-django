@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -155,10 +156,21 @@ CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 # Custom User Model 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# Redirect when lougout
+# Redirect when logout
 LOGOUT_REDIRECT_URL = '/'
 
 # Redirect when login
 LOGIN_REDIRECT_URL = '/'
 
-PROJECT_NAME = 'Bitiso'
+PROJECT_NAME = os.getenv('PROJECT_NAME ','Project')
+
+# settings.py
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST ','smtp@localhost')
+EMAIL_PORT = os.getenv('EMAIL_PORT ','587')
+EMAIL_USE_TLS = os.getenv('EMAIL_TLS ','True')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER','login')  # Your email address
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD','login')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL','noreply@noreply.com')
+
