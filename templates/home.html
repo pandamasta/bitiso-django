@@ -1,12 +1,15 @@
+{# templates/home.html #}
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
-<h1>Welcome to {{ project_name }}!</h1>
-  
+
+  <h1>{% trans "Welcome to" %} {{ project_name }}!</h1>
+
   {% if user.is_authenticated %}
-    <p>Welcome, {{ user.username }}!</p>
+    <p>{% blocktrans with username=user.username %}Welcome, {{ username }}!{% endblocktrans %}</p>
   {% else %}
-    <p>Welcome, guest! Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'register' %}">register</a>.</p>
+    <p>{% trans "Welcome, guest!" %}</p>
   {% endif %}
-  
+
 {% endblock %}

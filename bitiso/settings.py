@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'modeltranslation', 
-    'rosetta',
+    # 'rosetta',
     'accounts',
 
 ]
@@ -136,6 +136,7 @@ LANGUAGES = [
 # Path to translation files
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
+    os.path.join(BASE_DIR, 'accounts/locale'),
 ]
 
 # Static files (CSS, JavaScript, Images)
@@ -149,6 +150,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
 # Custom User Model 
 AUTH_USER_MODEL = 'accounts.CustomUser'

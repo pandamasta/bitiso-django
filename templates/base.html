@@ -1,27 +1,36 @@
+{# templates/base.html #}
+{% load i18n %}
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bitiso</title>
+    <title>{% trans "Welcome to" %} {{ project_name }}</title>
 </head>
 <body>
     <header>
         <nav>
-            <ul>
-                <li><a href="{% url 'home' %}">Home</a></li>
-                {% if user.is_authenticated %}
-                <form method="post" action="{% url 'logout' %}">
+            <a href="{% url 'home' %}">{% trans "Home" %}</a>
+
+            {% if user.is_authenticated %}
+                <!-- Show Logout if user is authenticated -->
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>               
-                {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'register' %}">Register</a></li>
-                {% endif %}
-            </ul>
+                    <button type="submit">{% trans "Logout" %}</button>
+                </form>
+            {% else %}
+                <!-- Show Register and Login if user is not authenticated -->
+                <a href="{% url 'register' %}">{% trans "Register" %}</a>
+                <a href="{% url 'login' %}">{% trans "Login" %}</a>
+            {% endif %}
+
+            <!-- Language switcher -->
+            {% include 'accounts/form_language_switcher.html' %}
         </nav>
     </header>
+
     <div>
         {% block content %}{% endblock %}
     </div>
+
 </body>
 </html>
