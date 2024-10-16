@@ -1,0 +1,12 @@
+{# pages/templates/pages/home.html #}
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+    <h1>{% trans "Welcome to" %} {{ project_name }}!</h1>
+    {% if user.is_authenticated %}
+        <p>{% blocktrans with username=user.username %}Welcome, {{ username }}!{% endblocktrans %}</p>
+    {% else %}
+        <p>{% trans "Welcome, guest!" %}</p>
+    {% endif %}
+{% endblock %}
