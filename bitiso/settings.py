@@ -37,15 +37,17 @@ ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'modeltranslation', 
     # 'rosetta',
     'accounts',
+    #'pages',
+    'pages.apps.PagesConfig',
 
 ]
 
@@ -174,3 +176,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER','login')  # Your email address
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD','login')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL','noreply@noreply.com')
 
+
+# MODELTRANSLATION_TRANSLATION_FILES = (
+#     'pages.translation',  # Path to your translation.py file
+# )
