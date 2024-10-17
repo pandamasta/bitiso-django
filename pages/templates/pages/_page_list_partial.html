@@ -1,0 +1,10 @@
+{# pages/templates/pages/_page_list_partial.html #}
+{% load i18n %}
+
+{% if page_list %}
+    {% for page in page_list %}
+        <a href="{% url 'page_detail' slug=page.slug %}">{{ page.title }}</a>
+    {% endfor %}
+{% else %}
+    <p>{% trans "No pages available." %}</p>
+{% endif %}

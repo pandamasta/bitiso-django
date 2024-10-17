@@ -18,8 +18,7 @@ urlpatterns = [
 
 
 # # i18n URL patterns for language-prefixed routes (like /fr/, /en/)
-# urlpatterns += i18n_patterns(
-#     # Accounts and pages with language prefix
-#     path('accounts/', include('accounts.urls')),
-#     path('', include('pages.urls')),  # Includes the dynamic pages app URLs
-# )
+urlpatterns += i18n_patterns(
+path('accounts/', include('accounts.urls')),
+    path('', include('pages.urls')),  # Includes the dynamic pages app URLs
+)

@@ -78,6 +78,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                  # Add the custom project name context processor
                 'bitiso.context_processors.project_name',
+                'bitiso.context_processors.page_list',
             ],
         },
     },

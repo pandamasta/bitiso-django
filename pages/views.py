@@ -5,21 +5,15 @@ from django.views.generic import DetailView, ListView
 from .models import Page
 from django.views.generic import TemplateView
 
-# class HomePageView(TemplateView):
-#     """Displays the homepage."""
-#     template_name = 'pages/home.html'
+from django.views.generic import ListView, DetailView
+from .models import Page
 
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         # Optionally, add extra context if needed
-#         context['latest_pages'] = Page.objects.filter(is_published=True).order_by('-created_at')[:5]
-#         return context
-    
-# from django.views.generic import TemplateView
+class HomePageView(ListView):
+    template_name = 'home.html'
+    context_object_name = 'page_list'
 
-class HomePageView(TemplateView):
-    template_name = 'pages/home.html'
-
+    def get_queryset(self):
+        return Page.objects.filter(is_published=True)
 
 class PageDetailView(DetailView):
     model = Page
