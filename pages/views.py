@@ -1,19 +1,22 @@
 # pages/views.py
 
-from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView, ListView
-from .models import Page
-from django.views.generic import TemplateView
-
 from django.views.generic import ListView, DetailView
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import DetailView
 from .models import Page
+from django.utils import translation
 
-class HomePageView(ListView):
-    template_name = 'home.html'
-    context_object_name = 'page_list'
+def redirect_to_language_home(request):
+    user_language = translation.get_language()
+    return redirect(f'/{user_language}/')
 
-    def get_queryset(self):
-        return Page.objects.filter(is_published=True)
+class HomePageView(DetailView):
+    template_name = 'pages/home.html'  # Use a dynamic home template
+    context_object_name = 'page'
+
+    def get_object(self):
+        # Fetch the page marked as the homepage
+        return get_object_or_404(Page, is_published=True, is_homepage=True)
 
 class PageDetailView(DetailView):
     model = Page
@@ -22,7 +25,6 @@ class PageDetailView(DetailView):
 
     def get_object(self):
         return get_object_or_404(Page, slug=self.kwargs['slug'], is_published=True)
-
 
 class PageListView(ListView):
     """Displays a list of all published pages."""

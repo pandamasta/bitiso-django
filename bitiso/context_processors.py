@@ -8,8 +8,6 @@ def project_name(request):
     }
 
 def page_list(request):
-    """A context processor that returns all published pages."""
-    pages = Page.objects.filter(is_published=True)
+    """A context processor that returns all published pages, excluding the homepage."""
+    pages = Page.objects.filter(is_published=True, is_homepage=False)
     return {'page_list': pages}
-
-
