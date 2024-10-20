@@ -104,17 +104,41 @@ def verify_email(request, uidb64, token):
         return redirect('home')
 
 
+def profile_view(request, uuid=None, username=None):
+    """Displays a user's profile based on UUID or username."""
+    if settings.USE_UUID_FOR_PROFILE_URL:
+        user = get_object_or_404(CustomUser, uuid=uuid)
+    else:
+        user = get_object_or_404(CustomUser, username=username)
+    
+    return render(request, 'accounts/profile.html', {'profile_user': user})
+
+
     
 @login_required
 def profile(request):
     """Displays and allows the user to update their profile."""
+    user = request.user
     if request.method == 'POST':
-        form = CustomUserChangeForm(request.POST, instance=request.user)
+        form = CustomUserChangeForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Your profile has been updated.")
+            new_username = form.cleaned_data.get('username')
+            if new_username != user.username:
+                # Check if the user has changed the username within the limit
+                time_since_last_change = timezone.now() - user.username_last_changed
+                if time_since_last_change < timedelta(days=settings.USERNAME_CHANGE_LIMIT_DAYS):
+                    messages.error(request, "You can only change your username once per week.")
+                else:
+                    # Update the username and record the change time
+                    user.username = new_username
+                    user.username_last_changed = timezone.now()
+                    user.save()
+                    messages.success(request, "Your username has been updated.")
+            else:
+                form.save()
+                messages.success(request, "Your profile has been updated.")
             return redirect('profile')
     else:
-        form = CustomUserChangeForm(instance=request.user)
-
+        form = CustomUserChangeForm(instance=user)
     return render(request, 'accounts/profile.html', {'form': form})
+

@@ -10,13 +10,35 @@ def redirect_to_language_home(request):
     user_language = translation.get_language()
     return redirect(f'/{user_language}/')
 
+from django.views.generic import DetailView
+from django.shortcuts import get_object_or_404, render
+from .models import Page
+
 class HomePageView(DetailView):
     template_name = 'pages/home.html'  # Use a dynamic home template
     context_object_name = 'page'
 
     def get_object(self):
-        # Fetch the page marked as the homepage
-        return get_object_or_404(Page, is_published=True, is_homepage=True)
+        try:
+            # Try to get the homepage page object
+            return Page.objects.get(is_published=True, is_homepage=True)
+        except Page.DoesNotExist:
+            return None  # No homepage exists, fallback to None
+
+    def get(self, request, *args, **kwargs):
+        # Check if a homepage exists
+        page = self.get_object()
+
+        if page:
+            # If a homepage exists, render it
+            context = {self.context_object_name: page}
+            return self.render_to_response(context)
+        else:
+            # If no homepage exists, render a default template or message
+            return render(request, 'pages/home.html', {
+                'message': "No homepage is currently set. Please create a homepage in the admin panel."
+            })
+
 
 class PageDetailView(DetailView):
     model = Page

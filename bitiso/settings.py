@@ -46,8 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'rosetta',
     'accounts',
-    #'pages',
-    'pages.apps.PagesConfig',
+    'pages',
+    'user_profiles',
+    # 'pages.apps.PagesConfig',
 
 ]
 
@@ -79,6 +80,9 @@ TEMPLATES = [
                  # Add the custom project name context processor
                 'bitiso.context_processors.project_name',
                 'bitiso.context_processors.page_list',
+                'bitiso.context_processors.profile_user',
+                'bitiso.context_processors.use_uuid_for_profile_url', 
+
             ],
         },
     },
@@ -165,6 +169,12 @@ LOGOUT_REDIRECT_URL = '/'
 # Redirect when login
 LOGIN_REDIRECT_URL = '/'
 
+# Use UUID or Username in URLs
+USE_UUID_FOR_PROFILE_URL = True  # Set to False to use username
+
+# Time limit for changing username (in days)
+USERNAME_CHANGE_LIMIT_DAYS = 1  # Set the limit for changing usernames (e.g., 7 days)
+
 PROJECT_NAME = os.getenv('PROJECT_NAME ','Project')
 
 # settings.py
@@ -182,3 +192,4 @@ EMAIL_VERIFICATION_REQUIRED = True
 # MODELTRANSLATION_TRANSLATION_FILES = (
 #     'pages.translation',  # Path to your translation.py file
 # )
+
