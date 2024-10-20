@@ -177,6 +177,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER','login')  # Your email address
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD','login')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL','noreply@noreply.com')
 
+EMAIL_VERIFICATION_REQUIRED = True
 
 # MODELTRANSLATION_TRANSLATION_FILES = (
 #     'pages.translation',  # Path to your translation.py file

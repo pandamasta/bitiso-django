@@ -17,18 +17,27 @@ User = get_user_model()  # Use the custom user model
 
 
 def register(request):
-    """Handles user registration and sends a verification email."""
+    """Handles user registration and sends a verification email if required."""
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = False  # Set the user to inactive until email is verified
-            user.save()
 
-            # Send the verification email
-            send_verification_email(user, request)
-            messages.success(request, "Registration successful! Please check your email to verify your account.")
-            return redirect('home')  # Do not log the user in at this point
+            if settings.EMAIL_VERIFICATION_REQUIRED:
+                user.is_active = False  # Set the user to inactive until email is verified
+                user.save()
+
+                # Send the verification email
+                send_verification_email(user, request)
+                messages.success(request, "Registration successful! Please check your email to verify your account.")
+            else:
+                # If email verification is not required, activate the user and log them in
+                user.is_active = True
+                user.save()
+                login(request, user)
+                messages.success(request, "Registration successful! You are now logged in.")
+
+            return redirect('home')
     else:
         form = CustomUserCreationForm()
 
@@ -57,6 +66,10 @@ from accounts.tokens import custom_token_generator
 
 def verify_email(request, uidb64, token):
     """Verifies the user's email using the custom token generator."""
+    if not settings.EMAIL_VERIFICATION_REQUIRED:
+        # Redirect if email verification is not required
+        return redirect('home')
+
     try:
         # Decode the user ID from the URL
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -89,6 +102,7 @@ def verify_email(request, uidb64, token):
         if settings.DEBUG:
             print("Token validation failed or user not found.")
         return redirect('home')
+
 
     
 @login_required
