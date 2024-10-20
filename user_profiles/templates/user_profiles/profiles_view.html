@@ -1,0 +1,9 @@
+{# user_profiles/templates/user_profiles/profile_view.html #}
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{{ profile_user.username }}'s Profile</h2>
+    <img src="{{ profile_user.userprofile.profile_picture.url }}" alt="{{ profile_user.username }}">
+    <p>{{ profile_user.userprofile.bio }}</p>
+    <!-- Other profile fields -->
+{% endblock %}

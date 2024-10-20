@@ -1,0 +1,23 @@
+{# user_profiles/templates/user_profiles/profile_detail.html #}
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ profile_user.username }}'s Profile</h2>
+
+{% if profile_user.userprofile.profile_picture %}
+    <img src="{{ profile_user.userprofile.profile_picture.url }}" alt="{{ profile_user.username }}">
+{% endif %}
+
+<p><strong>Bio:</strong> {{ profile_user.userprofile.bio }}</p>
+
+{% if profile_user.userprofile.social_links %}
+    <h3>Social Links</h3>
+    <ul>
+        {% for key, value in profile_user.userprofile.social_links.items %}
+            <li><a href="{{ value }}" target="_blank">{{ key }}</a></li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<p><strong>Date of Birth:</strong> {{ profile_user.userprofile.date_of_birth }}</p>
+{% endblock %}
