@@ -1,6 +1,5 @@
 {# templates/base.html #}
 {% load i18n %}
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,60 +7,27 @@
 </head>
 <body>
     <header>
-        {% block header %}
-            <!-- Language switcher wrapped in a container -->
-            <div class="language-switcher">
-                {% include 'shared/form_language_switcher.html' %}
-            </div>
-            
-            <nav>
-                <a href="{% url 'home' %}">{% trans "Home" %}</a> 
-                
-                <!-- Include the page list -->
-                {% include 'pages/_page_list_partial.html' %}
-                
-                <!-- Authentication links -->
-                {% if user.is_authenticated %}
-                    <p>{% trans "Welcome" %} {{ user.username }}!</p>
-                    <form method="post" action="{% url 'logout' %}" class="logout-form">
-                        {% csrf_token %}
-                        <button type="submit">{% trans "Logout" %}</button>
-                    </form>
-                    
-                    <!-- Link to Profile Edit and Profile view based on USE_UUID_FOR_PROFILE_URL -->
-                    <a href="{% if USE_UUID_FOR_PROFILE_URL %}{% url 'profile_edit' uuid=user.uuid %}{% else %}{% url 'profile_edit' username=user.username %}{% endif %}">
-                        {% trans "Edit Profile" %}
-                    </a>
-                    <a href="{% if USE_UUID_FOR_PROFILE_URL %}{% url 'profile_view' uuid=user.uuid %}{% else %}{% url 'profile_view' username=user.username %}{% endif %}">
-                        {% trans "Profile" %}
-                    </a>
-                {% else %}
-                    <a href="{% url 'register' %}">{% trans "Register" %}</a>
-                    <a href="{% url 'login' %}">{% trans "Login" %}</a>
-                {% endif %}
-            </nav>
-        {% endblock %}
+        <!-- Language switcher -->
+        {% include 'shared/form_language_switcher.html' %}
+        <nav>
+            {% include 'shared/nav_links.html' %}
+            {% include 'shared/auth_links.html' %}
+
+        </nav>
     </header>
 
     {% if messages %}
-        <div class="messages-container">
-            <ul class="messages">
-                {% for message in messages %}
-                    <li class="{{ message.tags|default:'info' }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
     {% endif %}
 
-    <main>
+    <div>
         {% block content %}{% endblock %}
-    </main>
+    </div>
 
-    <footer>
-        {% block footer %}
-            <!-- Optional footer content goes here -->
-        {% endblock %}
-    </footer>
-
+    {% include 'shared/footer.html' %}  {# Add the footer here #}
 </body>
 </html>

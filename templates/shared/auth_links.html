@@ -1,0 +1,22 @@
+{# templates/shared/_auth_links.html #}
+{% load i18n %}
+
+<div class="auth-links">
+    {% if user.is_authenticated %}
+        <p>{% trans "Welcome" %} {{ user.username }}!</p>
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit">{% trans "Logout" %}</button>
+        </form>
+        <!-- Profile Edit and View Links -->
+        <a href="{% if USE_UUID_FOR_PROFILE_URL %}{% url 'profile_edit' uuid=user.uuid %}{% else %}{% url 'profile_edit' username=user.username %}{% endif %}">
+            {% trans "Edit Profile" %}
+        </a>
+        <a href="{% if USE_UUID_FOR_PROFILE_URL %}{% url 'profile_view' uuid=user.uuid %}{% else %}{% url 'profile_view' username=user.username %}{% endif %}">
+            {% trans "Profile" %}
+        </a>
+    {% else %}
+        <a href="{% url 'register' %}">{% trans "Register" %}</a>
+        <a href="{% url 'login' %}">{% trans "Login" %}</a>
+    {% endif %}
+</div>

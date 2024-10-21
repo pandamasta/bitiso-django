@@ -170,7 +170,7 @@ LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 
 # Use UUID or Username in URLs
-USE_UUID_FOR_PROFILE_URL = False  # Set to False to use username
+USE_UUID_FOR_PROFILE_URL = True  # Set to False to use username
 
 # Time limit for changing username (in days)
 USERNAME_CHANGE_LIMIT_DAYS = 1  # Set the limit for changing usernames (e.g., 7 days)
@@ -193,3 +193,4 @@ EMAIL_VERIFICATION_REQUIRED = False
 #     'pages.translation',  # Path to your translation.py file
 # )
 
+COPYRIGHT_START_YEAR = 2018
