@@ -1,0 +1,15 @@
+{# user_profiles/templates/user_profiles/profile_edit.html #}
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h2>{% trans "Edit Profile" %}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% trans "Save changes" %}</button>
+</form>
+
+<a href="{% url 'profile_view' username=user.username %}">{% trans "Cancel" %}</a>
+{% endblock %}

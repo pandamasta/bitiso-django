@@ -170,7 +170,7 @@ LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 
 # Use UUID or Username in URLs
-USE_UUID_FOR_PROFILE_URL = True  # Set to False to use username
+USE_UUID_FOR_PROFILE_URL = False  # Set to False to use username
 
 # Time limit for changing username (in days)
 USERNAME_CHANGE_LIMIT_DAYS = 1  # Set the limit for changing usernames (e.g., 7 days)
@@ -187,7 +187,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER','login')  # Your email address
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD','login')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL','noreply@noreply.com')
 
-EMAIL_VERIFICATION_REQUIRED = True
+EMAIL_VERIFICATION_REQUIRED = False
 
 # MODELTRANSLATION_TRANSLATION_FILES = (
 #     'pages.translation',  # Path to your translation.py file

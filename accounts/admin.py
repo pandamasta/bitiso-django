@@ -4,4 +4,4 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'is_active', 'username_last_changed')
+    list_display = ('username', 'email', 'is_active', 'username_last_changed', 'is_staff')
