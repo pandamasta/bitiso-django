@@ -11,5 +11,5 @@
     <button type="submit">{% trans "Save changes" %}</button>
 </form>
 
-<a href="{% url 'profile_view' username=user.username %}">{% trans "Cancel" %}</a>
+<a href="{% if USE_UUID_FOR_PROFILE_URL %}{% url 'profile_view' uuid=user.uuid %}{% else %}{% url 'profile_view' username=user.username %}{% endif %}">{% trans "Cancel" %}</a>
 {% endblock %}

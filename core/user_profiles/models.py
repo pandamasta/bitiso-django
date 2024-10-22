@@ -16,10 +16,27 @@ class UserProfile(models.Model):
         blank=True, 
         null=True
     )
-    date_of_birth = models.DateField(_("Date of Birth"), blank=True, null=True)
-    social_links = models.JSONField(_("Social Links"), blank=True, null=True)
-    privacy_settings = models.JSONField(_("Privacy Settings"), blank=True, null=True)
-    notification_preferences = models.JSONField(_("Notification Preferences"), blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+    def save(self, *args, **kwargs):
+        # Check if an instance already exists in the database
+        try:
+            old_instance = UserProfile.objects.get(pk=self.pk)
+            # Check if the new profile_picture is different from the existing one
+            if old_instance.profile_picture and old_instance.profile_picture != self.profile_picture:
+                # If the profile_picture is changing, delete the old one
+                old_instance.profile_picture.delete(save=False)
+        except UserProfile.DoesNotExist:
+            # No old instance exists, so nothing to delete
+            pass
+
+        # Call the original save method to save the new profile picture
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Delete the profile picture file when the UserProfile instance is deleted
+        if self.profile_picture:
+            self.profile_picture.delete(save=False)
+        super().delete(*args, **kwargs)

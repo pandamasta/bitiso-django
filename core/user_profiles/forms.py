@@ -6,7 +6,7 @@ from .models import UserProfile
 class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['profile_picture', 'bio', 'social_links', 'privacy_settings', 'notification_preferences', 'date_of_birth']
+        fields = ['profile_picture', 'bio' ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -2,6 +2,7 @@ import os
 from uuid import uuid4
 from django.utils.deconstruct import deconstructible
 from django.core.exceptions import ValidationError
+import imghdr
 
 @deconstructible
 class PathAndRename:
@@ -26,10 +27,21 @@ class PathAndRename:
 def validate_image_type(image):
     """
     Validator to ensure only allowed image types (JPEG, PNG) are uploaded.
+    This validator works during file upload as well as during model interactions.
     """
-    allowed_types = ['image/jpeg', 'image/png']
-    if image.file.content_type not in allowed_types:
-        raise ValidationError('Unsupported file type. Allowed types: JPEG, PNG.')
+    allowed_types = ['jpeg', 'png']
+    
+    # If content_type is available (during form upload)
+    if hasattr(image, 'file') and hasattr(image.file, 'content_type'):
+        content_type = image.file.content_type
+        if content_type not in ['image/jpeg', 'image/png']:
+            raise ValidationError('Unsupported file type. Allowed types: JPEG, PNG.')
+    
+    # If content_type is not available (e.g., interacting with the model directly), we fallback to imghdr
+    else:
+        file_type = imghdr.what(image)
+        if file_type not in allowed_types:
+            raise ValidationError('Unsupported file type. Allowed types: JPEG, PNG.')
 
 def validate_file_size(image):
     """
