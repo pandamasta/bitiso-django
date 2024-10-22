@@ -1,0 +1,15 @@
+{% torrents/templates/torrents/torrent_detail.html #}
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{{ torrent.name }}</h2>
+    <p>Size: {{ torrent.size }} bytes</p>
+    <p>File Count: {{ torrent.file_count }}</p>
+    <p>Description: {{ torrent.description }}</p>
+    <p>Magnet Link: <a href="{{ torrent.magnet }}">{{ torrent.magnet }}</a></p>
+    <p>Category: {{ torrent.category.name }}</p>
+    <p>Website: <a href="{{ torrent.website_url }}">{{ torrent.website_url }}</a></p>
+
+    <a href="{% url 'torrent_edit' torrent.slug %}">Edit Torrent</a> | 
+    <a href="{% url 'torrent_delete' torrent.slug %}">Delete Torrent</a>
+{% endblock %}

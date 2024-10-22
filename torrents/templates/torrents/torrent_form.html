@@ -1,0 +1,15 @@
+{% torrents/templates/torrents/torrent_form.html #}
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% if form.instance.pk %}Edit Torrent{% else %}Create Torrent{% endif %}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %} Torrent</button>
+    </form>
+
+    <a href="{% url 'torrent_list' %}">Back to list</a>
+{% endblock %}
