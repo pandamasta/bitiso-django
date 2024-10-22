@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'rosetta',
     'accounts',
-    'pages',
+    'core.pages',
     'core.user_profiles',
     # 'pages.apps.PagesConfig',
 

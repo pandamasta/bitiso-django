@@ -1,6 +1,6 @@
 # bitiso/context_processors.py
 from django.conf import settings
-from pages.models import Page
+from core.pages.models import Page
 from django.contrib.auth import get_user_model
 
 
