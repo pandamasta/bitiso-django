@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'core.accounts',
     'core.pages',
     'core.user_profiles',
-    # 'pages.apps.PagesConfig',
+    'torrents',
 
 ]
 

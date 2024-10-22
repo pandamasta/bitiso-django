@@ -17,8 +17,9 @@ urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),  # Admin paths
     path('accounts/', include('core.accounts.urls')),  # Accounts app paths
     path('profiles/', include('core.user_profiles.urls')),  # Include user_profiles URLs
-
+    path('torrents/', include('torrents.urls')),  # Include the torrents app URLs
     # Map slugs directly at the root for pages like /en/about/
     path('<slug:slug>/', PageDetailView.as_view(), name='page_detail'),
+
 )
 
