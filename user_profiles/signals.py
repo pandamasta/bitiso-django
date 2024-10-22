@@ -14,9 +14,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):
     """Save the UserProfile whenever the CustomUser is saved."""
-    try:
+    if hasattr(instance, 'userprofile'):
         instance.userprofile.save()
-    except UserProfile.DoesNotExist:
-        # If the UserProfile doesn't exist, create it
+    else:
         UserProfile.objects.create(user=instance)
-

@@ -18,3 +18,4 @@ urlpatterns += i18n_patterns(
     # Map slugs directly at the root for pages like /en/about/
     path('<slug:slug>/', PageDetailView.as_view(), name='page_detail'),
 )
+
