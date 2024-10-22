@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Tracker Details</h2>
+<p>URL: {{ tracker.url }}</p>
+<a href="{% url 'tracker_edit' tracker.pk %}">Edit</a> | 
+<a href="{% url 'tracker_delete' tracker.pk %}">Delete</a>
+{% endblock %}

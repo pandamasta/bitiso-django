@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Tracker List</h2>
+<ul>
+    {% for tracker in trackers %}
+        <li><a href="{% url 'tracker_detail' tracker.pk %}">{{ tracker.url }}</a></li>
+    {% endfor %}
+</ul>
+<a href="{% url 'tracker_create' %}">Create New Tracker</a>
+{% endblock %}

@@ -1,0 +1,11 @@
+{# torrents/templates/torrents/projcect_list.html #}
+{% extends 'base.html' %}
+{% block content %}
+<h2>Project List</h2>
+<ul>
+    {% for project in projects %}
+        <li><a href="{% url 'project_detail' project.pk %}">{{ project.name }}</a></li>
+    {% endfor %}
+</ul>
+<a href="{% url 'project_create' %}">Create New Project</a>
+{% endblock %}
