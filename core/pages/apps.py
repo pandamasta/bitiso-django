@@ -1,3 +1,5 @@
+# core/pages/apps.py
+
 from django.apps import AppConfig
 
 class PagesConfig(AppConfig):

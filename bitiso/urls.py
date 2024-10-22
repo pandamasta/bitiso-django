@@ -12,7 +12,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path('', HomePageView.as_view(), name='home'),  # Home page URL should be named 'home'
     path('admin/', admin.site.urls),  # Admin paths
-    path('accounts/', include('accounts.urls')),  # Accounts app paths
+    path('accounts/', include('core.accounts.urls')),  # Accounts app paths
     path('profiles/', include('core.user_profiles.urls')),  # Include user_profiles URLs
 
     # Map slugs directly at the root for pages like /en/about/

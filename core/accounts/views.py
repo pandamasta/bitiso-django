@@ -12,6 +12,8 @@ from django.conf import settings
 from django.urls import reverse
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
+from core.accounts.tokens import custom_token_generator
+
 
 User = get_user_model()  # Use the custom user model
 
@@ -61,8 +63,6 @@ def send_verification_email(user, request):
         [user.email]
     )
 
-
-from accounts.tokens import custom_token_generator
 
 def verify_email(request, uidb64, token):
     """Verifies the user's email using the custom token generator."""
