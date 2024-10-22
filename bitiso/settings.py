@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     # 'rosetta',
     'accounts',
     'pages',
-    'user_profiles',
+    'core.user_profiles',
     # 'pages.apps.PagesConfig',
 
 ]
