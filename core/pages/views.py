@@ -1,18 +1,18 @@
 # pages/views.py
 
-from django.views.generic import ListView, DetailView
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import DetailView
-from .models import Page
+from django.views.generic import ListView, DetailView, UpdateView
+from django.core.exceptions import ValidationError
 from django.utils import translation
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from .models import Page
+from .forms import PageForm
 
 def redirect_to_language_home(request):
     user_language = translation.get_language()
     return redirect(f'/{user_language}/')
-
-from django.views.generic import DetailView
-from django.shortcuts import get_object_or_404, render
-from .models import Page
 
 class HomePageView(DetailView):
     template_name = 'pages/home.html'  # Use a dynamic home template
@@ -39,14 +39,17 @@ class HomePageView(DetailView):
                 'message': "No homepage is currently set. Please create a homepage in the admin panel."
             })
 
-
 class PageDetailView(DetailView):
     model = Page
-    template_name = 'pages/page_detail.html'
+    template_name = "pages/page_detail.html"
     context_object_name = 'page'
 
     def get_object(self):
-        return get_object_or_404(Page, slug=self.kwargs['slug'], is_published=True)
+        # Fetch the page by slug and only show published pages unless user is logged in
+        if self.request.user.is_authenticated:
+            return get_object_or_404(Page, slug=self.kwargs['slug'])
+        else:
+            return get_object_or_404(Page, slug=self.kwargs['slug'], is_published=True)
 
 class PageListView(ListView):
     """Displays a list of all published pages."""
@@ -57,3 +60,22 @@ class PageListView(ListView):
     def get_queryset(self):
         """Return only published pages."""
         return Page.objects.filter(is_published=True)
+
+@method_decorator(login_required, name='dispatch')
+class PageUpdateView(UpdateView):
+    model = Page
+    form_class = PageForm
+    template_name = "pages/page_edit.html"
+
+    def get_object(self):
+        return get_object_or_404(Page, slug=self.kwargs['slug'])
+
+    def form_valid(self, form):
+        try:
+            form.instance.clean()  # Run validation
+        except ValidationError as e:
+            form.add_error(None, e)  # Add validation errors to form
+            return self.form_invalid(form)
+
+        form.save()
+        return redirect(reverse('page_detail', kwargs={'slug': form.instance.slug}))

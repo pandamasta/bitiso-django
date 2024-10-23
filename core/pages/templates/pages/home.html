@@ -7,4 +7,7 @@
     <div>
         {{ page.content|safe }}
     </div>
+
+    {% if user.is_authenticated %}
+    <a href="{% url 'page_edit' slug=page.slug %}" class="btn btn-primary">Edit</a>  {% endif %}
 {% endblock %}
