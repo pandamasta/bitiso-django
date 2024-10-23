@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from ..utils.slug_utils import generate_unique_slug
+from django.conf import settings
 
 class Category(models.Model):
     """
@@ -17,9 +18,13 @@ class Category(models.Model):
         on_delete=models.PROTECT,
         related_name='children'
     )
+    # Add timestamps
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='categories', null=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), blank=True, null=True)
-
+    
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")

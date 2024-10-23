@@ -28,8 +28,11 @@ class Project(models.Model):
     large_image = models.ImageField(upload_to='img/project/large/', blank=True)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='projects')
+    # Add timestamps
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  # Automatically updates on save
     deleted_at = models.DateTimeField(_("Deleted at"), blank=True, null=True)
+
 
     class Meta:
         verbose_name = _("Project")

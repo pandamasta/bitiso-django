@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>{{ category.name }}</h2>
-<p>Slug: {{ category.slug }}</p>
 {% if category.parent_category %}
-    <p>Parent Category: <a href="{% url 'category_detail' category.parent_category.pk %}">{{ category.parent_category.name }}</a></p>
+    <p>Parent Category: <a href="{% url 'category_detail' category.parent_category.slug %}">{{ category.parent_category.name }}</a></p>
 {% endif %}
 <p>Created at: {{ category.created_at }}</p>
-<a href="{% url 'category_edit' category.pk %}">Edit</a> | 
-<a href="{% url 'category_delete' category.pk %}">Delete</a>
+<a href="{% url 'category_edit' category.slug %}">Edit</a> | 
+<a href="{% url 'category_delete' category.slug %}">Delete</a>
 {% endblock %}

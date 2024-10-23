@@ -34,18 +34,12 @@ class Torrent(models.Model):
     website_url_repo = models.URLField(_("Repository URL"), max_length=2000, blank=True)
     version = models.CharField(_("Version of the software"), max_length=16, blank=True)
 
-    # Timestamps
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='torrents', null=True, blank=True)    
+                        
+    # Add timestamps
     created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField(_("Deletion timestamp"), blank=True, null=True)
-    
-    # Uploader relation
-    uploader = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_("Uploader"),
-        null=True,
-        blank=True,
-        on_delete=models.PROTECT
-    )
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(_("Deleted at"), blank=True, null=True)
 
     # Statistics
     seed_count = models.PositiveIntegerField(_("Number of seeds"), default=0)
