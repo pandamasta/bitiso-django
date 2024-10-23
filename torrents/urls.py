@@ -1,6 +1,8 @@
 from django.urls import path
 #from . import views
 from torrents import views
+from .views import upload_local_torrent, import_torrent_from_url
+
 urlpatterns = [
     # Torrent URLs
     path('', views.TorrentListView.as_view(), name='torrent_list'),
@@ -29,4 +31,7 @@ urlpatterns = [
     path('trackers/<int:pk>/', views.TrackerDetailView.as_view(), name='tracker_detail'),
     path('trackers/<int:pk>/edit/', views.TrackerUpdateView.as_view(), name='tracker_edit'),
     path('trackers/<int:pk>/delete/', views.TrackerDeleteView.as_view(), name='tracker_delete'),
+
+    path('upload/', upload_local_torrent, name='upload_local_torrent'),
+    path('import-from-url/', import_torrent_from_url, name='import_torrent_from_url'),
 ]

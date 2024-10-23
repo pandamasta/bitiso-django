@@ -33,3 +33,11 @@ class TrackerForm(forms.ModelForm):
     class Meta:
         model = Tracker
         fields = ['url']
+
+
+class FileUploadForm(forms.Form):
+    file = forms.FileField(label="Upload a .torrent file")
+
+
+class URLDownloadForm(forms.Form):
+    url = forms.URLField(label="Download from URL", max_length=2000)

@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Torrent, Project, Category, Tracker
@@ -9,6 +8,16 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from torrents import views
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.core.files.storage import FileSystemStorage
+from .forms import FileUploadForm
+import requests
+from .forms import URLDownloadForm
+from .utils.torrent_utils import process_torrent_file
+from urllib.parse import urlparse
+from django.core.files.base import ContentFile
+from django.contrib.auth.decorators import login_required
 
 
 # List view: Display all torrents
@@ -188,3 +197,68 @@ class TrackerDeleteView(DeleteView):
 
     def get_object(self):
         return get_object_or_404(Tracker, slug=self.kwargs.get('slug'))
+    
+
+@login_required
+def upload_local_torrent(request):
+    """
+    View to handle uploading of a torrent file by a logged-in user.
+    """
+    if request.method == 'POST':
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['file']
+            fs = FileSystemStorage(location=settings.MEDIA_TORRENT)
+            filename = file.name
+
+            if fs.exists(filename):
+                messages.error(request, f"The file '{filename}' already exists. Please rename your file and try again.")
+                return redirect('dashboard')
+
+            saved_file_path = fs.save(file.name, file)
+            torrent_file_path = os.path.join(settings.MEDIA_TORRENT, saved_file_path)
+
+            try:
+                process_torrent_file(torrent_file_path, request.user)
+                messages.success(request, "Upload and import succeeded.")
+            except ValidationError as e:
+                messages.error(request, str(e))
+
+            return redirect('dashboard')
+
+    form = FileUploadForm()
+    return render(request, 'torrents/upload_local_torrent.html', {'form': form})
+
+
+@login_required
+def import_torrent_from_url(request):
+    """
+    View to handle downloading a torrent from a URL and importing it.
+    """
+    if request.method == 'POST':
+        form = URLDownloadForm(request.POST)
+        if form.is_valid():
+            url = form.cleaned_data['url']
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+
+                content = ContentFile(response.content)
+                parsed_url = urlparse(url)
+                filename = parsed_url.path.split('/')[-1]
+
+                fs = FileSystemStorage(location=settings.MEDIA_TORRENT)
+                saved_file_path = fs.save(filename, content)
+                torrent_file_path = os.path.join(settings.MEDIA_TORRENT, saved_file_path)
+
+                process_torrent_file(torrent_file_path, request.user, source_url=url)
+                messages.success(request, "Download, upload, and import succeeded.")
+            except requests.exceptions.RequestException as e:
+                messages.error(request, f"Error downloading file: {e}")
+            except ValidationError as e:
+                messages.error(request, str(e))
+
+            return redirect('dashboard')
+
+    form = URLDownloadForm()
+    return render(request, 'torrents/import_torrent_from_url.html', {'form': form})
