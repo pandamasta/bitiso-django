@@ -198,3 +198,4 @@ COPYRIGHT_START_YEAR = 2018
 
 MEDIA_URL = '/media/'  # URL to serve media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Absolute filesystem path to media directory
+

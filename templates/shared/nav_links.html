@@ -1,8 +1,11 @@
 {# templates/shared/_navigation.html #}
 {% load i18n %}
 
-<nav>
     <a href="{% url 'home' %}">{% trans "Home" %}</a> 
     <!-- Include the page list -->
     {% include 'pages/_page_list_partial.html' %}
-</nav>
+
+    <!-- Include URL of torrents/ -->
+    {% include 'torrents/_torrent_menu_list.html' %}
+
+    

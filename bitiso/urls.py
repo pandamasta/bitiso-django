@@ -17,12 +17,13 @@ urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),  # Admin paths
     path('accounts/', include('core.accounts.urls')),  # Accounts app paths
     path('profiles/', include('core.user_profiles.urls')),  # Include user_profiles URLs
-    # Specific paths for torrent, projects, categories, and trackers inside torrents app
-    path('torrents/', include('torrents.urls')),  # Include the torrents app URLs
-    path('projects/', include('torrents.urls')),  # Projects under torrents
-    path('categories/', include('torrents.urls')),  # Categories under torrents
-    path('trackers/', include('torrents.urls')),  # Trackers under torrents
-
+    # Specific paths for projects, categories, and trackers inside torrents app
+    path('torrents/', include('torrents.urls.urls_torrents')),  # Include the torrents app URLs
+    path('projects/', include('torrents.urls.urls_projects')),  # Separate URLs for projects
+    path('categories/', include('torrents.urls.urls_categories')),  # Separate URLs for categories
+    path('trackers/', include('torrents.urls.urls_trackers')),  # Separate URLs for trackers
+    
+    
     # Map slugs directly at the root for pages like /en/about/
     path('<slug:slug>/', PageDetailView.as_view(), name='page_detail'),
 
