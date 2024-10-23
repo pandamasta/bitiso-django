@@ -9,12 +9,17 @@
     <header>
         <!-- Language switcher -->
         {% include 'shared/form_language_switcher.html' %}
-        <nav>
-            {% include 'shared/nav_links.html' %}
-            {% include 'shared/auth_links.html' %}
-        </nav>
-    </header>
+        <h1>Welcome to Bitiso</h1>
+        <p>Your hub for free and open-source software.</p>
 
+
+    </header>
+    <nav>
+        {% include 'shared/nav_links.html' %}
+        {% include 'shared/auth_links.html' %}
+    </nav>
+
+    
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
