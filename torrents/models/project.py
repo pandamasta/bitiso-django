@@ -1,12 +1,11 @@
 #torrents/models/project.py
 
 from django.db import models
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from django.contrib.auth.models import User
+from ..utils.image_utils import resize_images_for_instance
 from ..utils.slug_utils import generate_unique_slug
-from ..utils.image_utils import resize_project_images  # Assuming you place the resizing logic here
-from django.conf import settings
+
 
 class Project(models.Model):
     """
@@ -30,9 +29,8 @@ class Project(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='projects')
     # Add timestamps
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)  # Automatically updates on save
+    updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), blank=True, null=True)
-
 
     class Meta:
         verbose_name = _("Project")
@@ -45,8 +43,24 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = generate_unique_slug(self, self.name)
+        
         super().save(*args, **kwargs)  # Save the model first
 
-        # Call the utility function to handle resizing
-        if self.image:
-            resize_project_images(self)  # Pass the model instance to the utility function
+        # Only resize if a new image was uploaded
+        if self.image and self.image_has_changed():
+            resize_images_for_instance(self, 'image', {
+                'mini': (13, 13),
+                'small': (40, 40),
+                'medium': (150, 150),
+                'large': (300, 300),
+            })
+
+    def image_has_changed(self):
+        """
+        Check if the image has been changed.
+        """
+        if not self.pk:  # New instance
+            return True
+
+        old_image = Project.objects.filter(pk=self.pk).values('image').first()
+        return old_image and old_image['image'] != self.image.name

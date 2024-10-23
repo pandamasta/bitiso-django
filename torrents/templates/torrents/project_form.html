@@ -1,9 +1,10 @@
-{# torrents/templates/torrents/projcect_form.html #}
+{# torrents/templates/torrents/project_form.html #}
 
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>{% if form.instance.pk %}Edit Project{% else %}Create Project{% endif %}</h2>
-<form method="post">
+<h2>{% if form.instance.slug %}Edit Project{% else %}Create Project{% endif %}</h2>
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Save</button>
