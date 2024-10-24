@@ -239,7 +239,10 @@ def upload_local_torrent(request):
     return render(request, 'torrents/upload_local_torrent.html', {'form': form})
 
 
-logger = logging.getLogger('torrent_import')
+
+logger = logging.getLogger(__name__)
+
+
 
 @login_required
 def import_torrent_from_url(request):
@@ -251,47 +254,56 @@ def import_torrent_from_url(request):
         if form.is_valid():
             url = form.cleaned_data['url']
             try:
-                logger.debug(f"Starting download for URL: {url}")
-
-                # Attempt to download the file
+                logger.info(f"Downloading torrent from URL: {url}")
                 response = requests.get(url)
                 response.raise_for_status()
 
-                logger.debug(f"Downloaded file from URL: {url} with status: {response.status_code}")
-
                 content = ContentFile(response.content)
                 parsed_url = urlparse(url)
-                filename = parsed_url.path.split('/')[-1]
+                original_filename = parsed_url.path.split('/')[-1]
+                filename = original_filename
 
-                torrent_dir = settings.MEDIA_TORRENT
-                if not os.path.exists(torrent_dir):
-                    logger.debug(f"Torrent directory not found. Creating: {torrent_dir}")
-                    os.makedirs(torrent_dir)
+                # Ensure the MEDIA_TORRENT directory exists
+                torrent_directory = settings.MEDIA_TORRENT
+                if not os.path.exists(torrent_directory):
+                    os.makedirs(torrent_directory)
+                    logger.info(f"Created directory: {torrent_directory}")
+                else:
+                    logger.info(f"Torrent directory already exists: {torrent_directory}")
 
-                fs = FileSystemStorage(location=torrent_dir)
-                unique_filename = fs.get_available_name(filename)
-                logger.debug(f"Saving file as: {unique_filename}")
+                fs = FileSystemStorage(location=torrent_directory)
 
-                saved_file_path = fs.save(unique_filename, content)
-                torrent_file_path = os.path.join(torrent_dir, saved_file_path)
+                # Check if the file already exists in the filesystem and handle conflicts
+                counter = 1
+                while fs.exists(filename):
+                    logger.warning(f"The file '{filename}' already exists in the filesystem. Renaming.")
+                    filename = f"{os.path.splitext(original_filename)[0]}_{counter}{os.path.splitext(original_filename)[1]}"
+                    counter += 1
 
-                # Log and process the torrent file
-                logger.debug(f"Processing torrent file at path: {torrent_file_path}")
+                # Save the torrent file
+                logger.info(f"Saving torrent file as: {filename}")
+                saved_file_path = fs.save(filename, content)
+                torrent_file_path = os.path.join(torrent_directory, saved_file_path)
+                logger.info(f"Torrent file saved at: {torrent_file_path}")
+
+                # Process the torrent file
                 process_torrent_file(torrent_file_path, request.user, source_url=url)
-                logger.info(f"Torrent file processed successfully: {torrent_file_path}")
-
                 messages.success(request, "Download, upload, and import succeeded.")
+
             except requests.exceptions.RequestException as e:
-                logger.error(f"Error downloading file: {e}")
+                logger.error(f"Error downloading torrent from {url}: {str(e)}")
                 messages.error(request, f"Error downloading file: {e}")
             except ValidationError as e:
-                logger.error(f"Validation error: {e}")
-                messages.error(request, str(e))
+                logger.error(f"Validation error processing torrent: {str(e)}")
+                messages.error(request, f"Error processing torrent: {e}")
             except Exception as e:
-                logger.error(f"Unexpected error during torrent processing: {e}")
-                messages.error(request, f"Error processing torrent file: {e}")
+                logger.error(f"Unexpected error occurred: {str(e)}")
+                messages.error(request, f"An unexpected error occurred: {e}")
 
-            return redirect('dashboard', username=request.user.username)
+            # Redirect to the user-specific dashboard
+            user_uuid = request.user.uuid
+            return redirect('dashboard', uuid=user_uuid)
 
     form = URLDownloadForm()
     return render(request, 'torrents/import_torrent_from_url.html', {'form': form})
+

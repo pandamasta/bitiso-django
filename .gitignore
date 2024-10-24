@@ -12,3 +12,5 @@ tmp/
 .env*
 .venv
 fixtures/
+media/
+

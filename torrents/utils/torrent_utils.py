@@ -8,6 +8,7 @@ from torrents.models import Torrent, Tracker
 # Set up logging
 logger = logging.getLogger(__name__)
 
+
 def process_torrent_file(torrent_file_path, uploader, source_url=None, category=None, project=None):
     """
     Process and import a torrent file, add Bitiso trackers, and save the torrent to the database.
@@ -23,26 +24,30 @@ def process_torrent_file(torrent_file_path, uploader, source_url=None, category=
         Torrent object if successfully processed, else None.
     """
     try:
+        logger.info(f"Starting to process torrent file: {torrent_file_path}")
+
         # Read the torrent file
         t = Torrenttorf.read(torrent_file_path)
-        logger.debug(f"Torrent {t.name} read from {torrent_file_path}.")
+        logger.debug(f"Torrent {t.name} read successfully from {torrent_file_path}.")
 
         # Add Bitiso-specific tracker
         bitiso_trackers = [settings.TRACKER_ANNOUNCE]
         existing_trackers = [tracker for sublist in t.trackers for tracker in sublist]
+        logger.debug(f"Existing trackers: {existing_trackers}")
         for tracker in bitiso_trackers:
             if tracker not in existing_trackers:
                 t.trackers.append([tracker])
         logger.debug(f"Trackers after adding Bitiso: {t.trackers}")
 
-        # Re-write the torrent file with the new trackers
-        t.write(torrent_file_path)
-        logger.info(f"Torrent file re-written with Bitiso trackers at {torrent_file_path}.")
+        # Re-write the torrent file to a new path to avoid overwriting
+        new_torrent_file_path = f"{os.path.splitext(torrent_file_path)[0]}_processed{os.path.splitext(torrent_file_path)[1]}"
+        t.write(new_torrent_file_path)
+        logger.info(f"Torrent file rewritten with Bitiso trackers at {new_torrent_file_path}.")
 
         # Check if the torrent already exists in the database by info_hash
         if Torrent.objects.filter(info_hash=t.infohash).exists():
-            logger.warning(f"Info hash {t.infohash} already exists in the database.")
-            return None
+            logger.warning(f"Torrent with info hash {t.infohash} already exists in the database. Skipping.")
+            raise ValidationError(f"Torrent with info hash {t.infohash} already exists.")
 
         # Build the magnet URI and file list
         magnet_uri = str(t.magnet())
@@ -56,8 +61,8 @@ def process_torrent_file(torrent_file_path, uploader, source_url=None, category=
             pieces=t.pieces,
             piece_size=t.piece_size,
             magnet=magnet_uri[:2048],
-            torrent_filename=(t.name + '.torrent')[:128],
-            comment="Default comment"[:256],  # Truncate for DB
+            torrent_filename=(t.name + '_processed.torrent')[:128],
+            comment="Default comment"[:256],
             file_list=file_list[:2048],  # Truncate for DB
             file_count=len(t.files),
             category=category,
