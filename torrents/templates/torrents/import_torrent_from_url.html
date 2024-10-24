@@ -7,5 +7,5 @@
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Import</button>
 </form>
-<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+<li><a href="{% if USE_UUID_FOR_PROFILE_URL %}{% url 'dashboard' uuid=user.uuid %}{% else %}{% url 'dashboard' username=user.username %}{% endif %}">Go to Dashboard</a></li>
 {% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ user.username }}'s Dashboard</h2>
+<p>Welcome, {{ user.username }}! This is your dashboard.</p>
+
+<ul>
+    <li><strong>Email:</strong> {{ user.email }}</li>
+    <li><strong>Joined:</strong> {{ user.date_joined }}</li>
+</ul>
+
+{% block dashboard_extras %}{% endblock %}
+{% endblock %}
+

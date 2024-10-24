@@ -201,3 +201,5 @@ COPYRIGHT_START_YEAR = 2018
 MEDIA_URL = '/media/'  # URL to serve media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Absolute filesystem path to media directory
 
+MEDIA_TORRENT = os.path.join(MEDIA_ROOT, 'torrents/')
+TRACKER_ANNOUNCE = "http://tracker.bitiso.org:6969"

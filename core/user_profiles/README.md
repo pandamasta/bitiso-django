@@ -101,6 +101,10 @@ from .views import MyProjectUserProfileView, MyProjectUserProfileEditView
 urlpatterns = [
     path('<uuid:uuid>/', MyProjectUserProfileView.as_view(), name='profile_view'),
     path('<uuid:uuid>/edit/', MyProjectUserProfileEditView.as_view(), name='profile_edit'),
+
+    # Optionally, if you also support username-based URLs
+    path('<str:username>/', MyProjectUserProfileView.as_view(), name='profile_view'),
+    path('<str:username>/edit/', MyProjectUserProfileEditView.as_view() , name='profile_edit'),
 ]
 ```
 

@@ -1,3 +1,5 @@
+import os
+from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -18,6 +20,7 @@ from .utils.torrent_utils import process_torrent_file
 from urllib.parse import urlparse
 from django.core.files.base import ContentFile
 from django.contrib.auth.decorators import login_required
+import logging
 
 
 # List view: Display all torrents
@@ -197,7 +200,7 @@ class TrackerDeleteView(DeleteView):
 
     def get_object(self):
         return get_object_or_404(Tracker, slug=self.kwargs.get('slug'))
-    
+
 
 @login_required
 def upload_local_torrent(request):
@@ -208,12 +211,18 @@ def upload_local_torrent(request):
         form = FileUploadForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['file']
-            fs = FileSystemStorage(location=settings.MEDIA_TORRENT)
+
+            # Ensure the directory exists
+            torrent_dir = settings.MEDIA_TORRENT
+            if not os.path.exists(torrent_dir):
+                os.makedirs(torrent_dir)
+
+            fs = FileSystemStorage(location=torrent_dir)
             filename = file.name
 
             if fs.exists(filename):
                 messages.error(request, f"The file '{filename}' already exists. Please rename your file and try again.")
-                return redirect('dashboard')
+                return redirect('dashboard', username=request.user.username)
 
             saved_file_path = fs.save(file.name, file)
             torrent_file_path = os.path.join(settings.MEDIA_TORRENT, saved_file_path)
@@ -224,11 +233,13 @@ def upload_local_torrent(request):
             except ValidationError as e:
                 messages.error(request, str(e))
 
-            return redirect('dashboard')
+            return redirect('dashboard', username=request.user.username)
 
     form = FileUploadForm()
     return render(request, 'torrents/upload_local_torrent.html', {'form': form})
 
+
+logger = logging.getLogger('torrent_import')
 
 @login_required
 def import_torrent_from_url(request):
@@ -240,25 +251,47 @@ def import_torrent_from_url(request):
         if form.is_valid():
             url = form.cleaned_data['url']
             try:
+                logger.debug(f"Starting download for URL: {url}")
+
+                # Attempt to download the file
                 response = requests.get(url)
                 response.raise_for_status()
+
+                logger.debug(f"Downloaded file from URL: {url} with status: {response.status_code}")
 
                 content = ContentFile(response.content)
                 parsed_url = urlparse(url)
                 filename = parsed_url.path.split('/')[-1]
 
-                fs = FileSystemStorage(location=settings.MEDIA_TORRENT)
-                saved_file_path = fs.save(filename, content)
-                torrent_file_path = os.path.join(settings.MEDIA_TORRENT, saved_file_path)
+                torrent_dir = settings.MEDIA_TORRENT
+                if not os.path.exists(torrent_dir):
+                    logger.debug(f"Torrent directory not found. Creating: {torrent_dir}")
+                    os.makedirs(torrent_dir)
 
+                fs = FileSystemStorage(location=torrent_dir)
+                unique_filename = fs.get_available_name(filename)
+                logger.debug(f"Saving file as: {unique_filename}")
+
+                saved_file_path = fs.save(unique_filename, content)
+                torrent_file_path = os.path.join(torrent_dir, saved_file_path)
+
+                # Log and process the torrent file
+                logger.debug(f"Processing torrent file at path: {torrent_file_path}")
                 process_torrent_file(torrent_file_path, request.user, source_url=url)
+                logger.info(f"Torrent file processed successfully: {torrent_file_path}")
+
                 messages.success(request, "Download, upload, and import succeeded.")
             except requests.exceptions.RequestException as e:
+                logger.error(f"Error downloading file: {e}")
                 messages.error(request, f"Error downloading file: {e}")
             except ValidationError as e:
+                logger.error(f"Validation error: {e}")
                 messages.error(request, str(e))
+            except Exception as e:
+                logger.error(f"Unexpected error during torrent processing: {e}")
+                messages.error(request, f"Error processing torrent file: {e}")
 
-            return redirect('dashboard')
+            return redirect('dashboard', username=request.user.username)
 
     form = URLDownloadForm()
     return render(request, 'torrents/import_torrent_from_url.html', {'form': form})

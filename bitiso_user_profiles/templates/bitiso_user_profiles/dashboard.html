@@ -1,0 +1,17 @@
+{% extends 'user_profiles/dashboard.html' %}
+
+{% block dashboard_extras %}
+<h3>Your Torrents</h3>
+
+<ul>
+    {% for torrent in user_torrents %}
+        <li>{{ torrent.name }} - Uploaded on {{ torrent.created_at }}</li>
+    {% empty %}
+        <li>No torrents uploaded yet.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'torrent_upload' %}" class="btn btn-primary">Upload a New Torrent</a>
+<a href="{% url 'torrent_import' %}" class="btn btn-secondary">Import Torrent from URL</a>
+{% endblock %}
+
