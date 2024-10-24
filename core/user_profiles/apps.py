@@ -6,4 +6,5 @@ class UserProfilesConfig(AppConfig):
     name = 'core.user_profiles'
 
     def ready(self):
-        import core.user_profiles.signals  # Import the signals here
+        import core.user_profiles.signals  # Import the signals when the app is ready
+

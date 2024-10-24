@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'core.accounts',
     'core.pages',
     'core.user_profiles',
+    'bitiso_user_profiles',
+
     'torrents',
 
 ]

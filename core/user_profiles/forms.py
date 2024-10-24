@@ -1,11 +1,11 @@
 # user_profiles/forms.py
 
 from django import forms
-from .models import UserProfile
+from .models import AbstractUserProfile
 
 class ProfileEditForm(forms.ModelForm):
     class Meta:
-        model = UserProfile
+        model = AbstractUserProfile
         fields = ['profile_picture', 'bio' ]
 
     def __init__(self, *args, **kwargs):

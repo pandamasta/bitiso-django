@@ -18,7 +18,8 @@ urlpatterns += i18n_patterns(
     path('', HomePageView.as_view(), name='home'),  # Home page URL should be named 'home'
     path('admin/', admin.site.urls),  # Admin paths
     path('accounts/', include('core.accounts.urls')),  # Accounts app paths
-    path('profiles/', include('core.user_profiles.urls')),  # Include user_profiles URLs
+    #path('profiles/', include('core.user_profiles.urls')),  # Include user_profiles URLs
+    path('profiles/', include('bitiso_user_profiles.urls')),  # Ensure you include the bitiso_user_profiles URLs
 
     # Project, category, and tracker routes
     path('torrents/', include('torrents.urls.urls_torrents')),  # Torrents app URLs

@@ -8,7 +8,7 @@ from .forms import ProfileEditForm
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import UserProfile
+from .models import AbstractUserProfile
 
 User = get_user_model()
 
@@ -23,19 +23,35 @@ class ProfileView(DetailView):
             return get_object_or_404(User, uuid=self.kwargs.get('uuid'))
         return get_object_or_404(User, username=self.kwargs.get('username'))
 
-
+    def get_context_data(self, **kwargs):
+        """Pass the profile object to the template."""
+        context = super().get_context_data(**kwargs)
+        # Fetch the BitisoUserProfile related to the user
+        context['profile'] = self.get_object().bitisouserprofile
+        return context
+    
 @method_decorator(login_required, name='dispatch')
 class ProfileEditView(UpdateView):
-    model = UserProfile
     template_name = 'user_profiles/profile_edit.html'
     form_class = ProfileEditForm
     context_object_name = 'profile_user'
 
     def get_object(self):
-        """Return the profile based on either UUID or username, depending on settings."""
+        """
+        Dynamically get the profile based on UUID or username.
+        The profile model is obtained from the extending app via get_profile_model.
+        """
+        ProfileModel = self.get_profile_model()  # Dynamically get the concrete profile model
         if settings.USE_UUID_FOR_PROFILE_URL:
-            return get_object_or_404(UserProfile, user__uuid=self.kwargs.get('uuid'))
-        return get_object_or_404(UserProfile, user__username=self.kwargs.get('username'))
+            return get_object_or_404(ProfileModel, user__uuid=self.kwargs.get('uuid'))
+        return get_object_or_404(ProfileModel, user__username=self.kwargs.get('username'))
+
+    def get_profile_model(self):
+        """
+        Return the profile model.
+        This should be overridden by the app extending the core profile.
+        """
+        raise NotImplementedError("You need to define the get_profile_model method in your app.")
 
     def get_success_url(self):
         """Redirect to the correct profile view after a successful update."""
