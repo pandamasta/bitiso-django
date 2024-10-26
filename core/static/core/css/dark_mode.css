@@ -1,0 +1,30 @@
+:root {
+    --background-color: #181a1b;
+    --text-color: #e8e6e3;
+    --link-color: #569cd6;
+    --border-color: #252627;
+    --hover-color: #8dd1ff;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+a {
+    color: var(--link-color);
+}
+
+a:hover {
+    color: var(--hover-color);
+}
+
+hr, input, textarea, select {
+    border-color: var(--border-color);
+}
+
+.dark-mode {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}

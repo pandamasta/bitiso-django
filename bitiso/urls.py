@@ -11,14 +11,19 @@ from django.conf import settings
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),  # Language switcher
     path('', redirect_to_language_home),  # Redirect root URL to language-specific home page
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
+
+# Serving static and media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # i18n URL patterns for language-prefixed routes (like /fr/, /en/)
 urlpatterns += i18n_patterns(
     path('', HomePageView.as_view(), name='home'),  # Home page URL should be named 'home'
     path('admin/', admin.site.urls),  # Admin paths
     path('accounts/', include('core.accounts.urls')),  # Accounts app paths
-    #path('profiles/', include('core.user_profiles.urls')),  # Include user_profiles URLs
+
     path('profiles/', include('bitiso_user_profiles.urls')),  # Ensure you include the bitiso_user_profiles URLs
 
     # Project, category, and tracker routes

@@ -1,9 +1,16 @@
 {# templates/base.html #}
 {% load i18n %}
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
+
     <title>{% trans "Welcome to" %} {{ project_name }}</title>
+
+    <!-- Include the dark mode CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/dark_mode.css' %}">
+
 </head>
 <body>
     <header>
@@ -11,7 +18,6 @@
         {% include 'shared/form_language_switcher.html' %}
         <h1>Welcome to Bitiso</h1>
         <p>Your hub for free and open-source software.</p>
-
 
     </header>
     <nav>
