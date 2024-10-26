@@ -10,17 +10,23 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class BitisoUserProfileView(ProfileView):
+
     def get_profile_model(self):
         return BitisoUserProfile
-    
+
     def get_context_data(self, **kwargs):
-        """Pass the profile object to the template."""
         context = super().get_context_data(**kwargs)
-        # Ensure that the correct profile is being passed
-        context['profile'] = self.get_object().bitisouserprofile # fetches the BitisoUserProfile associated with the user.
+        user = self.get_object()  # Get the user object (e.g., CustomUser)
+        
+        # Ensure the profile exists or create it if missing
+        if not hasattr(user, 'bitisouserprofile'):
+            # Create the profile if it doesn't exist
+            BitisoUserProfile.objects.create(user=user)
+            context['profile'] = user.bitisouserprofile
+        else:
+            context['profile'] = user.bitisouserprofile
 
         return context
-
 
 class BitisoUserProfileEditView(ProfileEditView):
     def get_profile_model(self):
@@ -36,7 +42,7 @@ def user_torrent_dashboard(request, uuid=None, username=None):
         user = get_object_or_404(User, uuid=uuid)
     else:
         user = get_object_or_404(User, username=username)
-    
+
     user_torrents = user.torrents.all()  # Fetch the user's torrents
     return render(request, 'bitiso_user_profiles/dashboard.html', {
         'user': user,
