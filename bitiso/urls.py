@@ -22,10 +22,10 @@ urlpatterns += i18n_patterns(
     path('profiles/', include('bitiso_user_profiles.urls')),  # Ensure you include the bitiso_user_profiles URLs
 
     # Project, category, and tracker routes
-    path('torrents/', include('torrents.urls.urls_torrents')),  # Torrents app URLs
-    path('projects/', include('torrents.urls.urls_projects')),  # Project URLs
-    path('categories/', include('torrents.urls.urls_categories')),  # Category URLs
-    path('trackers/', include('torrents.urls.urls_trackers')),  # Tracker URLs
+    path('torrents/', include('torrents.urls.torrents')),  # Torrents app URLs
+    path('projects/', include('torrents.urls.projects')),  # Project URLs
+    path('categories/', include('torrents.urls.categories')),  # Category URLs
+    path('trackers/', include('torrents.urls.trackers')),  # Tracker URLs
         
     # Pages URL patterns
     path('<slug:slug>/', PageDetailView.as_view(), name='page_detail'),

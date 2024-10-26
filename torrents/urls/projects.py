@@ -2,7 +2,7 @@ from django.urls import path
 from torrents import views
 from django.conf import settings
 
-from ..views.projects_views import (
+from ..views.projects import (
     ProjectListView, ProjectDetailView, ProjectCreateView,
     ProjectUpdateView, ProjectDeleteView
 )

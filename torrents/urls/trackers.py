@@ -2,7 +2,7 @@ from django.urls import path
 from torrents import views
 from django.conf import settings
 
-from ..views.trackers_views import (
+from ..views.trackers import (
     TrackerListView,TrackerDetailView, TrackerCreateView,
     TrackerUpdateView, TrackerDeleteView
 )

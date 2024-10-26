@@ -1,8 +1,9 @@
+#torrents/urls/categories.py
 from django.urls import path
 from torrents import views
 from django.conf import settings
 
-from ..views.categories_views import (
+from ..views.categories import (
     CategoryListView,CategoryDetailView, CategoryCreateView,
     CategoryUpdateView, CategoryDeleteView
 )
