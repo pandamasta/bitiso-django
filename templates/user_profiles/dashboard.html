@@ -12,6 +12,8 @@
     {% endfor %}
 </ul>
 
-<a href="{% url 'upload_local_torrent' %}" class="btn btn-primary">Upload a New Torrent</a>
-<a href="{% url 'import_torrent_from_url' %}" class="btn btn-secondary">Import from URL</a>
+<a href="{% url 'torrent_upload' %}" class="btn btn-primary">Upload a New Torrent</a>
+
+<a href="{% url 'torrent_import_from_url' %}" class="btn btn-secondary">Import from URL</a>
+
 {% endblock %}
