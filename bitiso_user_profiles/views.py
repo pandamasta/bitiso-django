@@ -2,7 +2,7 @@ from core.user_profiles.views import ProfileEditView, ProfileView
 from .models import BitisoUserProfile
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from torrents.models import Torrent
+from torrents.models import Torrent, Project, Category
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
@@ -43,8 +43,12 @@ def user_torrent_dashboard(request, uuid=None, username=None):
     else:
         user = get_object_or_404(User, username=username)
 
-    user_torrents = user.torrents.all()  # Fetch the user's torrents
+    user_torrents = Torrent.objects.filter(user=request.user)
+    # user_torrents = user.torrents.all()  # Fetch the user's torrents
+    user_projects = Project.objects.filter(user=request.user)
+    user_categories = Category.objects.filter(user=request.user)
     return render(request, 'bitiso_user_profiles/dashboard.html', {
-        'user': user,
-        'user_torrents': user_torrents
+        'user_torrents': user_torrents,
+        'user_projects': user_projects,
+        'user_categories': user_categories
     })

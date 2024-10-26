@@ -4,6 +4,8 @@
 <h2>{{ user.username }}'s Dashboard</h2>
 <p>Welcome, {{ user.username }}! Here are your uploaded torrents:</p>
 
+<!-- Torrents Section -->
+<h3>Your Torrents</h3>
 <ul>
     {% for torrent in user_torrents %}
         <li>{{ torrent.name }} - {{ torrent.created_at }}</li>
@@ -11,9 +13,29 @@
         <li>No torrents uploaded yet.</li>
     {% endfor %}
 </ul>
-
 <a href="{% url 'torrent_upload' %}" class="btn btn-primary">Upload a New Torrent</a>
-
 <a href="{% url 'torrent_import_from_url' %}" class="btn btn-secondary">Import from URL</a>
+
+<!-- Projects Section -->
+<h3>Your Projects</h3>
+<ul>
+    {% for project in user_projects %}
+        <li>{{ project.name }} - {{ project.created_at }}</li>
+    {% empty %}
+        <li>No projects created yet.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'project_create' %}" class="btn btn-primary">Create a New Project</a>
+
+<!-- Categories Section -->
+<h3>Your Categories</h3>
+<ul>
+    {% for category in user_categories %}
+        <li>{{ category.name }} - {{ category.created_at }}</li>
+    {% empty %}
+        <li>No categories created yet.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'category_create' %}" class="btn btn-primary">Create a New Category</a>
 
 {% endblock %}
