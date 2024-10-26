@@ -32,23 +32,40 @@ class BitisoUserProfileEditView(ProfileEditView):
     def get_profile_model(self):
         return BitisoUserProfile
 
-
 @login_required
-def user_torrent_dashboard(request, uuid=None, username=None):
+def user_dashboard(request):
     """
-    Extend the generic dashboard to include torrent management for the user.
+    View that handles the user dashboard, showing the counts of torrents, projects, and categories.
     """
-    if settings.USE_UUID_FOR_PROFILE_URL and uuid:
-        user = get_object_or_404(User, uuid=uuid)
-    else:
-        user = get_object_or_404(User, username=username)
-
     user_torrents = Torrent.objects.filter(user=request.user)
-    # user_torrents = user.torrents.all()  # Fetch the user's torrents
     user_projects = Project.objects.filter(user=request.user)
     user_categories = Category.objects.filter(user=request.user)
+
+    # Count the items for display
+    torrents_count = user_torrents.count()
+    projects_count = user_projects.count()
+    categories_count = user_categories.count()
+
     return render(request, 'bitiso_user_profiles/dashboard.html', {
-        'user_torrents': user_torrents,
-        'user_projects': user_projects,
-        'user_categories': user_categories
+        'user': request.user,
+        'torrents_count': torrents_count,
+        'projects_count': projects_count,
+        'categories_count': categories_count,
     })
+
+
+@login_required
+def user_torrents(request):
+    user_torrents = Torrent.objects.filter(user=request.user)
+    return render(request, 'bitiso_user_profiles/torrents.html', {'user_torrents': user_torrents})
+
+@login_required
+def user_projects(request):
+    user_projects = Project.objects.filter(user=request.user)
+    return render(request, 'bitiso_user_profiles/projects.html', {'user_projects': user_projects})
+
+@login_required
+def user_categories(request):
+    user_categories = Category.objects.filter(user=request.user)
+    return render(request, 'bitiso_user_profiles/categories.html', {'user_categories': user_categories})
+

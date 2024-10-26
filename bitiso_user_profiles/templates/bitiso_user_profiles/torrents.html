@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ user.username }}'s Torrents</h2>
+
+<ul>
+    {% for torrent in user_torrents %}
+        <li>{{ torrent.name }} - {{ torrent.created_at }}</li>
+    {% empty %}
+        <li>No torrents uploaded yet.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'torrent_upload' %}" class="btn btn-primary">Upload a New Torrent</a>
+<a href="{% url 'torrent_import_from_url' %}" class="btn btn-secondary">Import from URL</a>
+
+{% endblock %}
