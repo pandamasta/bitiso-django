@@ -32,32 +32,46 @@ class BitisoUserProfileEditView(ProfileEditView):
     def get_profile_model(self):
         return BitisoUserProfile
 
+    #user_categories = Category.objects.filter(user=request.user)
+
 @login_required
 def user_dashboard(request):
     """
-    View that handles the user dashboard, showing the counts of torrents, projects, and categories.
+    View that handles the user dashboard, showing the counts of torrents, projects, and categories
+    along with the lists for categories and projects to use in the dashboard form.
     """
-    user_torrents = Torrent.objects.filter(user=request.user)
-    user_projects = Project.objects.filter(user=request.user)
-    user_categories = Category.objects.filter(user=request.user)
+    # # Get torrents, projects, and categories related to the user
+    # user_torrents = Torrent.objects.filter(user=request.user)
+    # user_projects = Project.objects.filter(user=request.user)
+    # user_categories = Category.objects.filter(user=request.user)
 
-    # Count the items for display
-    torrents_count = user_torrents.count()
-    projects_count = user_projects.count()
-    categories_count = user_categories.count()
+    # # Count the items for display
+    # torrents_count = user_torrents.count()
+    # projects_count = user_projects.count()
+    # categories_count = user_categories.count()
 
-    return render(request, 'bitiso_user_profiles/dashboard.html', {
-        'user': request.user,
-        'torrents_count': torrents_count,
-        'projects_count': projects_count,
-        'categories_count': categories_count,
-    })
+    # # Pass categories and projects to the form as well
+    # categories = Category.objects.all()  # Assuming you want all categories, adjust if needed
+    # projects = Project.objects.all()  # Assuming you want all projects, adjust if needed
+
+    return render(request, 'bitiso_user_profiles/dashboard.html')
+
 
 
 @login_required
 def user_torrents(request):
+
     user_torrents = Torrent.objects.filter(user=request.user)
-    return render(request, 'bitiso_user_profiles/torrents.html', {'user_torrents': user_torrents})
+    projects = Project.objects.all()
+    categories = Category.objects.all()
+    # user_projects = Project.objects.filter(user=request.user)
+    # user_categories = Category.objects.filter(user=request.user)
+
+    return render(request, 'bitiso_user_profiles/torrents.html', {
+        'user_torrents': user_torrents,
+        'categories': categories,  # Add categories to the context
+        'projects': projects,  # Add projects to the context
+        })
 
 @login_required
 def user_projects(request):

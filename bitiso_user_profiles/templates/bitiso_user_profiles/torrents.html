@@ -3,14 +3,6 @@
 {% block content %}
 <h2>{{ user.username }}'s Torrents</h2>
 
-<ul>
-    {% for torrent in user_torrents %}
-        <li>{{ torrent.name }} - {{ torrent.created_at }}</li>
-    {% empty %}
-        <li>No torrents uploaded yet.</li>
-    {% endfor %}
-</ul>
-
 {% block torrents_list %}
     {% include 'torrents/torrent_list_form.html' %}
 {% endblock %}
