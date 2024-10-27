@@ -15,7 +15,13 @@ class TorrentListView(ListView):
     context_object_name = 'torrents'
     paginate_by = 10  # If you want to paginate torrents
 
+
+    def get_queryset(self):
+        # Return only active torrents (is_active=True)
+        return Torrent.objects.filter(is_active=True)
+    
     def get_object(self):
+        # Ensure that the torrent with the provided slug exists
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
 
 # Detail view: Display details of a specific torrent
@@ -184,7 +190,8 @@ def import_torrent_from_url(request):
 
             # Redirect to the user-specific dashboard
             user_uuid = request.user.uuid
-            return redirect('dashboard', uuid=user_uuid)
+            # return redirect('dashboard', uuid=user_uuid)
+            return redirect('dashboard')
 
     form = URLDownloadForm()
     return render(request, 'torrents/import_torrent_from_url.html', {'form': form})

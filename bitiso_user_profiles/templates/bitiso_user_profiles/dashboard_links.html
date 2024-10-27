@@ -1,0 +1,7 @@
+{% if user.is_authenticated %}
+
+<a href="{% url 'user_torrents' %}">My Torrents ({{ torrents_count }})</a>
+<a href="{% url 'user_projects' %}">My Projects ({{ projects_count }})</a>
+<a href="{% url 'user_categories' %}">My Categories ({{ categories_count }})</a>
+ 
+{% endif %}

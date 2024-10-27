@@ -2,36 +2,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Torrents List</h2>
-    <ul>
+<h2>Torrents List</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Torrent Name</th>
+            <th>Size</th>
+            <th>Files</th>
+            <th>Seeds</th>
+            <th>Leeches</th>
+            <th>Category</th>
+            <th>Project</th>
+            <th>Added At</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for torrent in torrents %}
-            <li>
-                <a href="{% url 'torrent_detail' torrent.slug %}">{{ torrent.name }}</a> 
-                ({{ torrent.size }} bytes, {{ torrent.file_count }} files)
-            </li>
+            {% if torrent.is_active %}
+                <tr>
+                    <td>
+                        <a href="{% url 'torrent_detail' torrent.slug %}">{{ torrent.name }}</a>
+                    </td>
+                    <td>{{ torrent.size | filesizeformat }}</td>
+                    <td>{{ torrent.file_count }}</td>
+                    <td>{{ torrent.seed_count }}</td>
+                    <td>{{ torrent.leech_count }}</td>
+                    <td>{{ torrent.category }}</td>
+                    <td>{{ torrent.project }}</td>
+                    <td>{{ torrent.creation }}</td>
+                </tr>
+            {% endif %}
         {% empty %}
-            <p>No torrents found.</p>
+            <tr>
+                <td colspan="8">No active torrents found.</td>
+            </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+</table>
 
-    <!-- Pagination (if enabled) -->
-    {% if is_paginated %}
-        <div class="pagination">
-            <span class="step-links">
-                {% if page_obj.has_previous %}
-                    <a href="?page=1">&laquo; first</a>
-                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-                {% endif %}
+<!-- Pagination (if enabled) -->
+{% if is_paginated %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
 
-                <span class="current">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                </span>
-
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">next</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-                {% endif %}
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
             </span>
-        </div>
-    {% endif %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endif %}
 {% endblock %}

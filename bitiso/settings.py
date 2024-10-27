@@ -104,7 +104,7 @@ TEMPLATES = [
                 'bitiso.context_processors.page_list',
                 'bitiso.context_processors.profile_user',
                 'bitiso.context_processors.use_uuid_for_profile_url', 
-
+                'bitiso.context_processors.user_dashboard_counts', 
             ],
         },
     },

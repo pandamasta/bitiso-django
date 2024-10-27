@@ -11,6 +11,11 @@
     {% endfor %}
 </ul>
 
+{% block torrents_list %}
+    {% include 'torrents/torrent_list_form.html' %}
+{% endblock %}
+
+
 <a href="{% url 'torrent_upload' %}" class="btn btn-primary">Upload a New Torrent</a>
 <a href="{% url 'torrent_import_from_url' %}" class="btn btn-secondary">Import from URL</a>
 

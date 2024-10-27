@@ -1,0 +1,47 @@
+<h3>Your Torrents:</h3>
+<form method="post" action="{% url 'bulk_torrent_action' %}" class="pure-form">
+    {% csrf_token %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Pieces</th>
+                <th>Piece Size</th>
+                <th>Seeds</th>
+                <th>Leeches</th>
+                <th>Category</th>
+                <th>Project</th>
+                <th>Added At</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for torrent in user_torrents %}
+                <tr>
+                    <!-- Checkbox to select each torrent -->
+                    <td><input type="checkbox" name="torrent_ids" value="{{ torrent.id }}"></td>
+                    <td><a href="{% url 'torrent_edit' torrent.slug %}">{{ torrent.name }}</a></td>
+                    <td>{{ torrent.size | filesizeformat }}</td>
+                    <td>{{ torrent.pieces }}</td>
+                    <td>{{ torrent.piece_size }}</td>
+                    <td>{{ torrent.seed }}</td>
+                    <td>{{ torrent.leech }}</td>
+                    <td>{{ torrent.category }}</td>
+                    <td>{{ torrent.project }}</td>
+                    <td>{{ torrent.creation }}</td>
+
+                    <!-- Display the torrent status -->
+                    <td>{% if torrent.is_active %}Active{% else %}Inactive{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Action Selection -->
+    <div class="bulk-action-buttons">
+        <button type="submit" name="action" value="enable" class="btn btn-success">Enable Selected</button>
+        <button type="submit" name="action" value="disable" class="btn btn-warning">Disable Selected</button>
+    </div>
+</form>

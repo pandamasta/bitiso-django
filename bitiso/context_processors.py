@@ -2,6 +2,7 @@
 from django.conf import settings
 from core.pages.models import Page
 from django.contrib.auth import get_user_model
+from torrents.models import Torrent, Project, Category
 
 
 def project_name(request):
@@ -24,4 +25,21 @@ def profile_user(request):
 def use_uuid_for_profile_url(request):
     return {
         'USE_UUID_FOR_PROFILE_URL': settings.USE_UUID_FOR_PROFILE_URL
+    }
+
+
+def user_dashboard_counts(request):
+    if request.user.is_authenticated:
+        torrents_count = Torrent.objects.filter(user=request.user).count()
+        projects_count = Project.objects.filter(user=request.user).count()
+        categories_count = Category.objects.filter(user=request.user).count()
+    else:
+        torrents_count = 0
+        projects_count = 0
+        categories_count = 0
+
+    return {
+        'torrents_count': torrents_count,
+        'projects_count': projects_count,
+        'categories_count': categories_count,
     }
