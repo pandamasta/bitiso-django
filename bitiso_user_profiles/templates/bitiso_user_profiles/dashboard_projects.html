@@ -18,7 +18,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for project in user_projects %}
+                {% for project, torrent_count in projects %}
                     <tr>
                         <td><input type="checkbox" name="project_ids" value="{{ project.id }}"></td>
                         <td>
@@ -36,7 +36,7 @@
                             {% endif %}
                         </td>
                         <td><a href="{% url 'project_detail' project.slug %}">{{ project.name }}</a></td>
-                        <td>{{ torrent_count }}</td> 
+                        <td><a href="{% url 'list_torrents' project.id %}">{{ torrent_count }}</a></td>
                         <td>{{ project.description|truncatewords:20 }}</td>
                     </tr>
                 {% endfor %}

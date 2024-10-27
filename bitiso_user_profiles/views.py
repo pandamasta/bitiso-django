@@ -6,6 +6,7 @@ from torrents.models import Torrent, Project, Category
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
+from .actions import bulk_project_action
 
 User = get_user_model()
 
@@ -37,30 +38,17 @@ class BitisoUserProfileEditView(ProfileEditView):
 @login_required
 def user_dashboard(request):
     """
-    View that handles the user dashboard, showing the counts of torrents, projects, and categories
-    along with the lists for categories and projects to use in the dashboard form.
+    Main view of dashboard/
     """
-    # # Get torrents, projects, and categories related to the user
-    # user_torrents = Torrent.objects.filter(user=request.user)
-    # user_projects = Project.objects.filter(user=request.user)
-    # user_categories = Category.objects.filter(user=request.user)
-
-    # # Count the items for display
-    # torrents_count = user_torrents.count()
-    # projects_count = user_projects.count()
-    # categories_count = user_categories.count()
-
-    # # Pass categories and projects to the form as well
-    # categories = Category.objects.all()  # Assuming you want all categories, adjust if needed
-    # projects = Project.objects.all()  # Assuming you want all projects, adjust if needed
-
     return render(request, 'bitiso_user_profiles/dashboard.html')
 
 
 
 @login_required
 def user_torrents(request):
-
+    """
+    View that show the user torrent and related bukl actions 
+    """
     user_torrents = Torrent.objects.filter(user=request.user)
     projects = Project.objects.all()
     categories = Category.objects.all()
@@ -75,6 +63,7 @@ def user_torrents(request):
 
 @login_required
 def user_projects(request):
+
     user_projects = Project.objects.filter(user=request.user)
     return render(request, 'bitiso_user_profiles/projects.html', {'user_projects': user_projects})
 

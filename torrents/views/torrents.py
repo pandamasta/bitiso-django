@@ -32,6 +32,19 @@ class TorrentDetailView(DetailView):
 
     def get_object(self):
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
+
+    def get_context_data(self, **kwargs):
+        # Get the existing context from the parent class
+        context = super().get_context_data(**kwargs)
+
+        # Get the current torrent object
+        torrent = self.get_object()
+
+        # Add tracker details to the context (assuming a reverse relation through `TrackerStat`)
+        context['tracker_detail'] = torrent.trackerstat_set.all()
+
+        return context
+
     
 # Create view: Form for uploading a new torrent
 class TorrentCreateView(CreateView):
