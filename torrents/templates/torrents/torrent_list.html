@@ -3,6 +3,7 @@
 
 {% block content %}
 <h2>Torrents List</h2>
+{% if torrents %}
 
 <table>
     <thead>
@@ -61,4 +62,9 @@
         </span>
     </div>
 {% endif %}
+{% else %}
+<td colspan="8">No active torrents found.</td>
+
+{% endif %}
+
 {% endblock %}

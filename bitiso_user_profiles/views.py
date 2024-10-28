@@ -49,9 +49,10 @@ def user_torrents(request):
     """
     View that show the user torrent and related bukl actions 
     """
-    user_torrents = Torrent.objects.filter(user=request.user)
+    user_torrents = Torrent.objects.all()
     projects = Project.objects.all()
     categories = Category.objects.all()
+    # user_torrents = Torrent.objects.filter(user=request.user)
     # user_projects = Project.objects.filter(user=request.user)
     # user_categories = Category.objects.filter(user=request.user)
 
@@ -64,11 +65,14 @@ def user_torrents(request):
 @login_required
 def user_projects(request):
 
-    user_projects = Project.objects.filter(user=request.user)
+    #user_projects = Project.objects.filter(user=request.user)
+    user_projects = Project.objects.all()
+
     return render(request, 'bitiso_user_profiles/projects.html', {'user_projects': user_projects})
 
 @login_required
 def user_categories(request):
-    user_categories = Category.objects.filter(user=request.user)
+    user_categories = Category.objects.all()
+    #user_categories = Category.objects.filter(user=request.user)
     return render(request, 'bitiso_user_profiles/categories.html', {'user_categories': user_categories})
 

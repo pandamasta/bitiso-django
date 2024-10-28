@@ -1,10 +1,18 @@
 #torrents/models/project.py
 
+import logging
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from ..utils.image_utils import resize_images_for_instance
 from ..utils.slug_utils import generate_unique_slug
+from PIL import Image, UnidentifiedImageError
+import os 
+from core.utils import resize_and_save_images
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class Project(models.Model):
@@ -20,11 +28,11 @@ class Project(models.Model):
     website_url_repo = models.URLField(_("Repository URL"), max_length=2000, blank=True)
 
     # Image fields
-    image = models.ImageField(upload_to='img/project/original/', null=True, blank=True)
-    mini_image = models.ImageField(upload_to='img/project/mini/', blank=True)
-    small_image = models.ImageField(upload_to='img/project/small/', blank=True)
-    medium_image = models.ImageField(upload_to='img/project/medium/', blank=True)
-    large_image = models.ImageField(upload_to='img/project/large/', blank=True)
+    image = models.ImageField(upload_to='img/project/original/', null=True, blank=True, default='')
+    mini_image = models.ImageField(upload_to='img/project/mini/', blank=True, default='')
+    small_image = models.ImageField(upload_to='img/project/small/', blank=True, default='')
+    medium_image = models.ImageField(upload_to='img/project/medium/', blank=True, default='')
+    large_image = models.ImageField(upload_to='img/project/large/', blank=True, default='')
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='projects')
     # Add timestamps
@@ -39,28 +47,20 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
-
+        
     def save(self, *args, **kwargs):
+        logger.debug(f"Saving project: {self.name}")
+
         if not self.slug:
             self.slug = generate_unique_slug(self, self.name)
-        
-        super().save(*args, **kwargs)  # Save the model first
 
-        # Only resize if a new image was uploaded
-        if self.image and self.image_has_changed():
-            resize_images_for_instance(self, 'image', {
+        super().save(*args, **kwargs)  # Save model first to access image file path
+
+        if self.image:  # Replace 'image' with your image field name
+            resize_and_save_images(self, 'image', {
                 'mini': (13, 13),
                 'small': (40, 40),
                 'medium': (150, 150),
                 'large': (300, 300),
             })
 
-    def image_has_changed(self):
-        """
-        Check if the image has been changed.
-        """
-        if not self.pk:  # New instance
-            return True
-
-        old_image = Project.objects.filter(pk=self.pk).values('image').first()
-        return old_image and old_image['image'] != self.image.name

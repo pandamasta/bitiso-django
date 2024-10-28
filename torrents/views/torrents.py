@@ -1,12 +1,29 @@
 # torrents/views/torrents.py
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-
+from django.core.exceptions import ValidationError
+from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.conf import settings
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.core.files.storage import FileSystemStorage
+import requests
+from urllib.parse import urlparse
+from django.core.files.base import ContentFile
+from django.contrib.auth.decorators import login_required
+import os
+import logging
 
+from django.urls import reverse_lazy
+from ..utils.torrent_utils import process_torrent_file
 from ..models import Torrent
 from ..forms import TorrentForm
+from ..forms import URLDownloadForm
+from ..forms import FileUploadForm
+
+logger = logging.getLogger(__name__)
+
 
 # List view: Display all torrents
 class TorrentListView(ListView):
@@ -45,7 +62,6 @@ class TorrentDetailView(DetailView):
 
         return context
 
-    
 # Create view: Form for uploading a new torrent
 class TorrentCreateView(CreateView):
     model = Torrent
@@ -77,30 +93,6 @@ class TorrentDeleteView(DeleteView):
     
 
     #############
-
-from django.core.exceptions import ValidationError
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-#from ..models import Torrent, Project, Category, Tracker
-from ..forms import TorrentForm
-#from ..forms import ProjectForm, CategoryForm, TrackerForm
-from django.shortcuts import get_object_or_404
-from django.conf import settings
-from torrents import views
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.core.files.storage import FileSystemStorage
-from ..forms import FileUploadForm
-import requests
-from ..forms import URLDownloadForm
-from ..utils.torrent_utils import process_torrent_file
-from urllib.parse import urlparse
-from django.core.files.base import ContentFile
-from django.contrib.auth.decorators import login_required
-import os
-import logging
 
 
 @login_required
@@ -138,12 +130,6 @@ def upload_local_torrent(request):
 
     form = FileUploadForm()
     return render(request, 'torrents/upload_local_torrent.html', {'form': form})
-
-
-
-logger = logging.getLogger(__name__)
-
-
 
 @login_required
 def import_torrent_from_url(request):

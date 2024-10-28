@@ -18,5 +18,4 @@ urlpatterns = [
     path('<slug:slug>/edit/', ProjectUpdateView.as_view(), name='project_edit'),
     path('<slug:slug>/delete/', ProjectDeleteView.as_view(), name='project_delete'),
 
-
 ]

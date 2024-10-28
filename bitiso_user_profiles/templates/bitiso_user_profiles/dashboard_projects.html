@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+<!-- {% extends 'base.html' %}
 
 {% block content %}
     <h2>Project List</h2>
@@ -22,8 +22,8 @@
                     <tr>
                         <td><input type="checkbox" name="project_ids" value="{{ project.id }}"></td>
                         <td>
-                            {% if project.mini_image %}
-                                <img src="{{ project.mini_image.url }}" alt="{{ project.name }}" style="width: 50px; height: 50px;">
+                            {% if project.small_image %}
+                                <img src="{{ project.small_image.url }}" alt="{{ project.name }}" style="width: 50px; height: 50px;">
                             {% else %}
                                 No Image
                             {% endif %}
@@ -50,4 +50,4 @@
     </form>
 
     <a href="{% url 'project_create' %}" class="btn btn-primary">Create New Project</a>
-{% endblock %}
+{% endblock %} -->

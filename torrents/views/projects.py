@@ -4,8 +4,9 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.core.paginator import Paginator
 
-from ..models import Project
+from ..models import Project, Torrent
 from ..forms import ProjectForm
 
 class ProjectListView(ListView):
@@ -22,6 +23,20 @@ class ProjectDetailView(DetailView):
     
     def get_object(self):
         return get_object_or_404(Project, slug=self.kwargs.get('slug'))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get the project instance
+        project = self.get_object()
+        
+        # Get related torrents and paginate them
+        related_torrents = Torrent.objects.filter(project=project)
+        paginator = Paginator(related_torrents, 10)  # Show 10 torrents per page
+        page_number = self.request.GET.get('page')
+        context['related_torrents'] = paginator.get_page(page_number)
+        
+        return context
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project

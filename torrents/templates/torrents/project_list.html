@@ -3,10 +3,30 @@
 
 {% block content %}
 <h2>Project List</h2>
-<ul>
-    {% for project in projects %}
-        <li><a href="{% url 'project_detail' project.slug %}">{{ project.name }}</a></li>
-    {% endfor %}
-</ul>
 <a href="{% url 'project_create' %}">Create New Project</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Project</th>
+                    <th>Torrent</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                    <tr>
+                        <td>
+                            {% if project.small_image %}
+                                <img src="{{ project.small_image.url }}" alt="{{ project.name }}" style="width: 40px; height: 40px;">
+                            {% else %}
+                            {% endif %}
+                        </td>
+                        <td>{{ project.name }} </td>
+                        <td>{{ torrent_count }}</td>
+                        <td>{{ project.description|truncatewords:20 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 {% endblock %}

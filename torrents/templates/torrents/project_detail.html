@@ -1,12 +1,48 @@
-{# torrents/templates/torrents/projcect_detail.html #}
+{# torrents/templates/torrents/project_detail.html #}
 
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>{{ project.name }}</h2>
-<p>{{ project.description }}</p>
-Official Website: <a href="{{ project.website_url }}">{{ project.website_url }}</a>
-Download: <a href="{{ project.website_url_download }}">{{ project.website_url_download }}</a>
-Repository: <a href="{{ project.website_url_repo }}">{{ project.website_url_repo }}</a>
-<a href="{% url 'project_edit' project.slug %}">Edit</a>
-<a href="{% url 'project_delete' project.slug %}">Delete</a>
+<h2>{{ object.name }}</h2>
+<p>{{ object.description }}</p>
+
+<p>Official Website: <a href="{{ object.website_url }}">{{ object.website_url }}</a></p>
+<p>Download: <a href="{{ object.website_url_download }}">{{ object.website_url_download }}</a></p>
+<p>Repository: <a href="{{ object.website_url_repo }}">{{ object.website_url_repo }}</a></p>
+
+<a href="{% url 'project_edit' object.slug %}">Edit</a>
+<a href="{% url 'project_delete' object.slug %}">Delete</a>
+
+<h3>Related Torrents</h3>
+{% if related_torrents %}
+    <ul>
+        {% for torrent in related_torrents %}
+            <li>
+                <strong>{{ torrent.name }}</strong> - {{ torrent.size }} MB
+                <a href="{% url 'torrent_detail' torrent.slug %}">View</a>
+            </li>
+        {% endfor %}
+    </ul>
+    
+    {# Pagination controls if pagination is enabled #}
+    <div class="pagination">
+        <span class="step-links">
+            {% if related_torrents.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ related_torrents.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ related_torrents.number }} of {{ related_torrents.paginator.num_pages }}
+            </span>
+
+            {% if related_torrents.has_next %}
+                <a href="?page={{ related_torrents.next_page_number }}">Next</a>
+                <a href="?page={{ related_torrents.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% else %}
+    <p>No related torrents found for this project.</p>
+{% endif %}
 {% endblock %}
