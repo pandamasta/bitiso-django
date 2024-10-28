@@ -3,6 +3,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
+        {% if object.medium_image %}
+    <img src="{{ object.medium_image.url }}" alt="{{ object.medium_image.url }}" style="width: 100px; height: 100px; object-fit: contain;">
+    {% endif %}
 <h2>{{ object.name }}</h2>
 <p>{{ object.description }}</p>
 
@@ -23,7 +26,7 @@
             </li>
         {% endfor %}
     </ul>
-    
+
     {# Pagination controls if pagination is enabled #}
     <div class="pagination">
         <span class="step-links">

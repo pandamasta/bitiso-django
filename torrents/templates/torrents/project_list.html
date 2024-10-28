@@ -22,8 +22,8 @@
                             {% else %}
                             {% endif %}
                         </td>
-                        <td>{{ project.name }} </td>
-                        <td>{{ torrent_count }}</td>
+                        <td><a href="{% url 'project_detail' project.slug  %}">{{ project.name }}</a> </td>
+                        <td>{{ project.torrent_count }}</td>
                         <td>{{ project.description|truncatewords:20 }}</td>
                     </tr>
                 {% endfor %}

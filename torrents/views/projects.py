@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
+from django.db.models import Count
 
 from ..models import Project, Torrent
 from ..forms import ProjectForm
@@ -16,6 +17,10 @@ class ProjectListView(ListView):
 
     def get_object(self):
         return get_object_or_404(Project, slug=self.kwargs.get('slug'))
+
+    def get_queryset(self):
+        # Annotate each project with the number of related torrents
+        return Project.objects.annotate(torrent_count=Count('torrents'))
 
 class ProjectDetailView(DetailView):
     model = Project

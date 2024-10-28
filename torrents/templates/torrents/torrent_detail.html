@@ -10,38 +10,38 @@
 
     <h2>{{ torrent.name }}</h2>
     
-    <!-- <table class="table table-striped">
-        <tbody>
-            <tr>
-                <th>Size</th>
-                <td>{{ torrent.size  | filesizeformat }} ({{ torrent.size }} byte)</td>
-            </tr>
-            <tr>
-                <th>File Count</th>
-                <td>{{ torrent.file_count }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ torrent.description }}</td>
-            </tr>
-            <tr>
-            <tr>
-                <td><strong>Info hash</strong></td>
-                <td>{{ torrent.info_hash }}</td>
-            </tr>
-                <th>Magnet Link</th>
-                <td><a href="{{ torrent.magnet }}">{{ torrent.magnet }}</a></td>
-            </tr>
-            <tr>
-                <th>Category</th>
-                <td>{{ torrent.category.name }}</td>
-            </tr>
-            <tr>
-                <th>Website</th>
-                <td><a href="{{ torrent.website_url }}">{{ torrent.website_url }}</a></td>
-            </tr>
-        </tbody>
-    </table> -->
+{#     <table class="table table-striped">#}
+{#        <tbody>#}
+{#            <tr>#}
+{#                <th>Size</th>#}
+{#                <td>{{ torrent.size  | filesizeformat }} ({{ torrent.size }} byte)</td>#}
+{#            </tr>#}
+{#            <tr>#}
+{#                <th>File Count</th>#}
+{#                <td>{{ torrent.file_count }}</td>#}
+{#            </tr>#}
+{#            <tr>#}
+{#                <th>Description</th>#}
+{#                <td>{{ torrent.description }}</td>#}
+{#            </tr>#}
+{#            <tr>#}
+{#            <tr>#}
+{#                <td><strong>Info hash</strong></td>#}
+{#                <td>{{ torrent.info_hash }}</td>#}
+{#            </tr>#}
+{#                <th>Magnet Link</th>#}
+{#                <td><a href="{{ torrent.magnet }}">{{ torrent.magnet }}</a></td>#}
+{#            </tr>#}
+{#            <tr>#}
+{#                <th>Category</th>#}
+{#                <td>{{ torrent.category.name }}</td>#}
+{#            </tr>#}
+{#            <tr>#}
+{#                <th>Website</th>#}
+{#                <td><a href="{{ torrent.website_url }}">{{ torrent.website_url }}</a></td>#}
+{#            </tr>#}
+{#        </tbody>#}
+{#    </table> #}
 
     <p>Size: {{ torrent.size  | filesizeformat }} ({{ torrent.size }} byte)</p>
     <p>File Count: {{ torrent.file_count }}</p>

@@ -8,30 +8,34 @@
 <table>
     <thead>
         <tr>
+            <th></th>
             <th>Torrent Name</th>
             <th>Size</th>
-            <th>Files</th>
+            <th>Added At</th>
             <th>Seeds</th>
             <th>Leeches</th>
             <th>Category</th>
             <th>Project</th>
-            <th>Added At</th>
         </tr>
     </thead>
     <tbody>
         {% for torrent in torrents %}
             {% if torrent.is_active %}
                 <tr>
+                    <td class="no-wrap">
+                    {% if torrent.project.mini_image %}
+                    <img src="{{ torrent.project.mini_image.url }}" alt="">
+                    {% endif %}
+                </td>
                     <td>
                         <a href="{% url 'torrent_detail' torrent.slug %}">{{ torrent.name }}</a>
                     </td>
                     <td>{{ torrent.size | filesizeformat }}</td>
-                    <td>{{ torrent.file_count }}</td>
+                    <td>{{ torrent.creation | date:"Y-m-D"  }}</td>
                     <td>{{ torrent.seed_count }}</td>
                     <td>{{ torrent.leech_count }}</td>
                     <td>{{ torrent.category }}</td>
                     <td>{{ torrent.project }}</td>
-                    <td>{{ torrent.creation }}</td>
                 </tr>
             {% endif %}
         {% empty %}
