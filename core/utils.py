@@ -33,8 +33,11 @@ def resize_and_save_images(instance, image_field_name, sizes, base_path=None):
         logger.error(f"Could not process the image: {e}")
         raise ValidationError(f"Could not process the image: {e}")
 
-    # Check if the image has an alpha channel
+    # Check if the image has an alpha channel or is in 'P' mode and convert to RGB if necessary
     is_transparent = img.mode == 'RGBA'
+    if is_transparent or img.mode == 'P':
+        img = img.convert('RGB')
+        logger.debug("Converted image to RGB mode to support JPEG format.")
 
     # Get filename and extension
     filename, _ = os.path.splitext(os.path.basename(image_field.name))
@@ -71,3 +74,4 @@ def resize_and_save_images(instance, image_field_name, sizes, base_path=None):
     # Update model instance fields without triggering save()
     instance.__class__.objects.filter(pk=instance.pk).update(**updated_fields)
     logger.debug(f"Resized images saved for {instance._meta.verbose_name}: {instance}")
+
