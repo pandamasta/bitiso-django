@@ -4,7 +4,7 @@
 {% block content %}
 <h2>Torrents List</h2>
 {% if torrents %}
-
+<div class="table-container">
 <table>
     <thead>
         <tr>
@@ -45,7 +45,7 @@
         {% endfor %}
     </tbody>
 </table>
-
+</div>
 <!-- Pagination (if enabled) -->
 {% if is_paginated %}
     <div class="pagination">

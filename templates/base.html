@@ -5,10 +5,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% trans "Welcome to" %} {{ project_name }}</title>
     <!-- Include the dark mode CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/normalize.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/basic_theme.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/dark_mode.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/mobile.css' %}">
 </head>
 <body>
 

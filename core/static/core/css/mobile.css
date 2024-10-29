@@ -1,0 +1,36 @@
+/* Mobile styles */
+@media (max-width: 576px) { /* Small phones */
+    body {
+        width: 95%;
+        font-size: 0.9rem; /* Slightly smaller font size */
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 768px) { /* Tablets */
+    body {
+        width: 90%;
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+}
+
+/* Standard desktop */
+
+@media (min-width: 1024px) and (max-width: 1280px) {
+    body {
+        width: 80%; /* Center the content with some margins */
+    }
+}
+
+/* Larger screen 22-32 inches */
+
+@media (min-width: 1281px) { /* For large desktops */
+    body {
+        width: 70%;
+        max-width: 1400px; /* Limit max width for very large screens */
+        font-size: 1.1rem; /* Slightly increase font size */
+        margin: 0 auto;
+    }
+}
+

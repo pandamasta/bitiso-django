@@ -10,6 +10,18 @@ body {
 /*    text-align: center;*/
 /*}*/
 
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    max-width: 100%; /* Prevents table from extending beyond container */
+}
+
+/* Optional: Add padding or margin adjustments for better spacing */
+.table-container table {
+    width: 100%; /* Keeps table width full within container */
+}
+
+
 main {
     margin-left:auto;
     margin-right:auto;
