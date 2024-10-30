@@ -53,7 +53,7 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user  # Assign the logged-in user
         return super().form_valid(form)
 
-class ProjectUpdateView(UpdateView):
+class ProjectUpdateView(LoginRequiredMixin,UpdateView):
     model = Project
     form_class = ProjectForm
     template_name = 'torrents/project_form.html'
@@ -62,7 +62,7 @@ class ProjectUpdateView(UpdateView):
     def get_object(self):
         return get_object_or_404(Project, slug=self.kwargs.get('slug'))
 
-class ProjectDeleteView(DeleteView):
+class ProjectDeleteView(LoginRequiredMixin,DeleteView):
     model = Project
     template_name = 'torrents/project_confirm_delete.html'
     success_url = reverse_lazy('project_list')

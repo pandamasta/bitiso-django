@@ -1,8 +1,10 @@
 # torrents/views/category_views.py
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+
 
 from ..models import Category
 from ..forms import CategoryForm
@@ -24,7 +26,7 @@ class CategoryDetailView(DetailView):
     def get_object(self):
         return get_object_or_404(Category, slug=self.kwargs.get('slug'))
     
-class CategoryCreateView(CreateView):
+class CategoryCreateView(LoginRequiredMixin,CreateView):
     model = Category
     form_class = CategoryForm
     template_name = 'torrents/category_form.html'
@@ -33,7 +35,7 @@ class CategoryCreateView(CreateView):
     def get_object(self):
         return get_object_or_404(Category, slug=self.kwargs.get('slug'))
     
-class CategoryUpdateView(UpdateView):
+class CategoryUpdateView(LoginRequiredMixin,UpdateView):
     model = Category
     form_class = CategoryForm
     template_name = 'torrents/category_form.html'
@@ -42,7 +44,7 @@ class CategoryUpdateView(UpdateView):
     def get_object(self):
         return get_object_or_404(Category, slug=self.kwargs.get('slug'))
     
-class CategoryDeleteView(DeleteView):
+class CategoryDeleteView(LoginRequiredMixin,DeleteView):
     model = Category
     template_name = 'torrents/category_confirm_delete.html'
     success_url = reverse_lazy('category_list')

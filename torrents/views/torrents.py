@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 import os
 import logging
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from ..utils.torrent_utils import process_torrent_file
 from ..models import Torrent
@@ -63,7 +64,7 @@ class TorrentDetailView(DetailView):
         return context
 
 # Create view: Form for uploading a new torrent
-class TorrentCreateView(CreateView):
+class TorrentCreateView(LoginRequiredMixin,CreateView):
     model = Torrent
     form_class = TorrentForm
     template_name = 'torrents/torrent_form.html'
@@ -73,7 +74,7 @@ class TorrentCreateView(CreateView):
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
     
 # Update view: Form for editing an existing torrent
-class TorrentUpdateView(UpdateView):
+class TorrentUpdateView(LoginRequiredMixin,UpdateView):
     model = Torrent
     form_class = TorrentForm
     template_name = 'torrents/torrent_form.html'
@@ -83,7 +84,7 @@ class TorrentUpdateView(UpdateView):
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
     
 # Delete view: Confirm and delete an existing torrent
-class TorrentDeleteView(DeleteView):
+class TorrentDeleteView(LoginRequiredMixin,DeleteView):
     model = Torrent
     template_name = 'torrents/torrent_confirm_delete.html'
     success_url = reverse_lazy('torrent_list')  # Redirect to torrent list after successful deletion
