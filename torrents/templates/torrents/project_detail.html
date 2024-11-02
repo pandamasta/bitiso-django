@@ -17,35 +17,7 @@
 <a href="{% url 'project_delete' object.slug %}">Delete</a>
 
 <h3>Related Torrents</h3>
-{% if related_torrents %}
-    <ul>
-        {% for torrent in related_torrents %}
-            <li>
-                <strong>{{ torrent.name }}</strong> - {{ torrent.size }} MB
-                <a href="{% url 'torrent_detail' torrent.slug %}">View</a>
-            </li>
-        {% endfor %}
-    </ul>
 
-    {# Pagination controls if pagination is enabled #}
-    <div class="pagination">
-        <span class="step-links">
-            {% if related_torrents.has_previous %}
-                <a href="?page=1">&laquo; First</a>
-                <a href="?page={{ related_torrents.previous_page_number }}">Previous</a>
-            {% endif %}
+{% include "torrents/_torrent_list_public.html" %}
 
-            <span class="current">
-                Page {{ related_torrents.number }} of {{ related_torrents.paginator.num_pages }}
-            </span>
-
-            {% if related_torrents.has_next %}
-                <a href="?page={{ related_torrents.next_page_number }}">Next</a>
-                <a href="?page={{ related_torrents.paginator.num_pages }}">Last &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
-{% else %}
-    <p>No related torrents found for this project.</p>
-{% endif %}
 {% endblock %}

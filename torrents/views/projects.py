@@ -39,7 +39,7 @@ class ProjectDetailView(DetailView):
         related_torrents = Torrent.objects.filter(project=project)
         paginator = Paginator(related_torrents, 10)  # Show 10 torrents per page
         page_number = self.request.GET.get('page')
-        context['related_torrents'] = paginator.get_page(page_number)
+        context['torrents'] = paginator.get_page(page_number)
         
         return context
 
