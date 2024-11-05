@@ -6,6 +6,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from django.db.models import Count
+from ..models.category import Category
+from ..models.project import Project
 
 from ..models import Project, Torrent
 from ..forms import ProjectForm
@@ -19,6 +21,19 @@ class ProjectListView(ListView):
         # Return only active projects (is_active=True) and annotate with the torrent count
         return Project.objects.filter(is_active=True).annotate(torrent_count=Count('torrents'))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Retrieve categories and group projects under each category
+        categories = Category.objects.all()
+        context['categories'] = categories
+        # For each category, filter active projects and annotate torrent counts
+        category_projects = {
+            category: Project.objects.filter(category=category, is_active=True).annotate(torrent_count=Count('torrents'))
+            for category in categories
+        }
+        context['category_projects'] = category_projects
+        return context
+    
 class ProjectDetailView(DetailView):
     model = Project
     template_name = 'torrents/project_detail.html'

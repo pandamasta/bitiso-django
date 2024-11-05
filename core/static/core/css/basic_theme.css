@@ -88,3 +88,85 @@ footer {
 .actions .btn {
     margin-right: 0.5em;
 }
+
+/* Front end project list styling based on category styling */
+
+.project-list ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.project-list > ul > li {
+    margin-bottom: 1.5em;
+}
+
+.project-list ul ul {
+    margin-top: 0.5em;
+    padding-left: 1.5em;
+    border-left: 2px solid #ccc;
+}
+
+.project-list a {
+    color: #66ccff; /* Light blue for better contrast */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.project-list a:hover {
+    color: #ffffff; /* White on hover */
+    text-decoration: underline;
+}
+
+.project-list p {
+    font-size: 0.9em;
+    margin: 0.3em 0 1em;
+    /*color: #605f5f;*/
+}
+
+/* Adjust button alignment to match the layout */
+.project-list .btn {
+    display: inline-block;
+    margin-top: 1em;
+    text-align: left;
+}
+
+
+.project-list h3 {
+    margin-top: 2em;
+    font-size: 1.2em;
+    color: #dddddd;
+}
+
+.project-list ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.project-list ul > li {
+    margin-bottom: 1em;
+}
+
+.project-list .text-muted {
+    font-size: 0.9em;
+    color: #aaaaaa;
+    margin-top: 0.5em;
+}
+
+
+/* Default styling for larger screens */
+.project-description {
+    display: inline; /* Inline next to the project name */
+    color: inherit;
+    margin-left: 0.5em; /* Space between name and description */
+    font-size: 1em;
+}
+
+/* On mobile, display the description as a block below the name */
+@media (max-width: 768px) {
+    .project-description {
+        display: block; /* Block style for readability */
+        color: #6c757d; /* Muted color */
+        font-size: 0.9em;
+        margin-top: 0.3em; /* Add space above on mobile */
+    }
+}

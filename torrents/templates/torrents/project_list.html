@@ -1,36 +1,31 @@
-{# torrents/templates/torrents/projcect_list.html #}
 {% extends 'base.html' %}
 
 {% block content %}
 <h2>Project List</h2>
+
 {% if user.is_authenticated %}
-<a href="{% url 'project_create' %}">Create New Project</a>
+    <a href="{% url 'project_create' %}" class="btn btn-primary mb-3">Create New Project</a>
 {% endif %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Project</th>
-                    <th>Torrent</th>
-                    <th>Categoryx</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
+
+<div class="project-list">
+    {% for category, projects in category_projects.items %}
+        {% if projects %}
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.description }}</p>
+            
+            <ul>
                 {% for project in projects %}
-                    <tr>
-                        <td>
-                            {% if project.small_image %}
-                                <img src="{{ project.small_image.url }}" alt="{{ project.name }}" style="width: 40px; height: 40px;">
-                            {% else %}
-                            {% endif %}
-                        </td>
-                        <td><a href="{% url 'project_detail' project.slug  %}">{{ project.name }}</a> </td>
-                        <td>{{ project.torrent_count }}</td>
-                        <td>{{ project.category }}</td>
-                        <td>{{ project.description|truncatewords:20 }}</td>
-                    </tr>
+                    <li>
+                        <strong><a href="{% url 'project_detail' project.slug %}">{{ project.name }}</a></strong>
+                        ({{ project.torrent_count }} torrent{{ project.torrent_count|pluralize }})
+                        
+                        <!-- Description with conditional layout for mobile and desktop -->
+                        <span class="project-description">{{ project.description|truncatewords:20 }}</span>
+                    </li>
                 {% endfor %}
-            </tbody>
-        </table>
+            </ul>
+        {% endif %}
+    {% endfor %}
+</div>
+
 {% endblock %}

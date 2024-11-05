@@ -14,6 +14,7 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.decorators import login_required
 import os
 import logging
+import hashlib
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -135,47 +136,53 @@ def upload_local_torrent(request):
 @login_required
 def import_torrent_from_url(request):
     """
-    View to handle downloading a torrent from a URL and importing it.
+    View to handle downloading a torrent from a URL, saving it, and creating a user-friendly symlink.
     """
     if request.method == 'POST':
         form = URLDownloadForm(request.POST)
         if form.is_valid():
             url = form.cleaned_data['url']
             try:
-                logger.info(f"Downloading torrent from URL: {url}")
+                # Step 1: Download the torrent file from the provided URL
+                logger.info(f"Starting download of torrent from URL: {url}")
                 response = requests.get(url)
                 response.raise_for_status()
 
+                # Save the downloaded content as a ContentFile object for Django handling
                 content = ContentFile(response.content)
                 parsed_url = urlparse(url)
                 original_filename = parsed_url.path.split('/')[-1]
-                filename = original_filename
-
-                # Ensure the MEDIA_TORRENT directory exists
-                torrent_directory = settings.MEDIA_TORRENT
+                
+                # Step 2: Generate a hash-based directory structure to store the torrent file
+                # This keeps files organized for scalability
+                file_hash = hashlib.sha1(content.read()).hexdigest()  # Generate SHA-1 hash of content
+                subdir_1, subdir_2 = file_hash[0], file_hash[1]
+                torrent_directory = os.path.join(settings.MEDIA_TORRENT, subdir_1, subdir_2)
+                content.seek(0)  # Reset content pointer for saving
+                
+                # Ensure the directory exists
                 if not os.path.exists(torrent_directory):
                     os.makedirs(torrent_directory)
-                    logger.info(f"Created directory: {torrent_directory}")
-                else:
-                    logger.info(f"Torrent directory already exists: {torrent_directory}")
+                    logger.info(f"Created directory structure for torrent: {torrent_directory}")
 
+                # Step 3: Save the original torrent file in the organized directory
                 fs = FileSystemStorage(location=torrent_directory)
+                original_path = fs.save(f"{original_filename}_original.torrent", content)
+                original_full_path = os.path.join(torrent_directory, original_path)
+                logger.info(f"Original torrent file saved at: {original_full_path}")
 
-                # Check if the file already exists in the filesystem and handle conflicts
-                counter = 1
-                while fs.exists(filename):
-                    logger.warning(f"The file '{filename}' already exists in the filesystem. Renaming.")
-                    filename = f"{os.path.splitext(original_filename)[0]}_{counter}{os.path.splitext(original_filename)[1]}"
-                    counter += 1
+                # Step 4: Process the torrent and save a modified version with Bitiso tracker included
+                # Define the processed file path with a suffix for clarity
+                processed_filename = f"{original_filename}_processed.torrent"
+                processed_file_path = os.path.join(torrent_directory, processed_filename)
+                process_torrent_file(original_full_path, request.user, source_url=url, save_path=processed_file_path)
 
-                # Save the torrent file
-                logger.info(f"Saving torrent file as: {filename}")
-                saved_file_path = fs.save(filename, content)
-                torrent_file_path = os.path.join(torrent_directory, saved_file_path)
-                logger.info(f"Torrent file saved at: {torrent_file_path}")
+                # Step 5: Create a user-friendly symlink in the main media directory
+                simple_symlink_path = os.path.join(settings.MEDIA_ROOT, original_filename)
+                if not os.path.exists(simple_symlink_path):
+                    os.symlink(processed_file_path, simple_symlink_path)
+                    logger.info(f"Created user-friendly symlink at {simple_symlink_path} -> {processed_file_path}")
 
-                # Process the torrent file
-                process_torrent_file(torrent_file_path, request.user, source_url=url)
                 messages.success(request, "Download, upload, and import succeeded.")
 
             except requests.exceptions.RequestException as e:
@@ -188,11 +195,10 @@ def import_torrent_from_url(request):
                 logger.error(f"Unexpected error occurred: {str(e)}")
                 messages.error(request, f"An unexpected error occurred: {e}")
 
-            # Redirect to the user-specific dashboard
-            user_uuid = request.user.uuid
-            # return redirect('dashboard', uuid=user_uuid)
+            # Redirect to the user-specific dashboard after processing
             return redirect('dashboard')
 
     form = URLDownloadForm()
     return render(request, 'torrents/import_torrent_from_url.html', {'form': form})
+
 
