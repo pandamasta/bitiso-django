@@ -25,6 +25,12 @@ class Torrent(models.Model):
     file_list = models.TextField(_("List of files"), default="N/A")
     file_count = models.PositiveIntegerField(_("Number of files"), default=1)
 
+    # Path and signatures
+    original_file_path = models.CharField(_("Original Torrent path"), max_length=512, blank=True, null=True)
+    processed_file_path = models.CharField(("Processed Torrent path"), max_length=512, blank=True, null=True)
+    gpg_signature_path = models.CharField(("GPG signature path"),max_length=512, blank=True, null=True)
+    is_signed = models.BooleanField(("Is signed"),default=False)
+
     # Descriptive fields
     category = models.ForeignKey(Category, verbose_name=_("Category"), null=True, on_delete=models.PROTECT)
     is_active = models.BooleanField(_("Show in the front end"), default=False)

@@ -15,14 +15,20 @@ from django.contrib.auth.decorators import login_required
 import os
 import logging
 import hashlib
+import tempfile  # Import tempfile at the top of your file
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from ..utils.torrent_utils import process_torrent_file
-from ..models import Torrent
+from torrents.utils.torrent_utils import process_torrent_file
+#from torrents.utils.torrent_utils import process_torrent_file, _link_trackers_to_torrent
+
+from ..models import Torrent,Tracker
 from ..forms import TorrentForm
 from ..forms import URLDownloadForm
 from ..forms import FileUploadForm
+
+from django.utils.text import slugify
+
 
 logger = logging.getLogger(__name__)
 
@@ -133,72 +139,127 @@ def upload_local_torrent(request):
     form = FileUploadForm()
     return render(request, 'torrents/upload_local_torrent.html', {'form': form})
 
+
+import os
+import tempfile
+import uuid
+import requests
+from django.shortcuts import redirect
+from django.utils.text import slugify
+from django.contrib import messages
+from django.conf import settings
+from torrents.models import Torrent, Tracker
+from torrents.utils.torrent_utils import process_torrent_file
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 @login_required
 def import_torrent_from_url(request):
-    """
-    View to handle downloading a torrent from a URL, saving it, and creating a user-friendly symlink.
-    """
     if request.method == 'POST':
         form = URLDownloadForm(request.POST)
         if form.is_valid():
             url = form.cleaned_data['url']
+            tmp_file_path = None
             try:
-                # Step 1: Download the torrent file from the provided URL
-                logger.info(f"Starting download of torrent from URL: {url}")
+                # Step 1: Download the torrent file
+                logger.info(f"Downloading torrent from URL: {url}")
                 response = requests.get(url)
                 response.raise_for_status()
 
-                # Save the downloaded content as a ContentFile object for Django handling
-                content = ContentFile(response.content)
-                parsed_url = urlparse(url)
-                original_filename = parsed_url.path.split('/')[-1]
-                
-                # Step 2: Generate a hash-based directory structure to store the torrent file
-                # This keeps files organized for scalability
-                file_hash = hashlib.sha1(content.read()).hexdigest()  # Generate SHA-1 hash of content
-                subdir_1, subdir_2 = file_hash[0], file_hash[1]
-                torrent_directory = os.path.join(settings.MEDIA_TORRENT, subdir_1, subdir_2)
-                content.seek(0)  # Reset content pointer for saving
-                
-                # Ensure the directory exists
-                if not os.path.exists(torrent_directory):
-                    os.makedirs(torrent_directory)
-                    logger.info(f"Created directory structure for torrent: {torrent_directory}")
+                # Save to a temporary file with a clear name
+                original_filename = os.path.basename(urlparse(url).path) or "downloaded_torrent"
+                tmp_file_path = os.path.join(tempfile.gettempdir(), f"{original_filename}_temp.torrent")
+                with open(tmp_file_path, 'wb') as tmp_file:
+                    tmp_file.write(response.content)
+                logger.info(f"Temporary torrent file saved at: {tmp_file_path}")
 
-                # Step 3: Save the original torrent file in the organized directory
-                fs = FileSystemStorage(location=torrent_directory)
-                original_path = fs.save(f"{original_filename}_original.torrent", content)
-                original_full_path = os.path.join(torrent_directory, original_path)
+                # Step 2: Process the torrent file
+                metadata = process_torrent_file(tmp_file_path, request.user)
+                if not metadata:
+                    messages.error(request, "Failed to process the torrent file.")
+                    return redirect('dashboard')
+
+                # Ensure directory based on info hash for both original and processed files
+                subdir_1, subdir_2 = metadata["info_hash"][:2], metadata["info_hash"][2:4]
+                torrent_dir = os.path.join(settings.MEDIA_TORRENT, subdir_1, subdir_2)
+                os.makedirs(os.path.join(settings.MEDIA_ROOT, torrent_dir), exist_ok=True)
+
+                # Define full paths for saving files
+                original_full_path = os.path.join(settings.MEDIA_ROOT, torrent_dir, f"{metadata['name']}_original.torrent")
+                processed_full_path = os.path.join(settings.MEDIA_ROOT, torrent_dir, f"{metadata['name']}_processed.torrent")
+
+                # Save the original torrent file
+                with open(original_full_path, "wb") as f:
+                    f.write(response.content)
                 logger.info(f"Original torrent file saved at: {original_full_path}")
 
-                # Step 4: Process the torrent and save a modified version with Bitiso tracker included
-                # Define the processed file path with a suffix for clarity
-                processed_filename = f"{original_filename}_processed.torrent"
-                processed_file_path = os.path.join(torrent_directory, processed_filename)
-                process_torrent_file(original_full_path, request.user, source_url=url, save_path=processed_file_path)
+                # Save the processed torrent file
+                process_torrent_file(tmp_file_path, request.user, save_path=processed_full_path)
+                logger.info(f"Processed torrent file saved at: {processed_full_path}")
 
-                # Step 5: Create a user-friendly symlink in the main media directory
-                simple_symlink_path = os.path.join(settings.MEDIA_ROOT, original_filename)
-                if not os.path.exists(simple_symlink_path):
-                    os.symlink(processed_file_path, simple_symlink_path)
-                    logger.info(f"Created user-friendly symlink at {simple_symlink_path} -> {processed_file_path}")
+                # Convert full paths to relative paths
+                original_relative_path = os.path.relpath(original_full_path, settings.MEDIA_ROOT)
+                processed_relative_path = os.path.relpath(processed_full_path, settings.MEDIA_ROOT)
 
-                messages.success(request, "Download, upload, and import succeeded.")
+                # Create the Torrent instance with relative paths
+                torrent = Torrent(
+                    info_hash=metadata["info_hash"],
+                    name=metadata["name"],
+                    slug=slugify(metadata["name"]),
+                    original_file_path=original_relative_path,  # Store relative path
+                    processed_file_path=processed_relative_path,  # Store relative path
+                    website_url_download=url,
+                    user=request.user,
+                    size=metadata["size"],
+                    pieces=metadata["pieces"],
+                    piece_size=metadata["piece_size"],
+                    magnet=metadata["magnet"],
+                    torrent_filename=metadata["torrent_filename"],
+                    file_list=metadata["file_list"],
+                    file_count=metadata["file_count"]
+                )
+                torrent.save()
 
-            except requests.exceptions.RequestException as e:
-                logger.error(f"Error downloading torrent from {url}: {str(e)}")
-                messages.error(request, f"Error downloading file: {e}")
-            except ValidationError as e:
-                logger.error(f"Validation error processing torrent: {str(e)}")
-                messages.error(request, f"Error processing torrent: {e}")
+                # Link trackers
+                _link_trackers_to_torrent(metadata["trackers"], torrent)
+
+                messages.success(request, f"Torrent '{metadata['name']}' successfully imported.")
+                return redirect('dashboard')
+
+            except requests.RequestException as e:
+                logger.error(f"Error downloading torrent from {url}: {e}")
+                messages.error(request, f"Error downloading the torrent file: {e}")
             except Exception as e:
-                logger.error(f"Unexpected error occurred: {str(e)}")
-                messages.error(request, f"An unexpected error occurred: {e}")
-
-            # Redirect to the user-specific dashboard after processing
-            return redirect('dashboard')
+                logger.error(f"Unexpected error: {e}")
+                messages.error(request, f"An unexpected error occurred: {str(e)}")
+            finally:
+                # Clean up the temporary file
+                if tmp_file_path and os.path.exists(tmp_file_path):
+                    os.remove(tmp_file_path)
 
     form = URLDownloadForm()
     return render(request, 'torrents/import_torrent_from_url.html', {'form': form})
-
-
+def _link_trackers_to_torrent(trackers, torrent_obj):
+    """
+    Link each tracker URL to the Torrent object and set announce_priority.
+    """
+    for level, tracker_list in enumerate(trackers):
+        for tracker_url in tracker_list:
+            if tracker_url:
+                # Get or create the tracker by URL
+                tracker, created = Tracker.objects.get_or_create(url=tracker_url)
+                # Link the tracker to the Torrent object
+                torrent_obj.trackers.add(tracker)
+                
+                # Set announce_priority directly for each tracker in TrackerStat
+                tracker_stat, _ = torrent_obj.trackerstat_set.get_or_create(
+                    tracker=tracker,
+                    defaults={'announce_priority': level}
+                )
+                tracker_stat.announce_priority = level
+                tracker_stat.save()
+                
+                # Log the tracker link with announce_priority (level)
+                logger.debug(f"Linked tracker {tracker_url} to torrent {torrent_obj.name} with announce_priority {level}")

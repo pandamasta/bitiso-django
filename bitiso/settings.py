@@ -229,3 +229,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Absolute filesystem path to medi
 
 MEDIA_TORRENT = os.path.join(MEDIA_ROOT, 'torrents/')
 TRACKER_ANNOUNCE = "http://tracker.bitiso.org:6969"
+
+# In settings.py
+KEEP_ORIGINAL_TORRENT = True  # Set to False if you don't want to keep the original downloaded file
+

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Project List</h2>
+
+{% if user.is_authenticated %}
+    <a href="{% url 'project_create' %}" class="btn btn-primary mb-3">Create New Project</a>
+{% endif %}
+
+<div class="project-list">
+    {% for category, projects in category_projects.items %}
+        {% if projects %}
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.description }}</p>
+            
+            <ul>
+                {% for project in projects %}
+                    <li>
+                        <strong><a href="{% url 'project_detail' project.slug %}">{{ project.name }}</a></strong>
+                        ({{ project.torrent_count }} torrent{{ project.torrent_count|pluralize }})
+                        
+                        <!-- Description with conditional layout for mobile and desktop -->
+                        <span class="project-description">{{ project.description|truncatewords:20 }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endfor %}
+</div>
+
+{% endblock %}
