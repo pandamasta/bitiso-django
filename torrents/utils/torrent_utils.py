@@ -12,9 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 def process_torrent_file(torrent_file_path, user, save_path=None):
-    """
-    Processes the torrent file to add custom trackers and retrieve metadata.
-    """
     try:
         logger.info(f"Processing torrent file: {torrent_file_path}")
 
@@ -27,15 +24,14 @@ def process_torrent_file(torrent_file_path, user, save_path=None):
         if custom_tracker not in [tracker for sublist in t.trackers for tracker in sublist]:
             t.trackers.append([custom_tracker])
 
-        # Ensure save_path is set and unique
+        # If save_path is None, set a default
         if not save_path:
             save_path = os.path.join(settings.MEDIA_TORRENT, f"{t.infohash}_processed.torrent")
 
-        # Save the processed file
+        # Save the processed file with custom trackers
         t.write(save_path)
-        logger.info(f"Processed torrent file saved at: {save_path}")
 
-        # Return metadata with trackers
+        # Return metadata with trackers for further processing
         return {
             "info_hash": t.infohash,
             "name": t.name[:128],
@@ -46,7 +42,7 @@ def process_torrent_file(torrent_file_path, user, save_path=None):
             "torrent_filename": os.path.basename(save_path),
             "file_list": ";".join(f"{file.name},{file.size}" for file in t.files),
             "file_count": len(t.files),
-            "trackers": t.trackers
+            "trackers": t.trackers 
         }
     except Exception as e:
         logger.error(f"Error processing torrent file: {e}")
