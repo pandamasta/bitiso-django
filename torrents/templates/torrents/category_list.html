@@ -1,10 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Category List</h2>
-<ul>
-    {% for category in categories %}
-        <li><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></li>
-    {% endfor %}
-</ul>
+<div class="category-list">
+    <ul>
+        {% for category in categories %}
+            <li>
+                <strong><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></strong>
+                <p>{{ category.description }}</p>
+                
+                {% if category.children.all %}
+                    <ul>
+                        {% for subcategory in category.children.all %}
+                            <li>
+                                <a href="{% url 'category_detail' subcategory.slug %}">{{ subcategory.name }}</a>
+                                <p>{{ subcategory.description }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% if user.is_authenticated %}
 <a href="{% url 'category_create' %}">Create New Category</a>
+{% endif %}
 {% endblock %}

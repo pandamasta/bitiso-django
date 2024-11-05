@@ -7,6 +7,9 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
 from .actions import bulk_project_action
+from django.shortcuts import render
+from django.db.models import Count, Q  # Import Q for filtering
+
 
 User = get_user_model()
 
@@ -42,8 +45,6 @@ def user_dashboard(request):
     """
     return render(request, 'bitiso_user_profiles/dashboard.html')
 
-
-
 @login_required
 def user_torrents(request):
     """
@@ -64,15 +65,15 @@ def user_torrents(request):
 
 @login_required
 def user_projects(request):
-
-    #user_projects = Project.objects.filter(user=request.user)
-    user_projects = Project.objects.all()
+    # Get all projects for the current user, regardless of active status, and annotate active torrent count
+    user_projects = Project.objects.filter(user=request.user).annotate(
+        torrent_count=Count('torrents', filter=Q(torrents__is_active=True))
+    )
 
     return render(request, 'bitiso_user_profiles/projects.html', {'user_projects': user_projects})
 
 @login_required
 def user_categories(request):
-    user_categories = Category.objects.all()
-    #user_categories = Category.objects.filter(user=request.user)
+    # Retrieve categories created by the user, including any subcategories
+    user_categories = Category.objects.filter(user=request.user, parent_category__isnull=True).prefetch_related('children')
     return render(request, 'bitiso_user_profiles/categories.html', {'user_categories': user_categories})
-

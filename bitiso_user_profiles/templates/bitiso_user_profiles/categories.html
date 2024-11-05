@@ -3,14 +3,36 @@
 {% block content %}
 <h2>{{ user.username }}'s Categories</h2>
 
-<ul>
-    {% for category in user_categories %}
-        <li>{{ category.name }} - {{ category.created_at }}</li>
-    {% empty %}
-        <li>No categories created yet.</li>
-    {% endfor %}
-</ul>
-
+{% if user_categories %}
+    <ul class="category-list">
+        {% for category in user_categories %}
+            <li>
+                <strong>{{ category.name }}</strong> - <small>Created on {{ category.created_at|date:"Y-m-d" }}</small>
+                
+                <div class="actions">
+                    <a href="{% url 'category_edit' category.slug %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a href="{% url 'category_delete' category.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                </div>
+                
+                {% if category.children.all %}
+                    <ul class="subcategory-list">
+                        {% for subcategory in category.children.all %}
+                            <li>
+                                <strong>{{ subcategory.name }}</strong> - <small>Created on {{ subcategory.created_at|date:"Y-m-d" }}</small>
+                                <div class="actions">
+                                    <a href="{% url 'category_edit' subcategory.slug %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a href="{% url 'category_delete' subcategory.slug %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No categories created yet.</p>
+{% endif %}
 <a href="{% url 'category_create' %}" class="btn btn-primary">Create a New Category</a>
 
 {% endblock %}

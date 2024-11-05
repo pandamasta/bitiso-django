@@ -31,3 +31,60 @@ footer {
     text-align: center;
 }
 
+/* Front end categorie */
+
+.category-list ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.category-list > ul > li {
+    margin-bottom: 1.5em;
+}
+
+.category-list ul ul {
+    margin-top: 0.5em;
+    padding-left: 1.5em;
+    border-left: 2px solid #ccc;
+}
+
+.category-list a {
+    color: #007BFF;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.category-list a:hover {
+    text-decoration: underline;
+}
+
+.category-list p {
+    font-size: 0.9em;
+    /*color: #605f5f;*/
+    margin: 0.3em 0 1em;
+}
+
+/* Backend categorie */
+
+.category-list, .subcategory-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.category-list > li {
+    margin-bottom: 1em;
+}
+
+.subcategory-list {
+    margin-top: 0.5em;
+    padding-left: 1.5em;
+    border-left: 2px solid #ddd;
+}
+
+.actions {
+    margin-top: 0.5em;
+}
+
+.actions .btn {
+    margin-right: 0.5em;
+}

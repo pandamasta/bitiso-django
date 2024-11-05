@@ -1,0 +1,2 @@
+UPDATE public.torrents_project
+SET user_id = 2;

@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>{{ category.name }}</h2>
+
 {% if category.parent_category %}
     <p>Parent Category: <a href="{% url 'category_detail' category.parent_category.slug %}">{{ category.parent_category.name }}</a></p>
 {% endif %}
+<p>{{ category.description }}</p>
 <p>Created at: {{ category.created_at }}</p>
+
+<h3>Related Torrents</h3>
+{% include "torrents/_torrent_list_public.html" %}
+
+{% if user.is_authenticated %}
 <a href="{% url 'category_edit' category.slug %}">Edit</a> | 
 <a href="{% url 'category_delete' category.slug %}">Delete</a>
+{% endif %}
 {% endblock %}

@@ -15,12 +15,9 @@ class ProjectListView(ListView):
     template_name = 'torrents/project_list.html'
     context_object_name = 'projects'
 
-    def get_object(self):
-        return get_object_or_404(Project, slug=self.kwargs.get('slug'))
-
     def get_queryset(self):
-        # Annotate each project with the number of related torrents
-        return Project.objects.annotate(torrent_count=Count('torrents'))
+        # Return only active projects (is_active=True) and annotate with the torrent count
+        return Project.objects.filter(is_active=True).annotate(torrent_count=Count('torrents'))
 
 class ProjectDetailView(DetailView):
     model = Project
