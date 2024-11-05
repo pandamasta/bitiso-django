@@ -9,10 +9,13 @@ from ..utils.slug_utils import generate_unique_slug
 from PIL import Image, UnidentifiedImageError
 import os 
 from core.utils import resize_and_save_images
+from ..models.category import Category
+from ..models.license import License
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 
 class Project(models.Model):
@@ -26,6 +29,8 @@ class Project(models.Model):
     website_url = models.URLField(_("Official website URL"), max_length=2000, blank=True, null=True)
     website_url_download = models.URLField(_("Download page URL"), max_length=2000, blank=True)
     website_url_repo = models.URLField(_("Repository URL"), max_length=2000, blank=True)
+    category = models.ForeignKey(Category, verbose_name=_("Category"), null=True, on_delete=models.PROTECT)  # Assign category at project level
+    license = models.ForeignKey(License, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Default license"))
 
     # Image fields
     image = models.ImageField(upload_to='img/project/original/', null=True, blank=True, default='')
@@ -34,8 +39,7 @@ class Project(models.Model):
     medium_image = models.ImageField(upload_to='img/project/medium/', blank=True, default='')
     large_image = models.ImageField(upload_to='img/project/large/', blank=True, default='')
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='projects')
-    # Add timestamps
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='projects', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), blank=True, null=True)
@@ -56,7 +60,7 @@ class Project(models.Model):
 
         super().save(*args, **kwargs)  # Save model first to access image file path
 
-        if self.image:  # Replace 'image' with your image field name
+        if self.image:
             resize_and_save_images(self, 'image', {
                 'mini': (13, 13),
                 'small': (40, 40),

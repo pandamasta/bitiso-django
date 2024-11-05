@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from ..models.category import Category
 from ..models.project import Project
+from ..models.license import License
 from ..utils.slug_utils import generate_unique_slug
 
 class Torrent(models.Model):
@@ -27,16 +28,23 @@ class Torrent(models.Model):
     # Descriptive fields
     category = models.ForeignKey(Category, verbose_name=_("Category"), null=True, on_delete=models.PROTECT)
     is_active = models.BooleanField(_("Show in the front end"), default=False)
-    is_bitiso = models.BooleanField(_("Created by bitiso?"), default=True)
+    is_bitiso = models.BooleanField(_("Created by Bitiso?"), default=True)
     description = models.TextField(_("Description"), blank=True, default='')
     website_url = models.URLField(_("Official website URL"), max_length=2000, blank=True, null=True)
     website_url_download = models.URLField(_("Download page URL"), max_length=2000, blank=True)
     website_url_repo = models.URLField(_("Repository URL"), max_length=2000, blank=True)
     version = models.CharField(_("Version of the software"), max_length=16, blank=True)
+    license = models.ForeignKey(
+        License,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("License"),
+        help_text=_("Overrides project license if specified")
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='torrents', null=True, blank=True)
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='torrents', null=True, blank=True)    
-                        
-    # Add timestamps
+    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), blank=True, null=True)

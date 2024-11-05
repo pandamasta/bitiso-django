@@ -6,10 +6,11 @@ from django.conf import settings
 
 class Category(models.Model):
     """
-    Category for organizing torrents.
+    Category for organizing projects and torrents.
     """
     name = models.CharField(_("Name"), max_length=64)
     slug = models.SlugField(blank=True, null=True, unique=True)
+    description = models.TextField(_("Description"), blank=True, default='') 
     parent_category = models.ForeignKey(
         'self',
         verbose_name=_("Parent category"),
@@ -18,7 +19,6 @@ class Category(models.Model):
         on_delete=models.PROTECT,
         related_name='children'
     )
-    # Add timestamps
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='categories', null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
