@@ -47,7 +47,7 @@ from django.shortcuts import redirect
 from django.utils.text import slugify
 from urllib.parse import urlparse
 import requests
-
+from torf import Torrent as Torrenttorf
 
 
 logger = logging.getLogger(__name__)
@@ -172,21 +172,34 @@ def import_torrent_from_url(request, use_info_hash_folders=True):
                 return redirect('dashboard')
 
             try:
+                # Extract info_hash to check if torrent already exists
+                info_hash = extract_info_hash(tmp_file_path)
+                if not info_hash:
+                    messages.error(request, "Failed to extract info hash from the torrent file.")
+                    return redirect('dashboard')
+
+                # Check if torrent with the same info_hash already exists
+                if Torrent.objects.filter(info_hash=info_hash).exists():
+                    messages.info(request, f"The torrent with info_hash {info_hash} already exists in the database.")
+                    logger.info(f"Torrent with info_hash {info_hash} already exists. Skipping import.")
+                    return redirect('dashboard')
+
+                # Process torrent file to get full metadata
                 metadata = process_torrent_file(tmp_file_path, request.user)
                 if not metadata:
                     messages.error(request, "Failed to process the torrent file.")
                     return redirect('dashboard')
 
-                # Determine the save directory based on settings
+                # Determine save directory based on settings
                 save_dir = determine_save_dir(metadata["info_hash"], use_info_hash_folders)
 
-                # Save the single torrent file
+                # Save the torrent file
                 relative_path = save_torrent_file(tmp_file_path, metadata, save_dir)
 
-                # Create the Torrent instance with the single file path
+                # Create the Torrent instance
                 torrent = create_torrent_instance(metadata, url, relative_path, request.user)
 
-                # Link trackers to the torrent
+                # Link trackers
                 _link_trackers_to_torrent(metadata["trackers"], torrent)
 
                 messages.success(request, f"Torrent '{metadata['name']}' successfully imported.")
@@ -201,6 +214,16 @@ def import_torrent_from_url(request, use_info_hash_folders=True):
 
     form = URLDownloadForm()
     return render(request, 'torrents/import_torrent_from_url.html', {'form': form})
+
+
+def extract_info_hash(torrent_file_path):
+    """Extracts the info_hash from a torrent file."""
+    try:
+        t = Torrenttorf.read(torrent_file_path)
+        return t.infohash
+    except Exception as e:
+        logger.error(f"Error extracting info_hash from torrent file: {e}")
+        return None
 
 
 def download_torrent(url):
@@ -234,6 +257,11 @@ def save_torrent_file(tmp_file_path, metadata, save_dir):
     # Define the path for the single torrent file
     full_path = os.path.join(settings.MEDIA_ROOT, save_dir, f"{metadata['name']}.torrent")
 
+    # Check if file already exists and log message if so
+    if os.path.exists(full_path):
+        logger.info(f"Torrent file already exists at: {full_path}. Skipping save.")
+        return os.path.relpath(full_path, settings.MEDIA_ROOT)
+
     # Save the torrent file
     with open(full_path, "wb") as f:
         with open(tmp_file_path, 'rb') as tmp_file:
@@ -241,6 +269,7 @@ def save_torrent_file(tmp_file_path, metadata, save_dir):
 
     # Return the relative path
     return os.path.relpath(full_path, settings.MEDIA_ROOT)
+
 
 
 def create_torrent_instance(metadata, url, torrent_filename, user):

@@ -11,7 +11,7 @@ import uuid
 logger = logging.getLogger(__name__)
 
 
-def process_torrent_file(torrent_file_path, user, save_path=None):
+def process_torrent_file(torrent_file_path, user, save_dir=None):
     try:
         logger.info(f"Processing torrent file: {torrent_file_path}")
 
@@ -26,11 +26,17 @@ def process_torrent_file(torrent_file_path, user, save_path=None):
             t.trackers.append([custom_tracker])
             logger.info(f"Added custom tracker: {custom_tracker}")
 
-        # Define save path without '_processed' suffix
-        if not save_path:
+        # Define the save path using the save directory and name
+        if save_dir:
+            save_path = os.path.join(settings.MEDIA_ROOT, save_dir, f"{t.name}.torrent")
+        else:
             save_path = os.path.join(settings.MEDIA_TORRENT, f"{t.name}.torrent")
 
         # Save the modified torrent file with custom trackers
+        if os.path.exists(save_path):
+            logger.info(f"File already exists at: {save_path}. Skipping save.")
+            return None
+
         t.write(save_path)
         logger.info(f"Processed torrent file saved at: {save_path}")
 
@@ -42,7 +48,7 @@ def process_torrent_file(torrent_file_path, user, save_path=None):
             "pieces": t.pieces,
             "piece_size": t.piece_size,
             "magnet": str(t.magnet()),
-            "torrent_filename": os.path.basename(save_path),
+            "torrent_filename": os.path.relpath(save_path, settings.MEDIA_ROOT),
             "file_list": [{"name": file.name, "size": file.size} for file in t.files],
             "file_count": len(t.files),
             "trackers": t.trackers
@@ -50,6 +56,7 @@ def process_torrent_file(torrent_file_path, user, save_path=None):
     except Exception as e:
         logger.error(f"Error processing torrent file: {e}")
         return None
+
 
 # def _link_trackers_to_torrent(trackers, torrent_obj):
 #     """
