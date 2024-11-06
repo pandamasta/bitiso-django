@@ -29,6 +29,26 @@ from ..forms import FileUploadForm
 
 from django.utils.text import slugify
 
+import os
+import tempfile
+import uuid
+import requests
+from django.shortcuts import redirect
+from django.utils.text import slugify
+from django.contrib import messages
+from django.conf import settings
+from torrents.models import Torrent, Tracker
+from torrents.utils.torrent_utils import process_torrent_file
+import logging
+import os
+import tempfile
+from django.conf import settings
+from django.shortcuts import redirect
+from django.utils.text import slugify
+from urllib.parse import urlparse
+import requests
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -140,107 +160,109 @@ def upload_local_torrent(request):
     return render(request, 'torrents/upload_local_torrent.html', {'form': form})
 
 
-import os
-import tempfile
-import uuid
-import requests
-from django.shortcuts import redirect
-from django.utils.text import slugify
-from django.contrib import messages
-from django.conf import settings
-from torrents.models import Torrent, Tracker
-from torrents.utils.torrent_utils import process_torrent_file
-import logging
-
-logger = logging.getLogger(__name__)
-
-
 @login_required
-def import_torrent_from_url(request):
+def import_torrent_from_url(request, use_info_hash_folders=True):
     if request.method == 'POST':
         form = URLDownloadForm(request.POST)
         if form.is_valid():
             url = form.cleaned_data['url']
-            tmp_file_path = None
+            tmp_file_path = download_torrent(url)
+            if not tmp_file_path:
+                messages.error(request, "Error downloading the torrent file.")
+                return redirect('dashboard')
+
             try:
-                # Step 1: Download the torrent file
-                logger.info(f"Downloading torrent from URL: {url}")
-                response = requests.get(url)
-                response.raise_for_status()
-
-                # Save to a temporary file with a clear name
-                original_filename = os.path.basename(urlparse(url).path) or "downloaded_torrent"
-                tmp_file_path = os.path.join(tempfile.gettempdir(), f"{original_filename}_temp.torrent")
-                with open(tmp_file_path, 'wb') as tmp_file:
-                    tmp_file.write(response.content)
-                logger.info(f"Temporary torrent file saved at: {tmp_file_path}")
-
-                # Step 2: Process the torrent file
                 metadata = process_torrent_file(tmp_file_path, request.user)
                 if not metadata:
                     messages.error(request, "Failed to process the torrent file.")
                     return redirect('dashboard')
 
-                # Ensure directory based on info hash for both original and processed files
-                subdir_1, subdir_2 = metadata["info_hash"][:2], metadata["info_hash"][2:4]
-                torrent_dir = os.path.join(settings.MEDIA_TORRENT, subdir_1, subdir_2)
-                os.makedirs(os.path.join(settings.MEDIA_ROOT, torrent_dir), exist_ok=True)
+                # Determine the save directory based on settings
+                save_dir = determine_save_dir(metadata["info_hash"], use_info_hash_folders)
 
-                # Define full paths for saving files
-                original_full_path = os.path.join(settings.MEDIA_ROOT, torrent_dir, f"{metadata['name']}_original.torrent")
-                processed_full_path = os.path.join(settings.MEDIA_ROOT, torrent_dir, f"{metadata['name']}_processed.torrent")
+                # Save the single torrent file
+                relative_path = save_torrent_file(tmp_file_path, metadata, save_dir)
 
-                # Save the original torrent file
-                with open(original_full_path, "wb") as f:
-                    f.write(response.content)
-                logger.info(f"Original torrent file saved at: {original_full_path}")
+                # Create the Torrent instance with the single file path
+                torrent = create_torrent_instance(metadata, url, relative_path, request.user)
 
-                # Save the processed torrent file
-                process_torrent_file(tmp_file_path, request.user, save_path=processed_full_path)
-                logger.info(f"Processed torrent file saved at: {processed_full_path}")
-
-                # Convert full paths to relative paths
-                original_relative_path = os.path.relpath(original_full_path, settings.MEDIA_ROOT)
-                processed_relative_path = os.path.relpath(processed_full_path, settings.MEDIA_ROOT)
-
-                # Create the Torrent instance with relative paths
-                torrent = Torrent(
-                    info_hash=metadata["info_hash"],
-                    name=metadata["name"],
-                    slug=slugify(metadata["name"]),
-                    original_file_path=original_relative_path,  # Store relative path
-                    processed_file_path=processed_relative_path,  # Store relative path
-                    website_url_download=url,
-                    user=request.user,
-                    size=metadata["size"],
-                    pieces=metadata["pieces"],
-                    piece_size=metadata["piece_size"],
-                    magnet=metadata["magnet"],
-                    torrent_filename=metadata["torrent_filename"],
-                    file_list=metadata["file_list"],
-                    file_count=metadata["file_count"]
-                )
-                torrent.save()
-
-                # Link trackers
+                # Link trackers to the torrent
                 _link_trackers_to_torrent(metadata["trackers"], torrent)
 
                 messages.success(request, f"Torrent '{metadata['name']}' successfully imported.")
                 return redirect('dashboard')
 
-            except requests.RequestException as e:
-                logger.error(f"Error downloading torrent from {url}: {e}")
-                messages.error(request, f"Error downloading the torrent file: {e}")
             except Exception as e:
-                logger.error(f"Unexpected error: {e}")
+                logger.error(f"An error occurred while importing the torrent: {e}")
                 messages.error(request, f"An unexpected error occurred: {str(e)}")
             finally:
-                # Clean up the temporary file
                 if tmp_file_path and os.path.exists(tmp_file_path):
                     os.remove(tmp_file_path)
 
     form = URLDownloadForm()
     return render(request, 'torrents/import_torrent_from_url.html', {'form': form})
+
+
+def download_torrent(url):
+    """Télécharge le fichier torrent depuis une URL et retourne le chemin du fichier temporaire."""
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        original_filename = os.path.basename(urlparse(url).path) or "downloaded_torrent"
+        tmp_file_path = os.path.join(tempfile.gettempdir(), f"{original_filename}_temp.torrent")
+        with open(tmp_file_path, 'wb') as tmp_file:
+            tmp_file.write(response.content)
+        return tmp_file_path
+    except requests.RequestException as e:
+        logger.error(f"Error downloading torrent from {url}: {e}")
+        return None
+
+
+def determine_save_dir(info_hash, use_info_hash_folders):
+    """Détermine le répertoire de sauvegarde pour les fichiers torrent."""
+    if use_info_hash_folders:
+        subdir_1, subdir_2 = info_hash[:2], info_hash[2:4]
+        torrent_dir = os.path.join(settings.MEDIA_TORRENT, subdir_1, subdir_2)
+    else:
+        torrent_dir = settings.MEDIA_TORRENT  # Met tout dans le même dossier
+    os.makedirs(os.path.join(settings.MEDIA_ROOT, torrent_dir), exist_ok=True)
+    return torrent_dir
+
+
+def save_torrent_file(tmp_file_path, metadata, save_dir):
+    """Saves the processed torrent file and returns its relative path."""
+    # Define the path for the single torrent file
+    full_path = os.path.join(settings.MEDIA_ROOT, save_dir, f"{metadata['name']}.torrent")
+
+    # Save the torrent file
+    with open(full_path, "wb") as f:
+        with open(tmp_file_path, 'rb') as tmp_file:
+            f.write(tmp_file.read())
+
+    # Return the relative path
+    return os.path.relpath(full_path, settings.MEDIA_ROOT)
+
+
+def create_torrent_instance(metadata, url, torrent_filename, user):
+    """Crée et retourne une instance Torrent en base de données."""
+    torrent = Torrent(
+        info_hash=metadata["info_hash"],
+        name=metadata["name"],
+        slug=slugify(metadata["name"]),
+        torrent_filename=torrent_filename,
+        website_url_download=url,
+        user=user,
+        size=metadata["size"],
+        pieces=metadata["pieces"],
+        piece_size=metadata["piece_size"],
+        magnet=metadata["magnet"],
+        file_list=metadata["file_list"],
+        file_count=metadata["file_count"]
+    )
+    torrent.save()
+    return torrent
+
+
 def _link_trackers_to_torrent(trackers, torrent_obj):
     """
     Link each tracker URL to the Torrent object and set announce_priority.
@@ -248,18 +270,22 @@ def _link_trackers_to_torrent(trackers, torrent_obj):
     for level, tracker_list in enumerate(trackers):
         for tracker_url in tracker_list:
             if tracker_url:
-                # Get or create the tracker by URL
-                tracker, created = Tracker.objects.get_or_create(url=tracker_url)
-                # Link the tracker to the Torrent object
-                torrent_obj.trackers.add(tracker)
+                try:
+                    # Get or create the tracker by URL
+                    tracker, created = Tracker.objects.get_or_create(url=tracker_url)
+                    # Link the tracker to the Torrent object
+                    torrent_obj.trackers.add(tracker)
+                    
+                    # Set announce_priority directly for each tracker in TrackerStat
+                    tracker_stat, _ = torrent_obj.trackerstat_set.get_or_create(
+                        tracker=tracker,
+                        defaults={'announce_priority': level}
+                    )
+                    tracker_stat.announce_priority = level
+                    tracker_stat.save()
+                    
+                    # Log the tracker link with announce_priority (level)
+                    logger.debug(f"Linked tracker {tracker_url} to torrent {torrent_obj.name} with announce_priority {level}")
                 
-                # Set announce_priority directly for each tracker in TrackerStat
-                tracker_stat, _ = torrent_obj.trackerstat_set.get_or_create(
-                    tracker=tracker,
-                    defaults={'announce_priority': level}
-                )
-                tracker_stat.announce_priority = level
-                tracker_stat.save()
-                
-                # Log the tracker link with announce_priority (level)
-                logger.debug(f"Linked tracker {tracker_url} to torrent {torrent_obj.name} with announce_priority {level}")
+                except Exception as e:
+                    logger.error(f"Failed to link tracker {tracker_url} to torrent {torrent_obj.name}: {e}")

@@ -19,17 +19,20 @@ def process_torrent_file(torrent_file_path, user, save_path=None):
         t = Torrenttorf.read(torrent_file_path)
         logger.info(f"Parsed torrent file: {t.name}")
 
-        # Add custom tracker to the torrent's tracker list
+        # Ensure custom tracker is added to the list
         custom_tracker = settings.TRACKER_ANNOUNCE
-        if custom_tracker not in [tracker for sublist in t.trackers for tracker in sublist]:
+        trackers_set = {tracker for sublist in t.trackers for tracker in sublist}
+        if custom_tracker not in trackers_set:
             t.trackers.append([custom_tracker])
+            logger.info(f"Added custom tracker: {custom_tracker}")
 
-        # If save_path is None, set a default
+        # Define save path without '_processed' suffix
         if not save_path:
-            save_path = os.path.join(settings.MEDIA_TORRENT, f"{t.infohash}_processed.torrent")
+            save_path = os.path.join(settings.MEDIA_TORRENT, f"{t.name}.torrent")
 
-        # Save the processed file with custom trackers
+        # Save the modified torrent file with custom trackers
         t.write(save_path)
+        logger.info(f"Processed torrent file saved at: {save_path}")
 
         # Return metadata with trackers for further processing
         return {
@@ -40,9 +43,9 @@ def process_torrent_file(torrent_file_path, user, save_path=None):
             "piece_size": t.piece_size,
             "magnet": str(t.magnet()),
             "torrent_filename": os.path.basename(save_path),
-            "file_list": ";".join(f"{file.name},{file.size}" for file in t.files),
+            "file_list": [{"name": file.name, "size": file.size} for file in t.files],
             "file_count": len(t.files),
-            "trackers": t.trackers 
+            "trackers": t.trackers
         }
     except Exception as e:
         logger.error(f"Error processing torrent file: {e}")
