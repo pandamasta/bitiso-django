@@ -161,7 +161,7 @@ def upload_local_torrent(request):
 
 
 @login_required
-def import_torrent_from_url(request, use_info_hash_folders=True):
+def import_torrent_from_url(request, use_info_hash_folders=False):
     if request.method == 'POST':
         form = URLDownloadForm(request.POST)
         if form.is_valid():
@@ -184,17 +184,17 @@ def import_torrent_from_url(request, use_info_hash_folders=True):
                     logger.info(f"Torrent with info_hash {info_hash} already exists. Skipping import.")
                     return redirect('dashboard')
 
-                # Process torrent file to get full metadata
-                metadata = process_torrent_file(tmp_file_path, request.user)
+                # Determine save directory based on settings
+                save_dir = determine_save_dir(info_hash, use_info_hash_folders)
+
+                # Process torrent file to get full metadata, using the specified save_dir
+                metadata = process_torrent_file(tmp_file_path, request.user, save_dir=save_dir)
                 if not metadata:
                     messages.error(request, "Failed to process the torrent file.")
                     return redirect('dashboard')
 
-                # Determine save directory based on settings
-                save_dir = determine_save_dir(metadata["info_hash"], use_info_hash_folders)
-
                 # Save the torrent file
-                relative_path = save_torrent_file(tmp_file_path, metadata, save_dir)
+                relative_path = metadata["torrent_filename"]  # Already set to the correct relative path
 
                 # Create the Torrent instance
                 torrent = create_torrent_instance(metadata, url, relative_path, request.user)

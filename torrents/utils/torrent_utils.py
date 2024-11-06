@@ -28,7 +28,7 @@ def process_torrent_file(torrent_file_path, user, save_dir=None):
 
         # Define the save path using the save directory and name
         if save_dir:
-            save_path = os.path.join(settings.MEDIA_ROOT, save_dir, f"{t.name}.torrent")
+            save_path = os.path.join(save_dir, f"{t.name}.torrent")
         else:
             save_path = os.path.join(settings.MEDIA_TORRENT, f"{t.name}.torrent")
 
@@ -48,7 +48,7 @@ def process_torrent_file(torrent_file_path, user, save_dir=None):
             "pieces": t.pieces,
             "piece_size": t.piece_size,
             "magnet": str(t.magnet()),
-            "torrent_filename": os.path.relpath(save_path, settings.MEDIA_ROOT),
+            "torrent_filename": os.path.relpath(save_path, settings.MEDIA_ROOT),  # Relative path for the DB
             "file_list": [{"name": file.name, "size": file.size} for file in t.files],
             "file_count": len(t.files),
             "trackers": t.trackers
@@ -56,7 +56,6 @@ def process_torrent_file(torrent_file_path, user, save_dir=None):
     except Exception as e:
         logger.error(f"Error processing torrent file: {e}")
         return None
-
 
 # def _link_trackers_to_torrent(trackers, torrent_obj):
 #     """
