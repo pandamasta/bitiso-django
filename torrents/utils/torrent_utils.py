@@ -11,28 +11,21 @@ import uuid
 logger = logging.getLogger(__name__)
 
 
-def process_torrent_file(torrent_file_path, user, save_dir=None):
+def process_torrent_file(torrent_file_path, save_dir):
+    """Processes the torrent file, adding custom trackers, and saves it."""
     try:
         logger.info(f"Processing torrent file: {torrent_file_path}")
-
-        # Load and parse the torrent
         t = Torrenttorf.read(torrent_file_path)
         logger.info(f"Parsed torrent file: {t.name}")
 
-        # Ensure custom tracker is added to the list
+        # Add custom tracker if not present
         custom_tracker = settings.TRACKER_ANNOUNCE
-        trackers_set = {tracker for sublist in t.trackers for tracker in sublist}
-        if custom_tracker not in trackers_set:
+        if custom_tracker not in {tracker for sublist in t.trackers for tracker in sublist}:
             t.trackers.append([custom_tracker])
             logger.info(f"Added custom tracker: {custom_tracker}")
 
-        # Define the save path using the save directory and name
-        if save_dir:
-            save_path = os.path.join(save_dir, f"{t.name}.torrent")
-        else:
-            save_path = os.path.join(settings.MEDIA_TORRENT, f"{t.name}.torrent")
-
-        # Save the modified torrent file with custom trackers
+        # Save the processed file with specified save directory
+        save_path = os.path.join(save_dir, f"{t.name}.torrent")
         if os.path.exists(save_path):
             logger.info(f"File already exists at: {save_path}. Skipping save.")
             return None
@@ -40,7 +33,7 @@ def process_torrent_file(torrent_file_path, user, save_dir=None):
         t.write(save_path)
         logger.info(f"Processed torrent file saved at: {save_path}")
 
-        # Return metadata with trackers for further processing
+        # Return metadata with relative path for DB
         return {
             "info_hash": t.infohash,
             "name": t.name[:128],
@@ -48,7 +41,7 @@ def process_torrent_file(torrent_file_path, user, save_dir=None):
             "pieces": t.pieces,
             "piece_size": t.piece_size,
             "magnet": str(t.magnet()),
-            "torrent_filename": os.path.relpath(save_path, settings.MEDIA_ROOT),  # Relative path for the DB
+            "torrent_filename": os.path.relpath(save_path, settings.MEDIA_ROOT),
             "file_list": [{"name": file.name, "size": file.size} for file in t.files],
             "file_count": len(t.files),
             "trackers": t.trackers

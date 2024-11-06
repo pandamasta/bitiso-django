@@ -58,7 +58,7 @@ class TorrentListView(ListView):
     model = Torrent
     template_name = 'torrents/torrent_list.html'
     context_object_name = 'torrents'
-    paginate_by = 10  # If you want to paginate torrents
+    paginate_by = 40  # If you want to paginate torrents
 
 
     def get_queryset(self):
@@ -161,7 +161,7 @@ def upload_local_torrent(request):
 
 
 @login_required
-def import_torrent_from_url(request, use_info_hash_folders=False):
+def import_torrent_from_url(request, use_info_hash_folders=True):
     if request.method == 'POST':
         form = URLDownloadForm(request.POST)
         if form.is_valid():
@@ -188,16 +188,13 @@ def import_torrent_from_url(request, use_info_hash_folders=False):
                 save_dir = determine_save_dir(info_hash, use_info_hash_folders)
 
                 # Process torrent file to get full metadata, using the specified save_dir
-                metadata = process_torrent_file(tmp_file_path, request.user, save_dir=save_dir)
+                metadata = process_torrent_file(tmp_file_path, save_dir=save_dir)
                 if not metadata:
                     messages.error(request, "Failed to process the torrent file.")
                     return redirect('dashboard')
 
-                # Save the torrent file
-                relative_path = metadata["torrent_filename"]  # Already set to the correct relative path
-
                 # Create the Torrent instance
-                torrent = create_torrent_instance(metadata, url, relative_path, request.user)
+                torrent = create_torrent_instance(metadata, url, metadata["torrent_filename"], request.user)
 
                 # Link trackers
                 _link_trackers_to_torrent(metadata["trackers"], torrent)
@@ -242,38 +239,18 @@ def download_torrent(url):
 
 
 def determine_save_dir(info_hash, use_info_hash_folders):
-    """Détermine le répertoire de sauvegarde pour les fichiers torrent."""
+    """Determines the directory for saving torrent files."""
     if use_info_hash_folders:
         subdir_1, subdir_2 = info_hash[:2], info_hash[2:4]
         torrent_dir = os.path.join(settings.MEDIA_TORRENT, subdir_1, subdir_2)
     else:
-        torrent_dir = settings.MEDIA_TORRENT  # Met tout dans le même dossier
+        torrent_dir = settings.MEDIA_TORRENT
     os.makedirs(os.path.join(settings.MEDIA_ROOT, torrent_dir), exist_ok=True)
     return torrent_dir
 
 
-def save_torrent_file(tmp_file_path, metadata, save_dir):
-    """Saves the processed torrent file and returns its relative path."""
-    # Define the path for the single torrent file
-    full_path = os.path.join(settings.MEDIA_ROOT, save_dir, f"{metadata['name']}.torrent")
-
-    # Check if file already exists and log message if so
-    if os.path.exists(full_path):
-        logger.info(f"Torrent file already exists at: {full_path}. Skipping save.")
-        return os.path.relpath(full_path, settings.MEDIA_ROOT)
-
-    # Save the torrent file
-    with open(full_path, "wb") as f:
-        with open(tmp_file_path, 'rb') as tmp_file:
-            f.write(tmp_file.read())
-
-    # Return the relative path
-    return os.path.relpath(full_path, settings.MEDIA_ROOT)
-
-
-
 def create_torrent_instance(metadata, url, torrent_filename, user):
-    """Crée et retourne une instance Torrent en base de données."""
+    """Creates and saves a Torrent instance in the database."""
     torrent = Torrent(
         info_hash=metadata["info_hash"],
         name=metadata["name"],
@@ -293,16 +270,13 @@ def create_torrent_instance(metadata, url, torrent_filename, user):
 
 
 def _link_trackers_to_torrent(trackers, torrent_obj):
-    """
-    Link each tracker URL to the Torrent object and set announce_priority.
-    """
+    """Link each tracker URL to the Torrent object and set announce_priority."""
     for level, tracker_list in enumerate(trackers):
         for tracker_url in tracker_list:
             if tracker_url:
                 try:
                     # Get or create the tracker by URL
                     tracker, created = Tracker.objects.get_or_create(url=tracker_url)
-                    # Link the tracker to the Torrent object
                     torrent_obj.trackers.add(tracker)
                     
                     # Set announce_priority directly for each tracker in TrackerStat
@@ -312,9 +286,9 @@ def _link_trackers_to_torrent(trackers, torrent_obj):
                     )
                     tracker_stat.announce_priority = level
                     tracker_stat.save()
-                    
-                    # Log the tracker link with announce_priority (level)
                     logger.debug(f"Linked tracker {tracker_url} to torrent {torrent_obj.name} with announce_priority {level}")
                 
                 except Exception as e:
                     logger.error(f"Failed to link tracker {tracker_url} to torrent {torrent_obj.name}: {e}")
+
+
