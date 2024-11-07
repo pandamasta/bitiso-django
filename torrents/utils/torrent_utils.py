@@ -107,12 +107,22 @@ def process_torrent_file(torrent_file_path, save_dir):
             t.trackers.append([custom_tracker])
             logger.info(f"Added custom tracker: {custom_tracker}")
 
-        # Save the processed file with specified save directory
+        # Define the save path using the save directory and name
         save_path = os.path.join(save_dir, f"{t.name}.torrent")
+        
+        # Check for an existing file and a corresponding instance
         if os.path.exists(save_path):
-            logger.info(f"File already exists at: {save_path}. Skipping save.")
-            return None
+            logger.info(f"File already exists at: {save_path}. Checking for corresponding database entry.")
+            if Torrent.objects.filter(info_hash=t.infohash).exists():
+                # If instance exists, skip saving as the torrent is fully imported
+                logger.info(f"Torrent with info_hash {t.infohash} already exists. Skipping save.")
+                return None
+            else:
+                # If instance doesn't exist, assume incomplete import and delete the existing file
+                logger.info(f"No database entry found for {t.infohash}. Deleting incomplete file at {save_path}.")
+                os.remove(save_path)
 
+        # Save the modified torrent file with custom trackers
         t.write(save_path)
         logger.info(f"Processed torrent file saved at: {save_path}")
 
@@ -132,4 +142,3 @@ def process_torrent_file(torrent_file_path, save_dir):
     except Exception as e:
         logger.error(f"Error processing torrent file: {e}")
         return None
-
