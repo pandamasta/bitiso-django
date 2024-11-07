@@ -36,7 +36,7 @@ class TrackerForm(forms.ModelForm):
 
 
 class FileUploadForm(forms.Form):
-    file = forms.FileField(label="Upload a .torrent file")
+    file = forms.FileField(label="Select a .torrent file")
 
 
 class URLDownloadForm(forms.Form):

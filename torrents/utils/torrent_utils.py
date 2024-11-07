@@ -5,10 +5,93 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from torrents.models import Torrent, Tracker
 from torrents.models import Tracker, TrackerStat
-import uuid
+from django.utils.text import slugify
+import requests
+from urllib.parse import urlparse
+import tempfile  
 
 # Set up logging
 logger = logging.getLogger(__name__)
+
+
+
+def extract_info_hash(torrent_file_path):
+    """Extracts the info_hash from a torrent file."""
+    try:
+        t = Torrenttorf.read(torrent_file_path)
+        return t.infohash
+    except Exception as e:
+        logger.error(f"Error extracting info_hash from torrent file: {e}")
+        return None
+
+
+def download_torrent(url):
+    """Download torrent file from an URL and return temp file """
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        original_filename = os.path.basename(urlparse(url).path) or "downloaded_torrent"
+        tmp_file_path = os.path.join(tempfile.gettempdir(), f"{original_filename}_temp.torrent")
+        with open(tmp_file_path, 'wb') as tmp_file:
+            tmp_file.write(response.content)
+        return tmp_file_path
+    except requests.RequestException as e:
+        logger.error(f"Error downloading torrent from {url}: {e}")
+        return None
+
+
+def determine_save_dir(info_hash, use_info_hash_folders):
+    """Determines the directory for saving torrent files."""
+    if use_info_hash_folders:
+        subdir_1, subdir_2 = info_hash[:2], info_hash[2:4]
+        torrent_dir = os.path.join(settings.MEDIA_TORRENT, subdir_1, subdir_2)
+    else:
+        torrent_dir = settings.MEDIA_TORRENT
+    os.makedirs(os.path.join(settings.MEDIA_ROOT, torrent_dir), exist_ok=True)
+    return torrent_dir
+
+
+def create_torrent_instance(metadata, url, torrent_filename, user):
+    """Creates and saves a Torrent instance in the database."""
+    torrent = Torrent(
+        info_hash=metadata["info_hash"],
+        name=metadata["name"],
+        slug=slugify(metadata["name"]),
+        torrent_filename=torrent_filename,
+        website_url_download=url,
+        user=user,
+        size=metadata["size"],
+        pieces=metadata["pieces"],
+        piece_size=metadata["piece_size"],
+        magnet=metadata["magnet"],
+        file_list=metadata["file_list"],
+        file_count=metadata["file_count"]
+    )
+    torrent.save()
+    return torrent
+
+
+def _link_trackers_to_torrent(trackers, torrent_obj):
+    """Link each tracker URL to the Torrent object and set announce_priority."""
+    for level, tracker_list in enumerate(trackers):
+        for tracker_url in tracker_list:
+            if tracker_url:
+                try:
+                    # Get or create the tracker by URL
+                    tracker, created = Tracker.objects.get_or_create(url=tracker_url)
+                    torrent_obj.trackers.add(tracker)
+                    
+                    # Set announce_priority directly for each tracker in TrackerStat
+                    tracker_stat, _ = torrent_obj.trackerstat_set.get_or_create(
+                        tracker=tracker,
+                        defaults={'announce_priority': level}
+                    )
+                    tracker_stat.announce_priority = level
+                    tracker_stat.save()
+                    logger.debug(f"Linked tracker {tracker_url} to torrent {torrent_obj.name} with announce_priority {level}")
+                
+                except Exception as e:
+                    logger.error(f"Failed to link tracker {tracker_url} to torrent {torrent_obj.name}: {e}")
 
 
 def process_torrent_file(torrent_file_path, save_dir):
@@ -50,19 +133,3 @@ def process_torrent_file(torrent_file_path, save_dir):
         logger.error(f"Error processing torrent file: {e}")
         return None
 
-# def _link_trackers_to_torrent(trackers, torrent_obj):
-#     """
-#     Link each tracker URL to the Torrent object with the specified level.
-#     """
-#     for level, sublist in enumerate(trackers):
-#         for tracker_url in sublist:
-#             if tracker_url:
-#                 tracker, created = Tracker.objects.get_or_create(url=tracker_url)
-#                 torrent_obj.trackers.add(tracker)
-#                 # Create or update TrackerStat with the level field
-#                 tracker_stat, _ = torrent_obj.trackerstat_set.get_or_create(
-#                     tracker=tracker, defaults={'level': level}
-#                 )
-#                 tracker_stat.level = level
-#                 tracker_stat.save()
-#                 logger.debug(f"Linked tracker {tracker_url} to torrent {torrent_obj.name} at level {level}")
