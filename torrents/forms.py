@@ -1,15 +1,16 @@
 # torrents/forms.py
 
 from django import forms
-from .models import Torrent, Project, Category, Tracker
+from django.core.exceptions import ValidationError
 
+from .models import Torrent, Project, Category, Tracker
+from django.conf import settings
 
 
 class TorrentForm(forms.ModelForm):
     class Meta:
         model = Torrent
         fields = ['name', 'slug', 'size', 'pieces', 'piece_size', 'magnet', 'torrent_filename', 'comment', 'category', 'file_list', 'file_count', 'is_active', 'description', 'website_url', 'website_url_download', 'website_url_repo', 'version']
-
 
 class ProjectForm(forms.ModelForm):
     class Meta:
@@ -23,7 +24,6 @@ class ProjectForm(forms.ModelForm):
                 raise forms.ValidationError("Image size should not exceed 2MB.")
         return image
 
-
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
@@ -35,9 +35,24 @@ class TrackerForm(forms.ModelForm):
         fields = ['url']
 
 
+# Ensure the max size is loaded from settings
+MAX_FILE_SIZE_MB = getattr(settings, 'MAX_FILE_SIZE_MB', 5)  # Default to 5 MB
+
 class FileUploadForm(forms.Form):
-    file = forms.FileField(label="Select a .torrent file")
+    file = forms.FileField(label="Select a torrent file")
 
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
 
+        # Check file extension for .torrent
+        if not file.name.endswith('.torrent'):
+            raise ValidationError("Only .torrent files are allowed.")
+
+        # Check file size limit
+        if file.size > MAX_FILE_SIZE_MB * 1024 * 1024:
+            raise ValidationError(f"File size must be under {MAX_FILE_SIZE_MB} MB.")
+
+        return file
+    
 class URLDownloadForm(forms.Form):
     url = forms.URLField(label="Download from URL", max_length=2000)

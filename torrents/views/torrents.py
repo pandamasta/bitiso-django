@@ -1,48 +1,27 @@
 # torrents/views/torrents.py
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.core.files.storage import FileSystemStorage
-import requests
-from urllib.parse import urlparse
-from django.core.files.base import ContentFile
 from django.contrib.auth.decorators import login_required
 import os
 import logging
-import hashlib
-import tempfile  # Import tempfile at the top of your file
+import tempfile  
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from torrents.utils.torrent_utils import process_torrent_file
-#from torrents.utils.torrent_utils import process_torrent_file, _link_trackers_to_torrent
 
-from ..models import Torrent,Tracker
+from ..models import Torrent
 from ..forms import TorrentForm
 from ..forms import URLDownloadForm
 from ..forms import FileUploadForm
 
+# from torrents.models import Torrent
 
-import os
-import tempfile
-import requests
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.conf import settings
-from torrents.models import Torrent, Tracker
-from torrents.utils.torrent_utils import process_torrent_file
-import logging
-import os
-import tempfile
-from django.conf import settings
-from django.shortcuts import redirect
-
-import requests
 from torf import Torrent as Torrenttorf
 
 from torrents.utils.torrent_utils import (
@@ -135,15 +114,16 @@ def upload_local_torrent(request):
     """
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
+
         if form.is_valid():
-            file = request.FILES['file']
-            tmp_file_path = os.path.join(tempfile.gettempdir(), file.name)
-            
+            file = form.cleaned_data['file']
+
             # Save the uploaded file temporarily
+            tmp_file_path = os.path.join(tempfile.gettempdir(), file.name)
             with open(tmp_file_path, 'wb+') as temp_file:
                 for chunk in file.chunks():
                     temp_file.write(chunk)
-            
+
             try:
                 # Extract info_hash to check if torrent already exists
                 info_hash = extract_info_hash(tmp_file_path)
@@ -183,7 +163,9 @@ def upload_local_torrent(request):
                 if os.path.exists(tmp_file_path):
                     os.remove(tmp_file_path)
 
-    form = FileUploadForm()
+    else:
+        form = FileUploadForm()
+
     return render(request, 'torrents/upload_local_torrent.html', {'form': form})
 
 @login_required

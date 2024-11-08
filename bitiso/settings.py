@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     'core.pages',
     'core.user_profiles',
     'bitiso_user_profiles',
-
     'torrents',
 
 ]
@@ -230,3 +229,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Absolute filesystem path to medi
 MEDIA_TORRENT = os.path.join(MEDIA_ROOT, 'torrents/')
 TRACKER_ANNOUNCE = "http://tracker.bitiso.org:6969"
 
+MAX_FILE_SIZE_MB = 10

@@ -9,10 +9,10 @@ from django.utils.text import slugify
 import requests
 from urllib.parse import urlparse
 import tempfile  
+from django.conf import settings
 
 # Set up logging
 logger = logging.getLogger(__name__)
-
 
 
 def extract_info_hash(torrent_file_path):
