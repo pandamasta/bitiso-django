@@ -3,12 +3,19 @@ from .models import Torrent, Category, Project, Tracker, TrackerStat
 
 @admin.register(Torrent)
 class TorrentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'size', 'file_count', 'is_active', 'category', 'created_at')  # Replace 'creation' with 'created_at'
+    list_display = ('name', 'slug',  'file_count', 'is_active', 'status', 'category', 'created_at')
     search_fields = ('name', 'slug', 'category__name')
-    list_filter = ('is_active', 'category')
+    list_filter = ('is_active', 'status', 'category')
     prepopulated_fields = {'slug': ('name',)}
-    date_hierarchy = 'created_at'  # Replace 'creation' with 'created_at'
-    ordering = ('-created_at',)  # Replace 'creation' with 'created_at'
+    date_hierarchy = 'created_at'
+    ordering = ('-created_at',)
+
+    # Make certain fields read-only to prevent editing
+    readonly_fields = ('info_hash', 'size', 'pieces', 'file_count', 'piece_size', 
+                       'torrent_file_path', 'created_at', 'updated_at')
+
+    # Optionally exclude fields if they should not appear in the admin form at all
+    exclude = ('magnet',)  # Example if you need to exclude fields entirely
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):

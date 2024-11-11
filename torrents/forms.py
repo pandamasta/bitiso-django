@@ -8,9 +8,20 @@ from django.conf import settings
 
 
 class TorrentForm(forms.ModelForm):
+    readonly_fields = ['info_hash', 'size', 'pieces', 'piece_size', 'file_list', 'file_count',
+                       'magnet', 'torrent_file_path', 'website_url_download', 'created_at', 'updated_at']
+
     class Meta:
         model = Torrent
-        fields = ['name', 'slug', 'size', 'pieces', 'piece_size', 'magnet', 'torrent_file_path', 'comment', 'category', 'file_list', 'file_count', 'is_active', 'description', 'website_url', 'website_url_download', 'website_url_repo', 'version']
+        fields = [
+            'name','slug', 'comment', 'category', 
+            'is_active', 'description', 'website_url', 
+            'website_url_repo', 'version'
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
 
 class ProjectForm(forms.ModelForm):
     class Meta:

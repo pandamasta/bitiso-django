@@ -85,7 +85,7 @@ class TorrentCreateView(LoginRequiredMixin,CreateView):
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
     
 # Update view: Form for editing an existing torrent
-class TorrentUpdateView(LoginRequiredMixin,UpdateView):
+class TorrentUpdateView(LoginRequiredMixin, UpdateView):
     model = Torrent
     form_class = TorrentForm
     template_name = 'torrents/torrent_form.html'
@@ -93,7 +93,13 @@ class TorrentUpdateView(LoginRequiredMixin,UpdateView):
 
     def get_object(self):
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
-    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pass the Torrent instance directly to the template as 'torrent' for read-only display
+        context['torrent'] = self.get_object()
+        return context
+
 # Delete view: Confirm and delete an existing torrent
 class TorrentDeleteView(LoginRequiredMixin,DeleteView):
     model = Torrent

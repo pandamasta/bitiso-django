@@ -5,11 +5,45 @@
 {% block content %}
     <h2>{% if form.instance.pk %}Edit Torrent{% else %}Create Torrent{% endif %}</h2>
 
+    {# Display read-only fields in a separate section at the top #}
+    <div class="readonly-section" style="margin-bottom: 20px; padding: 10px; border: 1px solid #393939; background-color: #1f1f1f;">
+        <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;">Read-Only Information</h3>
+
+        <div class="form-group">
+            <label><strong>Info Hash:</strong></label> {{ torrent.info_hash }}
+        </div>
+        <div class="form-group">
+            <label><strong>Name:</strong></label> {{ torrent.name }}
+        </div>
+        <div class="form-group">
+            <label><strong>Size:</strong></label> {{ torrent.size }}
+        </div>
+        <div class="form-group">
+            <label><strong>Torrent File Path:</strong></label> {{ torrent.torrent_file_path }}
+        </div>
+        <div class="form-group">
+            <label><strong>Website Download URL:</strong></label> {{ torrent.website_url_download }}
+        </div>
+        <div class="form-group">
+            <label><strong>Created At:</strong></label> {{ torrent.created_at }}
+        </div>
+        <div class="form-group">
+            <label><strong>Updated At:</strong></label> {{ torrent.updated_at }}
+        </div>
+    </div>
+
+    {# Editable form fields #}
     <form method="post">
         {% csrf_token %}
+
+        {# Render only editable fields from the form #}
         {{ form.as_p }}
-        <button type="submit">{% if form.instance.pk %}Update{% else %}Create{% endif %} Torrent</button>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+            {% if form.instance.pk %}Update{% else %}Create{% endif %} Torrent
+        </button>
     </form>
 
-    <a href="{% url 'torrent_list' %}">Back to list</a>
+    <a href="{% url 'torrent_list' %}" style="margin-top: 10px; display: inline-block;">Back to list</a>
+
 {% endblock %}
