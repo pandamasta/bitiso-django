@@ -28,13 +28,24 @@ ARCHITECTURE_CHOICES = [
     ('amd64', 'amd64'),
     ('arm64', 'ARM64'),
     ('arm', 'ARM'),
+    ('other', 'Other'),
+
 ]
 
 OS_CHOICES = [
     ('linux', 'Linux'),
     ('windows', 'Windows'),
     ('macos', 'MacOS'),
+    ('android', 'Android'),
     ('bsd', 'BSD'),
+]
+
+# Status choices for torrent
+STATUS_CHOICES = [
+    ('active', _("Active - visible to all")),
+    ('pending', _("Pending validation")),
+    ('blocked', _("Blocked")),
+    ('deleted', _("Deleted")),
 ]
 
 class Torrent(models.Model):
@@ -66,6 +77,7 @@ class Torrent(models.Model):
     category = models.ForeignKey('Category', verbose_name=_("Category"), null=True, on_delete=models.PROTECT)
     is_active = models.BooleanField(_("Show in the front end"), default=False)
     is_bitiso = models.BooleanField(_("Created by Bitiso?"), default=True)
+    status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default='pending')
     description = models.TextField(_("Description"), blank=True, null=True)
     website_url = models.URLField(_("Official website URL"), max_length=2000, blank=True, null=True)
     website_url_download = models.URLField(_("Download page URL"), max_length=2000, blank=True, null=True)
@@ -85,7 +97,6 @@ class Torrent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), blank=True, null=True)
-
     # Statistics
     seed_count = models.PositiveIntegerField(_("Number of seeds"), default=0)
     leech_count = models.PositiveIntegerField(_("Number of leeches"), default=0)
@@ -104,6 +115,7 @@ class Torrent(models.Model):
             models.Index(fields=['created_at']),
             models.Index(fields=['updated_at']),
             models.Index(fields=['is_active']),
+            models.Index(fields=['status']),
             models.Index(fields=['category']),
         ]
 
