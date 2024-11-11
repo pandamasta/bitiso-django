@@ -147,7 +147,7 @@ def upload_local_torrent(request):
                     return redirect('dashboard')
 
                 # Save torrent instance in the database
-                torrent = create_torrent_instance(metadata, "", metadata["torrent_filename"], request.user)
+                torrent = create_torrent_instance(metadata, "", metadata["torrent_file_path"], request.user)
 
                 # Link trackers to the torrent
                 _link_trackers_to_torrent(metadata["trackers"], torrent)
@@ -202,7 +202,7 @@ def import_torrent_from_url(request, use_info_hash_folders=True):
                     return redirect('dashboard')
 
                 # Create the Torrent instance
-                torrent = create_torrent_instance(metadata, url, metadata["torrent_filename"], request.user)
+                torrent = create_torrent_instance(metadata, url, metadata["torrent_file_path"], request.user)
 
                 # Link trackers
                 _link_trackers_to_torrent(metadata["trackers"], torrent)

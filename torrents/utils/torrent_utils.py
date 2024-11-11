@@ -51,13 +51,13 @@ def determine_save_dir(info_hash, use_info_hash_folders):
     return torrent_dir
 
 
-def create_torrent_instance(metadata, url, torrent_filename, user):
+def create_torrent_instance(metadata, url, torrent_file_path, user):
     """Creates and saves a Torrent instance in the database."""
     torrent = Torrent(
         info_hash=metadata["info_hash"],
         name=metadata["name"],
         slug=slugify(metadata["name"]),
-        torrent_filename=torrent_filename,
+        torrent_file_path=torrent_file_path,
         website_url_download=url,
         user=user,
         size=metadata["size"],
@@ -134,7 +134,7 @@ def process_torrent_file(torrent_file_path, save_dir):
             "pieces": t.pieces,
             "piece_size": t.piece_size,
             "magnet": str(t.magnet()),
-            "torrent_filename": os.path.relpath(save_path, settings.MEDIA_ROOT),
+            "torrent_file_path": os.path.relpath(save_path, settings.MEDIA_ROOT),
             "file_list": [{"name": file.name, "size": file.size} for file in t.files],
             "file_count": len(t.files),
             "trackers": t.trackers
