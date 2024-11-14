@@ -9,7 +9,7 @@ from django.conf import settings
 
 class TorrentForm(forms.ModelForm):
     readonly_fields = ['info_hash', 'size', 'pieces', 'piece_size', 'file_list', 'file_count',
-                       'magnet', 'torrent_file_path', 'website_url_download', 'created_at', 'updated_at']
+                       'magnet', 'torrent_file', 'website_url_download', 'created_at', 'updated_at']
 
     class Meta:
         model = Torrent

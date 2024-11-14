@@ -14,6 +14,7 @@ import tempfile
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from torrents.utils.torrent_utils import process_torrent_file
+from django.core.files import File
 
 from ..models import Torrent
 from ..forms import TorrentForm
@@ -153,7 +154,7 @@ def upload_local_torrent(request):
                     return redirect('dashboard')
 
                 # Save torrent instance in the database
-                torrent = create_torrent_instance(metadata, "", metadata["torrent_file_path"], request.user)
+                torrent = create_torrent_instance(metadata, "", File(open(metadata["torrent_file_path"], 'rb')), request.user)
 
                 # Link trackers to the torrent
                 _link_trackers_to_torrent(metadata["trackers"], torrent)

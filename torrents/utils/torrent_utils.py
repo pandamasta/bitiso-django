@@ -51,13 +51,13 @@ def determine_save_dir(info_hash, use_info_hash_folders):
     return torrent_dir
 
 
-def create_torrent_instance(metadata, url, torrent_file_path, user):
+def create_torrent_instance(metadata, url, torrent_file, user):
     """Creates and saves a Torrent instance in the database."""
     torrent = Torrent(
         info_hash=metadata["info_hash"],
         name=metadata["name"],
         slug=slugify(metadata["name"]),
-        torrent_file_path=torrent_file_path,
+        torrent_file=torrent_file,
         website_url_download=url,
         user=user,
         size=metadata["size"],

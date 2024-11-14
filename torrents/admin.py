@@ -12,7 +12,7 @@ class TorrentAdmin(admin.ModelAdmin):
 
     # Make certain fields read-only to prevent editing
     readonly_fields = ('info_hash', 'size', 'pieces', 'file_count', 'piece_size', 
-                       'torrent_file_path', 'created_at', 'updated_at')
+                       'torrent_file', 'created_at', 'updated_at')
 
     # Optionally exclude fields if they should not appear in the admin form at all
     exclude = ('magnet',)  # Example if you need to exclude fields entirely

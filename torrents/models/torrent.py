@@ -60,6 +60,7 @@ class Torrent(models.Model):
     piece_size = models.PositiveIntegerField(_("Piece size in bytes"), default=0)
     magnet = models.TextField(_("Magnet URI"), blank=True, null=True)
     torrent_file_path = models.CharField(_("Torrent file path"), max_length=512, blank=True, null=True)
+    torrent_file = models.FileField(_("Torrent file"), upload_to="torrents/", blank=True, null=True)
     comment = models.CharField(_("Comment"), max_length=256, blank=True, null=True)
     trackers = models.ManyToManyField('Tracker', through="TrackerStat")
     file_list = models.TextField(_("List of files"), blank=True, null=True)
@@ -129,17 +130,17 @@ class Torrent(models.Model):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        logger.info(f"Attempting to delete torrent file for {self.torrent_file_path}")
-        torrent_file_path = os.path.join(settings.MEDIA_ROOT, self.torrent_file_path)
-
-        if os.path.isfile(torrent_file_path):
-            try:
-                os.remove(torrent_file_path)
-                logger.info(f"File {self.torrent_file_path} deleted successfully.")
-            except Exception as e:
-                logger.error(f"Failed to delete file {self.torrent_file_path}: {e}")
-        else:
-            logger.warning(f"File {self.torrent_file_path} does not exist at path: {torrent_file_path}")
-
+        # Use the path directly from the FileField
+        if self.torrent_file and self.torrent_file.path:
+            logger.info(f"Attempting to delete torrent file for {self.torrent_file.path}")
+            if os.path.isfile(self.torrent_file.path):
+                try:
+                    os.remove(self.torrent_file.path)
+                    logger.info(f"File {self.torrent_file.path} deleted successfully.")
+                except Exception as e:
+                    logger.error(f"Failed to delete file {self.torrent_file.path}: {e}")
+            else:
+                logger.warning(f"File {self.torrent_file.path} does not exist.")
+        
         super().delete(*args, **kwargs)
-        logger.info(f"Torrent object {self.torrent_file_path} deleted from database.")
+        logger.info(f"Torrent object {self.torrent_file} deleted from database.")

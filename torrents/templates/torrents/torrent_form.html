@@ -19,7 +19,12 @@
             <label><strong>Size:</strong></label> {{ torrent.size }}
         </div>
         <div class="form-group">
-            <label><strong>Torrent File Path:</strong></label> {{ torrent.torrent_file_path }}
+            <label><strong>Torrent File Path:</strong></label>
+            {% if torrent.torrent_file %}
+                <a href="{{ torrent.torrent_file.url }}">{{ torrent.torrent_file.name }}</a>
+            {% else %}
+                <p>No file uploaded</p>
+            {% endif %}
         </div>
         <div class="form-group">
             <label><strong>Website Download URL:</strong></label> {{ torrent.website_url_download }}
