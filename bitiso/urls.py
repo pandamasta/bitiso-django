@@ -6,11 +6,15 @@ from django.urls import path, include
 from core.pages.views import HomePageView, PageDetailView, PageUpdateView, redirect_to_language_home
 from django.conf.urls.static import static
 from django.conf import settings
+from torrents.views.torrents import serve_torrent_file
 
 
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),  # Language switcher
     path('', redirect_to_language_home),  # Redirect root URL to language-specific home page
+    
+    # Add serve_torrent_file outside i18n_patterns to avoid language prefix
+    path('t/<path:filename>', serve_torrent_file, name='serve_torrent_file'),
 ] 
 
 # Serving static and media files in development
@@ -31,7 +35,7 @@ urlpatterns += i18n_patterns(
     path('projects/', include('torrents.urls.projects')),  # Project URLs
     path('categories/', include('torrents.urls.categories')),  # Category URLs
     path('trackers/', include('torrents.urls.trackers')),  # Tracker URLs
-        
+    
     # Pages URL patterns
     path('<slug:slug>/', PageDetailView.as_view(), name='page_detail'),
     path('<slug:slug>/edit/', PageUpdateView.as_view(), name='page_edit'),  # Ensure consistency here

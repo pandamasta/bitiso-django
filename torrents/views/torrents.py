@@ -15,6 +15,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from torrents.utils.torrent_utils import process_torrent_file
 from django.core.files import File
+from django.http import FileResponse, Http404
 
 from ..models import Torrent
 from ..forms import TorrentForm
@@ -73,6 +74,12 @@ class TorrentDetailView(DetailView):
         # Add tracker details to the context (assuming a reverse relation through `TrackerStat`)
         context['tracker_detail'] = torrent.trackerstat_set.all()
 
+        # Add the base filename to the context
+        if torrent.torrent_file:
+            context['filename'] = os.path.basename(torrent.torrent_file.name)
+        else:
+            context['filename'] = None
+
         return context
 
 # Create view: Form for uploading a new torrent
@@ -115,9 +122,31 @@ class TorrentDeleteView(LoginRequiredMixin,DeleteView):
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
     
 
-    #############
+#
+# Rewrite the access to .torrent
+#
 
+def serve_torrent_file(request, filename):
+    try:
+        # Find the torrent object by filename
+        torrent = Torrent.objects.get(torrent_file__icontains=filename)
 
+        # Serve the file using FileResponse, automatically handles file opening and closing
+        return FileResponse(open(torrent.torrent_file.path, 'rb'), content_type='application/x-bittorrent')
+    
+    except Torrent.DoesNotExist:
+        logger.error(f"Torrent with filename {filename} not found.")
+        raise Http404("File not found.")
+    except FileNotFoundError:
+        logger.error(f"File for torrent {filename} does not exist on the server.")
+        raise Http404("File not found.")
+    except Exception as e:
+        logger.error(f"Error serving torrent {filename}: {str(e)}")
+        raise Http404("An unexpected error occurred.")
+
+#
+# Upload torrent views
+#
 @login_required
 def upload_local_torrent(request):
     """

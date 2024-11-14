@@ -13,11 +13,13 @@
     <p>Description: {{ torrent.description|default:"N/A" }}</p>
     <p>
         Torrent File: 
-        {% if torrent.torrent_file %}
-            <a href="{{ torrent.torrent_file.url }}">{{ torrent.torrent_file.name }}</a>
-        {% else %}
-            N/A
-        {% endif %}
+    {% if filename %}
+        <a href="{% url 'serve_torrent_file' filename=filename %}">
+            {{ filename }}
+        </a>
+    {% else %}
+        N/A
+    {% endif %}
     </p>
     <p>
         Magnet Link: 
