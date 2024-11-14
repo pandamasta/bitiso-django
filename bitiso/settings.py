@@ -162,6 +162,10 @@ LANGUAGES = [
     ('fr', 'French'), 
 ]
 
+MODELTRANSLATION_FALLBACK_LANGUAGES = {
+    'default': ('en',),  # Default fallback to English
+}
+
 # Path to translation files
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
