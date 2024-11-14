@@ -82,6 +82,10 @@ class TorrentCreateView(LoginRequiredMixin,CreateView):
     template_name = 'torrents/torrent_form.html'
     success_url = reverse_lazy('torrent_list')  # Redirect to torrent list after successful creation
 
+    # Vérification : seul le propriétaire peut éditer le torrent
+    # if torrent.user != request.user:
+    #     return HttpResponseForbidden("Vous n'êtes pas autorisé à modifier ce torrent.")
+    
     def get_object(self):
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
     
