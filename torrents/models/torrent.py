@@ -59,7 +59,6 @@ class Torrent(models.Model):
     pieces = models.PositiveIntegerField(_("Number of pieces"), default=1)
     piece_size = models.PositiveIntegerField(_("Piece size in bytes"), default=0)
     magnet = models.TextField(_("Magnet URI"), blank=True, null=True)
-    torrent_file_path = models.CharField(_("Torrent file path"), max_length=512, blank=True, null=True)
     torrent_file = models.FileField(_("Torrent file"), upload_to="torrents/", blank=True, null=True)
     comment = models.CharField(_("Comment"), max_length=256, blank=True, null=True)
     trackers = models.ManyToManyField('Tracker', through="TrackerStat")
@@ -71,7 +70,7 @@ class Torrent(models.Model):
     os = models.CharField(_("Operating System"), max_length=10, choices=OS_CHOICES, blank=True, null=True)
 
     # GPG Signature Path
-    gpg_signature_path = models.CharField(_("GPG signature path"), max_length=512, blank=True, null=True)
+    gpg_signature = models.FileField(_("GPG signature file"), upload_to="torrents/", blank=True, null=True)
     is_signed = models.BooleanField(_("Is signed"), default=False)
 
     # Descriptive fields
@@ -130,17 +129,29 @@ class Torrent(models.Model):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        # Use the path directly from the FileField
+        # Delete torrent file if it exists
         if self.torrent_file and self.torrent_file.path:
-            logger.info(f"Attempting to delete torrent file for {self.torrent_file.path}")
+            logger.info(f"Attempting to delete torrent file at {self.torrent_file.path}")
             if os.path.isfile(self.torrent_file.path):
                 try:
                     os.remove(self.torrent_file.path)
-                    logger.info(f"File {self.torrent_file.path} deleted successfully.")
+                    logger.info(f"Torrent file {self.torrent_file.path} deleted successfully.")
                 except Exception as e:
-                    logger.error(f"Failed to delete file {self.torrent_file.path}: {e}")
+                    logger.error(f"Failed to delete torrent file {self.torrent_file.path}: {e}")
             else:
-                logger.warning(f"File {self.torrent_file.path} does not exist.")
-        
+                logger.warning(f"Torrent file {self.torrent_file.path} does not exist.")
+
+        # Delete GPG signature file if it exists
+        if self.gpg_signature and self.gpg_signature.path:
+            logger.info(f"Attempting to delete GPG signature file at {self.gpg_signature.path}")
+            if os.path.isfile(self.gpg_signature.path):
+                try:
+                    os.remove(self.gpg_signature.path)
+                    logger.info(f"GPG signature file {self.gpg_signature.path} deleted successfully.")
+                except Exception as e:
+                    logger.error(f"Failed to delete GPG signature file {self.gpg_signature.path}: {e}")
+            else:
+                logger.warning(f"GPG signature file {self.gpg_signature.path} does not exist.")
+
         super().delete(*args, **kwargs)
-        logger.info(f"Torrent object {self.torrent_file} deleted from database.")
+        logger.info(f"Torrent object with files {self.torrent_file} and {self.gpg_signature} deleted from database.")
