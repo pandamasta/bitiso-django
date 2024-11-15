@@ -7,6 +7,7 @@ class License(models.Model):
     """
     name = models.CharField(_("License name"), max_length=100)
     description = models.TextField(_("License description"), blank=True, default='')
+    website_url = models.URLField(_("Official website URL"), max_length=2000, blank=True, null=True)
 
     class Meta:
         verbose_name = _("License")

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Torrent, Category, Project, Tracker, TrackerStat
+from .models import Torrent, Category, Project, Tracker, TrackerStat, License
 
 @admin.register(Torrent)
 class TorrentAdmin(admin.ModelAdmin):
@@ -28,10 +28,17 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_active', 'user', 'created_at')  # Replace 'creation' with 'created_at'
+    list_display = ('name', 'is_active', 'description','user', 'created_at')  # Replace 'creation' with 'created_at'
     search_fields = ('name', 'user__username')
     list_filter = ('is_active',)
     ordering = ('-created_at',)  # Replace 'creation' with 'created_at'
+
+
+@admin.register(License)
+class LicenseAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description','website_url')
+    search_fields = ('name',)
+    ordering = ('name',)
 
 
 @admin.register(Tracker)

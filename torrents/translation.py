@@ -11,7 +11,7 @@ class CategoryTranslationOptions(TranslationOptions):
 
 @register(License)
 class LicenseTranslationOptions(TranslationOptions):
-    fields = ('description',)
+    fields = ('description','website_url')
 
 @register(Project)
 class ProjectTranslationOptions(TranslationOptions):

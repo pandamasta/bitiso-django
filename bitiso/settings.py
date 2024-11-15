@@ -162,9 +162,9 @@ LANGUAGES = [
     ('fr', 'French'), 
 ]
 
-MODELTRANSLATION_FALLBACK_LANGUAGES = {
-    'default': ('en',),  # Default fallback to English
-}
+# MODELTRANSLATION_FALLBACK_LANGUAGES = {
+#     'default': ('en',),  # Default fallback to English
+# }
 
 # Path to translation files
 LOCALE_PATHS = [
@@ -231,6 +231,7 @@ MEDIA_URL = '/media/'  # URL to serve media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Absolute filesystem path to media directory
 
 MEDIA_TORRENT = os.path.join(MEDIA_ROOT, 'torrents/')
-TRACKER_ANNOUNCE = "http://tracker.bitiso.org:6969"
+TRACKER_ANNOUNCE = os.getenv('TRACKER_ANNOUNCE', '').split(',')
+
 
 MAX_FILE_SIZE_MB = 10
