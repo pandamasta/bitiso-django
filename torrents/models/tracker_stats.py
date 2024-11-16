@@ -11,7 +11,7 @@ class TrackerStat(models.Model):
     """
     torrent = models.ForeignKey(Torrent, on_delete=models.CASCADE)
     tracker = models.ForeignKey(Tracker, on_delete=models.CASCADE)
-    announce_priority = models.IntegerField(_("Announce priority"), default=0)
+    announce_priority = models.IntegerField(_("Announce priority"), default=0) #level
     seed = models.PositiveIntegerField(_("Number of seeds"), default=0)
     leech = models.PositiveIntegerField(_("Number of leeches"), default=0)
     complete = models.PositiveIntegerField(_("Complete"), default=0)
