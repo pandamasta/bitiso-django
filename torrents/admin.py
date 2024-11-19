@@ -3,7 +3,7 @@ from .models import Torrent, Category, Project, Tracker, TrackerStat, License
 
 @admin.register(Torrent)
 class TorrentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug',  'file_count', 'is_active', 'status', 'category', 'created_at')
+    list_display = ('name', 'slug',  'file_count', 'is_active', 'status', 'torrent_file', 'project', 'category', 'created_at')
     search_fields = ('name', 'slug', 'category__name')
     list_filter = ('is_active', 'status', 'category')
     prepopulated_fields = {'slug': ('name',)}
