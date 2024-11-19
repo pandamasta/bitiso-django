@@ -9,20 +9,37 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         },
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
+            'propagate': False,
         },
-        'torrents': {  # Logger for your torrents app
+        'torrents': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'tracker_scraper': {  # Suppress unnecessary warnings
+            'handlers': ['console'],
+            'level': 'ERROR',  # Only log ERROR or higher from tracker_scraper
+            'propagate': False,
         },
     },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
 }
+
 
 """
 Django settings for bitiso project.

@@ -5,10 +5,16 @@ import socket
 import logging
 from django.utils.timezone import now
 
+# Set up basic logging configuration
+logging.basicConfig(
+    level=logging.INFO,  # Only log messages at INFO level or higher
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
+)
+
 logger = logging.getLogger(__name__)
 
-SOCKET_TIMEOUT = 5
 
+SOCKET_TIMEOUT = 5
 
 class Command(BaseCommand):
     help = "Check connectivity for all trackers and update their reachability status."
