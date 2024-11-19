@@ -13,14 +13,17 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-
 SOCKET_TIMEOUT = 5
+
 
 class Command(BaseCommand):
     help = "Check connectivity for all trackers and update their reachability status."
 
     def handle(self, *args, **options):
-        trackers = Tracker.objects.all()
+        # Prefetch trackers to avoid redundant queries
+        trackers = list(Tracker.objects.all())
+        logger.info(f"Checking connectivity for {len(trackers)} trackers.")
+
         for tracker in trackers:
             self.check_connectivity(tracker)
 
@@ -32,20 +35,29 @@ class Command(BaseCommand):
         port = parsed_url.port or (443 if scheme == 'https' else 80)
 
         if scheme == 'udp':
-            # Assume UDP trackers are reachable unless proven otherwise
-            tracker.is_reachable = True
-            logger.warning(f"Skipping connectivity check for UDP tracker: {tracker.url}. Marked as reachable by default.")
-        else:
-            try:
-                conn = socket.create_connection((host, port), timeout=SOCKET_TIMEOUT)
-                conn.close()
-                tracker.is_reachable = True
-                tracker.last_seen = now()
-                tracker.last_try = now()
-                logger.info(f"Tracker {tracker.url} is reachable.")
-            except (socket.timeout, OSError) as e:
-                tracker.is_reachable = False
-                tracker.last_try = now()
-                logger.warning(f"Tracker {tracker.url} is not reachable: {e}")
+            # Skip UDP connectivity checks, mark as reachable
+            Tracker.objects.filter(id=tracker.id).update(is_reachable=True)
+            logger.info(f"Skipping connectivity check for UDP tracker: {tracker.url}. Marked as reachable by default.")
+            return
 
-        tracker.save()
+        try:
+            # Attempt to connect to the tracker
+            conn = socket.create_connection((host, port), timeout=SOCKET_TIMEOUT)
+            conn.close()
+
+            # Update tracker as reachable
+            Tracker.objects.filter(id=tracker.id).update(
+                is_reachable=True,
+                last_seen=now(),
+                last_try=now()
+            )
+            logger.info(f"Tracker {tracker.id} ({tracker.url}) is reachable.")
+
+        except (socket.timeout, OSError) as e:
+            # Update tracker as not reachable
+            Tracker.objects.filter(id=tracker.id).update(
+                is_reachable=False,
+                last_try=now()
+            )
+            logger.warning(f"Tracker {tracker.id} ({tracker.url}) is not reachable: {e}")
+
