@@ -43,13 +43,13 @@ class LicenseAdmin(admin.ModelAdmin):
 
 @admin.register(Tracker)
 class TrackerAdmin(admin.ModelAdmin):
-    list_display = ('url',)
+    list_display = ('url','is_reachable','is_scrapable','last_try_date','last_successful_scrape','failed_attempts')
     search_fields = ('url',)
     ordering = ('url',)
 
 @admin.register(TrackerStat)
 class TrackerStatAdmin(admin.ModelAdmin):
-    list_display = ('torrent', 'tracker', 'seed', 'leech', 'complete')
+    list_display = ('torrent', 'tracker', 'seed', 'leech', 'complete','last_scrape_attempt','last_successful_scrape')
     search_fields = ('torrent__name', 'tracker__url')
     ordering = ('torrent',)
 
