@@ -37,25 +37,42 @@ class Command(BaseCommand):
         tracker_url = options.get('tracker')
         specific_hash = options.get('hash')
 
+        trackers_processed = 0
+        trackers_skipped = 0
+        torrents_updated = 0
+
         if tracker_url:
             try:
                 tracker = Tracker.objects.get(url=tracker_url)
                 logger.info(f"Processing single tracker: {tracker.url}")
-                self.process_tracker(tracker, specific_hash)
+                torrents_updated += self.process_tracker(tracker, specific_hash)
+                trackers_processed += 1
             except Tracker.DoesNotExist:
                 logger.error(f"Tracker with URL {tracker_url} does not exist.")
         else:
             logger.info("Processing all trackers...")
             trackers = Tracker.objects.all()
             for tracker in trackers:
-                self.process_tracker(tracker, specific_hash)
+                result = self.process_tracker(tracker, specific_hash)
+                if result == -1:
+                    trackers_skipped += 1
+                else:
+                    trackers_processed += 1
+                    torrents_updated += result
+
+        # Add summary logs
+        logger.info("Scraping completed.")
+        logger.info(f"Summary:")
+        logger.info(f"- Trackers processed: {trackers_processed}")
+        logger.info(f"- Trackers skipped: {trackers_skipped}")
+        logger.info(f"- Torrents updated: {torrents_updated}")
 
     def process_tracker(self, tracker, specific_hash=None):
         """Process scraping for a single tracker."""
         # Skip trackers marked as not scrapable and within retry interval
         if not tracker.is_scrapable and tracker.last_try_date and tracker.last_try_date > now() - MAX_RETRIES_INTERVAL:
             logger.info(f"Skipping tracker {tracker.url} as it's marked not scrapable and retry interval hasn't passed.")
-            return
+            return -1
 
         # Update the last_try_date
         tracker.last_try_date = now()
@@ -66,12 +83,12 @@ class Command(BaseCommand):
             logger.warning(f"Tracker {tracker.url} is not reachable. Marking as not scrapable.")
             tracker.is_scrapable = False
             tracker.save()
-            return
+            return -1
 
         hashes = self.get_hashes_for_tracker(tracker, specific_hash)
         if not hashes:
             logger.info(f"No torrents found for tracker: {tracker.url}")
-            return
+            return 0
 
         logger.debug(f"Starting scrape for tracker: {tracker.url} with {len(hashes)} hashes.")
 
@@ -87,32 +104,34 @@ class Command(BaseCommand):
                 logger.warning(f"Timeout while scraping tracker: {tracker.url}")
                 tracker.is_scrapable = False
                 tracker.save()
-                return
+                return 0
             except BencodeDecodeError:
                 logger.warning(f"Invalid bencoded data received from tracker: {tracker.url}")
                 tracker.is_scrapable = False
                 tracker.save()
-                return
+                return 0
             except (ConnectionRefusedError, urllib3.exceptions.NewConnectionError) as e:
                 logger.warning(f"Network error with tracker {tracker.url}: {e}")
                 tracker.is_scrapable = False
                 tracker.save()
-                return
+                return 0
             except Exception as e:
                 logger.error(f"Unexpected error while scraping tracker {tracker.url}: {e}")
                 tracker.is_scrapable = False
                 tracker.save()
-                return
+                return 0
 
         if scrape_results:
             logger.info(f"Scrape completed for tracker: {tracker.url}. Updating stats...")
-            self.update_tracker_stats(tracker.id, scrape_results)
+            updated_count = self.update_tracker_stats(tracker.id, scrape_results)
             tracker.is_scrapable = True
+            tracker.save()
+            return updated_count
         else:
             logger.warning(f"No scrape results received for tracker: {tracker.url}. Marking as not scrapable.")
             tracker.is_scrapable = False
-
-        tracker.save()
+            tracker.save()
+            return 0
 
     def is_tracker_reachable(self, tracker):
         """Test if a tracker is reachable using a socket connection."""
@@ -148,6 +167,10 @@ class Command(BaseCommand):
         """Update TrackerStat and Torrent models with scrape results."""
         tracker_stats_to_update = []
         torrents_to_update = []
+        torrents_updated = 0
+
+        # Fetch the tracker URL for logging purposes
+        tracker_url = Tracker.objects.get(id=tracker_id).url
 
         for info_hash, stats in scrape_results.items():
             try:
@@ -162,6 +185,7 @@ class Command(BaseCommand):
                 torrent_obj.seed_count = stats.get("seeds", 0)
                 torrent_obj.leech_count = stats.get("peers", 0)
                 torrents_to_update.append(torrent_obj)
+                torrents_updated += 1
 
                 logger.debug(f"Updated stats for hash: {info_hash}")
             except Torrent.DoesNotExist:
@@ -171,8 +195,10 @@ class Command(BaseCommand):
 
         if tracker_stats_to_update:
             TrackerStat.objects.bulk_update(tracker_stats_to_update, ["seed", "leech", "complete"])
-            logger.info(f"Updated {len(tracker_stats_to_update)} TrackerStat records for tracker {tracker_id}")
+            logger.info(f"Updated {len(tracker_stats_to_update)} TrackerStat records for tracker {tracker_url}")
 
         if torrents_to_update:
             Torrent.objects.bulk_update(torrents_to_update, ["seed_count", "leech_count"])
-            logger.info(f"Updated {len(torrents_to_update)} Torrent records.")
+            logger.info(f"Updated {len(torrents_to_update)} Torrent records for tracker {tracker_url}")
+
+        return torrents_updated
