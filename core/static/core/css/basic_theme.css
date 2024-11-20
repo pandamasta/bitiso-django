@@ -31,6 +31,19 @@ footer {
     text-align: center;
 }
 
+/* Torrent */
+
+.seed {
+	background-color: transparent;
+	color: #6dff69;
+}
+
+.leech {
+	background-color: transparent;
+	color: #ff2f2f;
+	
+}
+
 /* Front end categorie */
 
 .category-list ul {

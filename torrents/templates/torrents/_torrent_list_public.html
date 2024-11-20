@@ -27,8 +27,8 @@
                     </td>
                     <td>{{ torrent.size | filesizeformat }}</td>
                     <td>{{ torrent.created_at| date:"Y-m-d"  }}</td>
-                    <td>{{ torrent.seed_count }}</td>
-                    <td>{{ torrent.leech_count }}</td>
+                    <td class="seed">{{ torrent.seed_count }}</td>
+                    <td class="leech"> {{ torrent.leech_count }}</td>
                     <td>{{ torrent.category }}</td>
                     <td>{{ torrent.project }}</td>
                 </tr>
