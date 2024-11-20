@@ -65,10 +65,11 @@ def user_torrents(request):
 
 @login_required
 def user_projects(request):
-    # Get all projects for the current user, regardless of active status, and annotate active torrent count
-    user_projects = Project.objects.filter(user=request.user).annotate(
-        torrent_count=Count('torrents', filter=Q(torrents__is_active=True))
-    )
+    """
+    Get all projects for the current user, regardless of active status.
+    Use the pre-calculated torrent_count field.
+    """
+    user_projects = Project.objects.filter(user=request.user)
 
     return render(request, 'bitiso_user_profiles/projects.html', {'user_projects': user_projects})
 

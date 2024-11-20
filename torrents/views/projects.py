@@ -18,22 +18,25 @@ class ProjectListView(ListView):
     context_object_name = 'projects'
 
     def get_queryset(self):
-        # Return only active projects (is_active=True) and annotate with the torrent count
-        return Project.objects.filter(is_active=True).annotate(torrent_count=Count('torrents'))
+        """
+        Return only active projects (is_active=True) without dynamic annotations.
+        """
+        return Project.objects.filter(is_active=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Retrieve categories and group projects under each category
         categories = Category.objects.all()
         context['categories'] = categories
-        # For each category, filter active projects and annotate torrent counts
+        # For each category, filter active projects using the pre-calculated torrent_count field
         category_projects = {
-            category: Project.objects.filter(category=category, is_active=True).annotate(torrent_count=Count('torrents'))
+            category: Project.objects.filter(category=category, is_active=True)
             for category in categories
         }
         context['category_projects'] = category_projects
         return context
-    
+
+
 class ProjectDetailView(DetailView):
     model = Project
     template_name = 'torrents/project_detail.html'
