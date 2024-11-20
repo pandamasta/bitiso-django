@@ -11,6 +11,7 @@ import os
 from core.utils import resize_and_save_images
 from ..models.category import Category
 from ..models.license import License
+from django.utils.html import format_html
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -31,7 +32,8 @@ class Project(models.Model):
     website_url_repo = models.URLField(_("Repository URL"), max_length=2000, blank=True)
     category = models.ForeignKey(Category, verbose_name=_("Category"), null=True, on_delete=models.PROTECT)  # Assign category at project level
     license = models.ForeignKey(License, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Default license"))
-
+    torrent_count = models.PositiveIntegerField(default=0, verbose_name="Number of Torrents")  
+    
     # Image fields
     image = models.ImageField(upload_to='img/project/original/', null=True, blank=True, default='')
     mini_image = models.ImageField(upload_to='img/project/mini/', blank=True, default='')
@@ -68,3 +70,12 @@ class Project(models.Model):
                 'large': (300, 300),
             })
 
+    def small_image_tag(self):
+        """
+        Returns an HTML img tag for the small image, to be displayed in the admin interface.
+        """
+        if self.small_image:
+            return format_html('<img src="{}" width="40" height="40" />', self.small_image.url)
+        return "No Image"
+
+    small_image_tag.short_description = "Small Image"  # Column header in admin

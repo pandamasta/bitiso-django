@@ -25,14 +25,20 @@ class CategoryAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
-
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_active', 'description','user', 'created_at')  # Replace 'creation' with 'created_at'
+    """
+    Custom admin configuration for Project model.
+    """
+    list_display = (
+        'name','small_image_tag', 'is_active', 'torrent_count', 
+        'description', 'category', 'license',
+        'website_url', 'website_url_download', 'website_url_repo',
+        'user', 'created_at'
+    )
     search_fields = ('name', 'user__username')
     list_filter = ('is_active',)
-    ordering = ('-created_at',)  # Replace 'creation' with 'created_at'
-
+    ordering = ('-created_at',)
 
 @admin.register(License)
 class LicenseAdmin(admin.ModelAdmin):

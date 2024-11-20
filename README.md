@@ -28,9 +28,6 @@
 - Customizable notifications and preferences.
 - API to fetch liked torrents from user profiles (Coming Soon).
 
-### 🌑 Dark Mode *(Optional, In Progress)*
-- Light and dark themes for better accessibility.
-
 ## 📈 Coming Soon...
 - **Advanced Torrent Management:** Bonus points, ratio tracking, and gamification.
 - **Moderation & RBAC:** Content moderation and admin roles.
@@ -42,7 +39,7 @@
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/django-bitiso.git
+   git clone https://github.com/pandamasta/bitiso-django.git
    cd django-bitiso
    ```
 2. Install dependencies:
