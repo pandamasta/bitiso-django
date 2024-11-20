@@ -20,8 +20,7 @@ class Command(BaseCommand):
     help = "Check connectivity for all trackers and update their reachability status."
 
     def handle(self, *args, **options):
-        # Prefetch trackers to avoid redundant queries
-        trackers = list(Tracker.objects.all())
+        trackers = list(Tracker.objects.filter(is_reachable_mode=Tracker.AUTOMATIC))
         logger.info(f"Checking connectivity for {len(trackers)} trackers.")
 
         for tracker in trackers:

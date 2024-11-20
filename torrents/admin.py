@@ -43,9 +43,9 @@ class LicenseAdmin(admin.ModelAdmin):
 
 @admin.register(Tracker)
 class TrackerAdmin(admin.ModelAdmin):
-    list_display = ('url','is_reachable','last_seen','is_scrapable','last_try')
+    list_display = ('url', 'last_seen','is_reachable', 'is_scrapable', 'is_reachable_mode', 'is_scrapable_mode')
+    list_filter = ('is_reachable', 'is_reachable_mode', 'is_scrapable', 'is_scrapable_mode')
     search_fields = ('url',)
-    ordering = ('url',)
 
 @admin.register(TrackerStat)
 class TrackerStatAdmin(admin.ModelAdmin):
