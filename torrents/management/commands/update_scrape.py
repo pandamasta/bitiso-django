@@ -5,14 +5,13 @@ from ...models.tracker import Tracker
 from django.utils.timezone import now
 import logging
 
+# Set up basic logging configuration
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler()]  # Single terminal handler
+    level=logging.INFO,  # Only log messages at INFO level or higher
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
 )
 
 logger = logging.getLogger(__name__)
-
 
 SUCCESS_THRESHOLD = 10  # Percentage threshold for determining scrapability
 
