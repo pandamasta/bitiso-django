@@ -1,46 +1,67 @@
-bitiso/
-├── bitiso/                       # Core project files
-│   ├── settings.py               # Updated with I18N settings
-│   ├── urls.py                   # Main URL configuration
-│   ├── wsgi.py                   # WSGI configuration
-│   └── asgi.py                   # ASGI configuration
-├── accounts/                     # User authentication and management
-│   ├── models.py                 # Custom user model
-│   ├── views.py                  # Registration, login, 2FA
-│   ├── forms.py                  # User forms
-│   ├── urls.py                   # Account URLs
-│   ├── templates/                # Translatable templates
-│   └── signals.py                # Account signals
-├── torrents/                     # Torrent management
-│   ├── models/                   # Models including translations
-│   ├── views.py                  # Upload, search, management
-│   ├── forms.py                  # Torrent forms
-│   ├── filters.py                # Search and filtering logic
-│   ├── urls.py                   # Torrent URLs
-│   ├── templates/                # Translatable templates
-├── user_profiles/                # User profiles and stats
-│   ├── models.py                 # Profile models
-│   ├── views.py                  # Profile views
-│   ├── templates/                # Translatable templates
-│   ├── urls.py                   # Profile URLs
-├── moderation/                   # Moderation tools
-│   ├── models.py                 # Moderation models
-│   ├── views.py                  # Moderation views
-│   ├── templates/                # Translatable templates
-│   └── urls.py                   # Moderation URLs
-├── pages/                        # Dynamic pages with I18N
-│   ├── models.py                 # Page models with translations
-│   ├── views.py                  # Page rendering
-│   ├── templates/                # Translatable templates
-│   └── urls.py                   # Page URLs
-├── gpg/                          # GPG functionality
-│   ├── models.py                 # GPG models
-│   ├── views.py                  # Key management, signing
-│   ├── services.py               # GPG logic
-│   ├── forms.py                  # GPG forms
-│   ├── templates/                # Translatable templates
-│   └── urls.py                   # GPG URLs
-├── locale/                       # Directory for translation files
-├── static/                       # Static files
-├── media/                        # Media files
-└── manage.py                     # Django management script
+# 🌐 Django-Bitiso
+
+**Django-Bitiso** is a Django-based platform designed to manage and share torrents, offering advanced features like tracker scraping and user management.
+
+## 🚀 Features
+
+### 📤 Torrent Upload
+- Upload torrents directly through the user interface.
+- Organize your torrents by categories and projects.
+
+### 📥 Torrent Download
+- Import torrents from external sources.
+- Support for `.torrent` files and Magnet links.
+
+### 🔍 Tracker Scraping
+- Scrape tracker data for efficient torrent management.
+- Automatically update statistics (seed, leech, etc.).
+
+### 🌎 Multilingual Support
+- Fully localized in English and French.
+- Looking for contributors to help with additional translations! 🌟
+
+### 🔒 GPG Signature Management *(In Progress)*
+- Add a security layer with GPG signatures to ensure file authenticity.
+
+### 👥 User Management *(In Progress)*
+- User profiles with profile pictures, bios, and social links.
+- Customizable notifications and preferences.
+- API to fetch liked torrents from user profiles (Coming Soon).
+
+### 🌑 Dark Mode *(Optional, In Progress)*
+- Light and dark themes for better accessibility.
+
+## 📈 Coming Soon...
+- **Advanced Torrent Management:** Bonus points, ratio tracking, and gamification.
+- **Moderation & RBAC:** Content moderation and admin roles.
+- **Real-Time Stats:** Integration with RRD or InfluxDB/Grafana.
+- **Driver Support:** Download and create torrents from sources like GitHub.
+- **API Improvements:** Enhanced endpoints for managing torrents and user data.
+
+## 💻 Installation
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/django-bitiso.git
+   cd django-bitiso
+   ```
+2. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+3. Apply database migrations:
+   ```
+   python manage.py migrate
+   ```
+4. Start the server:
+   ```
+   python manage.py runserver
+   ```
+
+## 🌟 Contributing
+
+Contributions are welcome!
+- Help expand translations 🌍 (currently supporting EN & FR).
+- Suggest or implement features like advanced stats, API endpoints, and more.
+- Open an issue or submit a pull request to get started!
+
