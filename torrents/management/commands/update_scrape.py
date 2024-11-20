@@ -19,7 +19,15 @@ SUCCESS_THRESHOLD = 10  # Percentage threshold for determining scrapability
 class Command(BaseCommand):
     help = "Recalculate and suggest updates for tracker scrapable status based on success rates."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            help="Preview changes without applying them."
+        )
+
     def handle(self, *args, **options):
+        dry_run = options['dry_run']
         trackers = Tracker.objects.all()
         updates = []
 
@@ -27,41 +35,47 @@ class Command(BaseCommand):
         to_update = []
 
         for tracker in trackers:
-            # Aggregate total attempts and successful scrapes
-            stats = TrackerStat.objects.filter(tracker=tracker).aggregate(
-                total_attempts=Count('id'),
-                successful_scrapes=Count('id', filter=Q(last_successful_scrape__isnull=False))
-            )
-            total_attempts = stats['total_attempts']
-            successful_scrapes = stats['successful_scrapes']
+            try:
+                # Aggregate total attempts and successful scrapes
+                stats = TrackerStat.objects.filter(tracker=tracker).aggregate(
+                    total_attempts=Count('id'),
+                    successful_scrapes=Count('id', filter=Q(last_successful_scrape__isnull=False))
+                )
+                total_attempts = stats['total_attempts']
+                successful_scrapes = stats['successful_scrapes']
 
-            if total_attempts > 0:
-                # Calculate success rate
-                success_rate = (successful_scrapes / total_attempts) * 100
-                current_status = tracker.is_scrapable
-                new_status = success_rate >= SUCCESS_THRESHOLD
+                if total_attempts > 0:
+                    # Calculate success rate
+                    success_rate = (successful_scrapes / total_attempts) * 100
+                    current_status = tracker.is_scrapable
+                    new_status = success_rate >= SUCCESS_THRESHOLD
 
-                if current_status != new_status:
-                    updates.append((tracker.url, current_status, new_status))
-                    tracker.is_scrapable = new_status
+                    if current_status != new_status:
+                        updates.append((tracker.url, current_status, new_status))
+                        tracker.is_scrapable = new_status
+                        to_update.append(tracker)
+
+                    logger.info(
+                        f"Tracker {tracker.url}: Success rate = {success_rate:.2f}%. "
+                        f"Scrapable status: {'Updated' if current_status != new_status else 'Unchanged'}."
+                    )
+                else:
+                    # Handle trackers with no recorded scrape attempts
+                    logger.info(
+                        f"Tracker {tracker.url} has no scrape attempts recorded. Marking as not scrapable."
+                    )
+                    tracker.is_scrapable = False
                     to_update.append(tracker)
-
-                logger.info(
-                    f"Tracker {tracker.url}: Success rate = {success_rate:.2f}%. "
-                    f"Scrapable status: {'Updated' if current_status != new_status else 'Unchanged'}."
-                )
-            else:
-                # Handle trackers with no recorded scrape attempts
-                logger.warning(
-                    f"Tracker {tracker.url} has no scrape attempts recorded. Marking as not scrapable."
-                )
-                tracker.is_scrapable = False
-                to_update.append(tracker)
+            except Exception as e:
+                logger.error(f"Error processing tracker {tracker.url}: {e}")
 
         # Perform bulk update for efficiency
         if to_update:
-            Tracker.objects.bulk_update(to_update, ['is_scrapable'])
-            logger.info("Bulk update completed for scrapable status.")
+            if dry_run:
+                logger.info(f"Dry Run: {len(to_update)} Tracker records would be updated.")
+            else:
+                Tracker.objects.bulk_update(to_update, ['is_scrapable'])
+                logger.info(f"Bulk update completed for {len(to_update)} trackers.")
 
         # Log suggested updates
         if updates:
@@ -70,3 +84,4 @@ class Command(BaseCommand):
                 logger.info(f" - {url}: {old_status} -> {new_status}")
         else:
             logger.info("No changes required for tracker scrapable status.")
+
