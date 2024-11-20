@@ -134,18 +134,28 @@ class Command(BaseCommand):
             return 0
 
     def is_tracker_reachable(self, tracker):
-        """Test if a tracker is reachable using a socket connection."""
+        """Test if a tracker is reachable based on its URL scheme."""
         parsed_url = urlparse(tracker.url)
         host = parsed_url.hostname
-        port = parsed_url.port or 80  # Default to 80 if no port is provided
+        scheme = parsed_url.scheme
+        port = parsed_url.port or (443 if scheme == 'https' else 80)
 
-        try:
-            with socket.create_connection((host, port), timeout=SOCKET_TIMEOUT):
-                logger.debug(f"Tracker {tracker.url} is reachable.")
+        if scheme in ('http', 'https'):
+            try:
+                conn = socket.create_connection((host, port), timeout=SOCKET_TIMEOUT)
+                conn.close()
+                logger.debug(f"Tracker {tracker.url} is reachable on port {port}.")
                 return True
-        except (socket.timeout, OSError) as e:
-            logger.debug(f"Tracker {tracker.url} is not reachable: {e}")
+            except (socket.timeout, OSError) as e:
+                logger.debug(f"Tracker {tracker.url} is not reachable: {e}")
+                return False
+        elif scheme == 'udp':
+            logger.warning(f"Cannot verify reachability of UDP tracker: {tracker.url}")
+            return True  # Assume reachable for UDP as no easy way to verify
+        else:
+            logger.warning(f"Unsupported tracker scheme: {scheme} for tracker {tracker.url}")
             return False
+
 
     def get_hashes_for_tracker(self, tracker, specific_hash=None):
         """Fetch hashes for the given tracker, optionally filtered by a specific hash."""
