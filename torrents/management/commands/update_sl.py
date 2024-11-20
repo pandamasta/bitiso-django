@@ -3,6 +3,12 @@ from ...models.torrent import Torrent
 from django.db.models import Max
 import logging
 
+# Set up basic logging configuration
+logging.basicConfig(
+    level=logging.INFO,  # Only log messages at INFO level or higher
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
+)
+
 logger = logging.getLogger(__name__)
 
 

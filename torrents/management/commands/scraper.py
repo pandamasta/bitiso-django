@@ -8,6 +8,12 @@ import urllib3
 from django.utils.timezone import now
 import logging
 
+# Set up basic logging configuration
+logging.basicConfig(
+    level=logging.INFO,  # Only log messages at INFO level or higher
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -71,14 +77,3 @@ class Command(BaseCommand):
                 except Exception as e:
                     logger.error(f"Error updating stats for hash {info_hash}: {e}")
 
-        # Update torrent-level statistics based on tracker stats (priority level 0)
-        for torrent in Torrent.objects.all():
-            try:
-                tracker_stat = TrackerStat.objects.filter(torrent_id=torrent.id).order_by("announce_priority").first()
-                if tracker_stat:
-                    torrent.seed = tracker_stat.seed
-                    torrent.leech = tracker_stat.leech
-                    torrent.save()
-                    logger.info(f"Updated Torrent stats for {torrent.info_hash}")
-            except Exception as e:
-                logger.error(f"Error updating Torrent stats for {torrent.info_hash}: {e}")

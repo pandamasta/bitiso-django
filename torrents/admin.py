@@ -49,7 +49,7 @@ class TrackerAdmin(admin.ModelAdmin):
 
 @admin.register(TrackerStat)
 class TrackerStatAdmin(admin.ModelAdmin):
-    list_display = ('torrent', 'tracker', 'seed', 'leech', 'complete','last_scrape_attempt','last_successful_scrape')
+    list_display = ('torrent', 'tracker', 'announce_priority','seed', 'leech', 'complete','last_scrape_attempt','last_successful_scrape')
     search_fields = ('torrent__name', 'tracker__url')
     ordering = ('torrent',)
 
