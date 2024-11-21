@@ -70,6 +70,21 @@ class Project(models.Model):
                 'large': (300, 300),
             })
 
+    def delete(self, *args, **kwargs):
+        """
+        Deletes associated image files from the disk when the project is deleted.
+        """
+        image_fields = ['image', 'mini_image', 'small_image', 'medium_image', 'large_image']
+        for field in image_fields:
+            image_field = getattr(self, field, None)
+            if image_field and image_field.name:
+                file_path = image_field.path
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                    logger.debug(f"Deleted {field} file at {file_path}")
+        
+        super().delete(*args, **kwargs)  # Call the parent class's delete method
+        
     def small_image_tag(self):
         """
         Returns an HTML img tag for the small image, to be displayed in the admin interface.
