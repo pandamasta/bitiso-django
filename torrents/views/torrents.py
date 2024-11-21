@@ -186,8 +186,21 @@ def upload_local_torrent(request):
                     messages.error(request, "Failed to process the torrent file.")
                     return redirect('dashboard')
 
-                # Save torrent instance in the database
-                torrent = create_torrent_instance(metadata, "", File(open(metadata["torrent_file_path"], 'rb')), request.user)
+                # Validate the saved torrent file
+                absolute_torrent_file_path = os.path.join(settings.MEDIA_ROOT, metadata["torrent_file_path"])
+                if not os.path.exists(absolute_torrent_file_path):
+                    logger.error(f"Torrent file not found at: {absolute_torrent_file_path}")
+                    messages.error(request, "Processed torrent file could not be found.")
+                    return redirect('dashboard')
+
+                # Create the Torrent instance
+                with open(absolute_torrent_file_path, 'rb') as torrent_file:
+                    torrent = create_torrent_instance(
+                        metadata,
+                        "",
+                        File(torrent_file),
+                        request.user
+                    )
 
                 # Link trackers to the torrent
                 _link_trackers_to_torrent(metadata["trackers"], torrent)
@@ -208,8 +221,12 @@ def upload_local_torrent(request):
 
     return render(request, 'torrents/upload_local_torrent.html', {'form': form})
 
+
 @login_required
 def import_torrent_from_url(request, use_info_hash_folders=True):
+    """
+    View to handle importing a torrent file from a URL by a logged-in user.
+    """
     if request.method == 'POST':
         form = URLDownloadForm(request.POST)
         if form.is_valid():
@@ -226,7 +243,7 @@ def import_torrent_from_url(request, use_info_hash_folders=True):
                     messages.error(request, "Failed to extract info hash from the torrent file.")
                     return redirect('dashboard')
 
-                # Check if torrent with the same info_hash already exists
+                # Check for existing torrent with the same info_hash
                 if Torrent.objects.filter(info_hash=info_hash).exists():
                     messages.info(request, f"The torrent with info_hash {info_hash} already exists in the database.")
                     logger.info(f"Torrent with info_hash {info_hash} already exists. Skipping import.")
@@ -235,16 +252,24 @@ def import_torrent_from_url(request, use_info_hash_folders=True):
                 # Determine save directory based on settings
                 save_dir = determine_save_dir(info_hash, use_info_hash_folders)
 
-                # Process torrent file to get full metadata, using the specified save_dir
+                # Process the torrent file
                 metadata = process_torrent_file(tmp_file_path, save_dir=save_dir)
                 if not metadata:
                     messages.error(request, "Failed to process the torrent file.")
                     return redirect('dashboard')
 
-                # Create the Torrent instance
-                torrent = create_torrent_instance(metadata, url, metadata["torrent_file_path"], request.user)
+                # Validate the saved torrent file
+                absolute_path = os.path.join(settings.MEDIA_ROOT, metadata["torrent_file_path"])
+                if not os.path.exists(absolute_path):
+                    logger.error(f"Torrent file not found at: {absolute_path}")
+                    messages.error(request, "Processed torrent file could not be found.")
+                    return redirect('dashboard')
 
-                # Link trackers
+                # Create the Torrent instance
+                with open(absolute_path, 'rb') as torrent_file:
+                    torrent = create_torrent_instance(metadata, url, File(torrent_file), request.user)
+
+                # Link trackers to the torrent
                 _link_trackers_to_torrent(metadata["trackers"], torrent)
 
                 messages.success(request, f"Torrent '{metadata['name']}' successfully imported.")
@@ -254,7 +279,8 @@ def import_torrent_from_url(request, use_info_hash_folders=True):
                 logger.error(f"An error occurred while importing the torrent: {e}")
                 messages.error(request, f"An unexpected error occurred: {str(e)}")
             finally:
-                if tmp_file_path and os.path.exists(tmp_file_path):
+                # Clean up temporary file
+                if os.path.exists(tmp_file_path):
                     os.remove(tmp_file_path)
 
     form = URLDownloadForm()
