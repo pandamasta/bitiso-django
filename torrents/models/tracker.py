@@ -48,6 +48,10 @@ class Tracker(models.Model):
         null=True, blank=True,
         help_text="The most recent attempt to contact the tracker (network-level or scrape)."
     )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="The date and time when this tracker was added to the database."
+    )
 
     class Meta:
         verbose_name = _("Tracker")

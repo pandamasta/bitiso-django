@@ -23,7 +23,10 @@ class TrackerStat(models.Model):
         null=True, blank=True,
         help_text="The last time this torrent was successfully scraped on this tracker."
     )
-
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="The date and time when this tracker stat was added to the database."
+    )
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['torrent', 'tracker'], name='unique_torrent_tracker')

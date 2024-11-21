@@ -25,7 +25,7 @@ LOGGING = {
         },
         'torrents': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': False,
         },
         'tracker_scraper': {  # Suppress unnecessary warnings
@@ -36,7 +36,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',
+        'level': 'DEBUG',
     },
 }
 
@@ -248,7 +248,9 @@ MEDIA_URL = '/media/'  # URL to serve media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Absolute filesystem path to media directory
 
 MEDIA_TORRENT = os.path.join(MEDIA_ROOT, 'torrents/')
-TRACKER_ANNOUNCE = os.getenv('TRACKER_ANNOUNCE', '').split(',')
+
+raw_trackers = os.getenv('TRACKER_ANNOUNCE', '')
+TRACKER_ANNOUNCE = [tracker.strip() for tracker in raw_trackers.split(',') if tracker.strip()]
 
 
 MAX_FILE_SIZE_MB = 10

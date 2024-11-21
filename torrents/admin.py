@@ -109,12 +109,12 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     """
-    Admin interface for the Project model with automatic slug generation.
+    Admin interface for the Project model with image upload and management.
     """
     # Fields to display in the list view
     list_display = (
-        'name', 'slug', 'is_active', 'category', 'license', 'user', 
-        'torrent_count', 'website_url', 'created_at'
+        'name', 'small_image_tag', 'slug', 'is_active', 'category', 'license', 
+        'user', 'torrent_count', 'website_url', 'created_at'
     )
     # Searchable fields
     search_fields = ('name', 'slug', 'category__name', 'user__username', 'license__name')
@@ -126,14 +126,12 @@ class ProjectAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     
     # Read-only fields to prevent manual editing of computed or system fields
-    readonly_fields = (
-        'slug', 'torrent_count', 'created_at', 'updated_at', 'deleted_at'
-    )
+    readonly_fields = ('small_image_tag', 'torrent_count', 'created_at', 'updated_at', 'deleted_at')
     
     # Display fieldsets for better organization
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'description', 'is_active', 'category', 'license', 'user')
+            'fields': ('name', 'description', 'is_active', 'category', 'license', 'user', 'image', 'small_image_tag')
         }),
         ('Related Data', {
             'fields': ('torrent_count',),
@@ -166,14 +164,6 @@ class ProjectAdmin(admin.ModelAdmin):
         self.message_user(request, f"{queryset.count()} projects successfully deactivated.")
     deactivate_projects.short_description = "Deactivate selected projects"
 
-    def torrent_count(self, obj):
-        """
-        Displays the number of torrents related to the project.
-        """
-        return obj.torrents.count()
-    torrent_count.short_description = "Torrent Count"
-
-
 @admin.register(License)
 class LicenseAdmin(admin.ModelAdmin):
     list_display = ('name', 'description','website_url')
@@ -183,13 +173,13 @@ class LicenseAdmin(admin.ModelAdmin):
 
 @admin.register(Tracker)
 class TrackerAdmin(admin.ModelAdmin):
-    list_display = ('url', 'last_seen','is_reachable', 'is_scrapable', 'is_reachable_mode', 'is_scrapable_mode')
+    list_display = ('url', 'last_seen','is_reachable', 'is_scrapable', 'is_reachable_mode', 'is_scrapable_mode','created_at')
     list_filter = ('is_reachable', 'is_reachable_mode', 'is_scrapable', 'is_scrapable_mode')
     search_fields = ('url',)
 
 @admin.register(TrackerStat)
 class TrackerStatAdmin(admin.ModelAdmin):
-    list_display = ('torrent', 'tracker', 'announce_priority','seed', 'leech', 'complete','last_scrape_attempt','last_successful_scrape')
+    list_display = ('torrent', 'tracker', 'announce_priority','seed', 'leech', 'complete','last_scrape_attempt','last_successful_scrape','created_at')
     search_fields = ('torrent__name', 'tracker__url')
     ordering = ('torrent',)
 

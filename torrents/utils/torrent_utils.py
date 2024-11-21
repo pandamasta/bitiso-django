@@ -113,6 +113,18 @@ def create_torrent_instance(metadata, url, torrent_file, user):
         return None
 
 
+def is_valid_tracker_url(url):
+    """
+    Validates a tracker URL.
+    """
+    try:
+        parsed = urlparse(url)
+        # Accept common schemes like http, https, and udp
+        return parsed.scheme in {"http", "https", "udp"} and bool(parsed.netloc)
+    except Exception:
+        return False
+
+
 def _link_trackers_to_torrent(trackers, torrent_obj):
     """
     Link each tracker URL to the Torrent object and set announce_priority.
@@ -122,11 +134,9 @@ def _link_trackers_to_torrent(trackers, torrent_obj):
         torrent_obj (Torrent): The Torrent instance to link trackers to.
     """
     for level, tracker_list in enumerate(trackers):
-        # Process each tracker URL in the tier
         for tracker_url in tracker_list:
-            if tracker_url:
+            if tracker_url and is_valid_tracker_url(tracker_url):  # Validate tracker URL
                 try:
-                    # Get or create the tracker in the database
                     tracker, _ = Tracker.objects.get_or_create(url=tracker_url)
                     torrent_obj.trackers.add(tracker)
 
@@ -135,14 +145,14 @@ def _link_trackers_to_torrent(trackers, torrent_obj):
                         tracker=tracker,
                         defaults={'announce_priority': level}
                     )
-                    # Ensure announce_priority is always updated
                     tracker_stat.announce_priority = level
                     tracker_stat.save()
 
                     logger.debug(f"Linked tracker {tracker_url} to torrent {torrent_obj.name} with priority {level}")
                 except Exception as e:
                     logger.error(f"Error linking tracker {tracker_url} to torrent {torrent_obj.name}: {e}")
-
+            else:
+                logger.warning(f"Invalid tracker URL skipped: {tracker_url}")
 
 def process_torrent_file(torrent_file_path, save_dir):
     """Processes the torrent file, adds custom trackers, and saves it."""
