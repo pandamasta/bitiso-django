@@ -11,6 +11,6 @@ tmp/
 .env-*
 .env*
 .venv
-fixtures/
 media/
+fixtures-private/
 

@@ -1,31 +1,55 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Project List</h2>
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Projects</h2>
+        {% if user.is_authenticated %}
+            <a href="{% url 'project_create' %}" class="btn btn-primary">Create New Project</a>
+        {% endif %}
+    </div>
 
-{% if user.is_authenticated %}
-    <a href="{% url 'project_create' %}" class="btn btn-primary mb-3">Create New Project</a>
-{% endif %}
-
-<div class="project-list">
     {% for category, projects in category_projects.items %}
         {% if projects %}
-            <h3>{{ category.name }}</h3>
-            <p>{{ category.description }}</p>
-            
-            <ul>
-                {% for project in projects %}
-                    <li>
-                        <strong><a href="{% url 'project_detail' project.slug %}">{{ project.name }}</a></strong>
-                        ({{ project.torrent_count }} torrent{{ project.torrent_count|pluralize }})
-                        
-                        <!-- Description with conditional layout for mobile and desktop -->
-                        <span class="project-description">{{ project.description|truncatewords:20 }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
+        <div class="card mb-4 shadow">
+            <div class="card-header">
+                <h3 class="card-title mb-0">{{ category.name }}</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">{{ category.description }}</p>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for project in projects %}
+                    <div class="col">
+                        <div class="card h-100">
+                            {% if project.medium_image %}
+                            <img src="{{ project.large_image.url }}" alt="{{ project.name }}" 
+                                 class="card-img-top" style="object-fit: cover; height: 150px;">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{% url 'project_detail' project.slug %}" class="text-decoration-none">{{ project.name }}</a>
+                                </h5>
+                                <p class="card-text text-muted">
+                                    {{ project.description|truncatewords:20 }}
+                                </p>
+                                <p class="small text-muted">
+                                    {{ project.torrent_count }} torrent{{ project.torrent_count|pluralize }}
+                                </p>
+                            </div>
+                            <div class="card-footer text-end">
+                                <a href="{% url 'project_detail' project.slug %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
         {% endif %}
     {% endfor %}
-</div>
 
+    {% if not category_projects %}
+        <p class="text-center text-muted">No projects found.</p>
+    {% endif %}
+</div>
 {% endblock %}

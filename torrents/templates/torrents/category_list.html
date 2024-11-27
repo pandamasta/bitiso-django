@@ -1,28 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Category List</h2>
-<div class="category-list">
-    <ul>
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Categories</h2>
+        {% if user.is_authenticated %}
+            <a href="{% url 'category_create' %}" class="btn btn-primary">Create New Category</a>
+        {% endif %}
+    </div>
+
+    <div class="row">
         {% for category in categories %}
-            <li>
-                <strong><a href="{% url 'category_detail' category.slug %}">{{ category.name }}</a></strong>
-                <p>{{ category.description }}</p>
-                
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'category_detail' category.slug %}" class="text-decoration-none">{{ category.name }}</a>
+                    </h5>
+                    <p class="card-text text-muted">{{ category.description|truncatewords:20 }}</p>
+                </div>
                 {% if category.children.all %}
-                    <ul>
-                        {% for subcategory in category.children.all %}
-                            <li>
-                                <a href="{% url 'category_detail' subcategory.slug %}">{{ subcategory.name }}</a>
-                                <p>{{ subcategory.description }}</p>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                <ul class="list-group list-group-flush">
+                    {% for subcategory in category.children.all %}
+                    <li class="list-group-item">
+                        <a href="{% url 'category_detail' subcategory.slug %}" class="text-decoration-underline text-decoration-none">{{ subcategory.name }}</a>
+                        <p class="text-muted mb-0">{{ subcategory.description|truncatewords:10 }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
                 {% endif %}
-            </li>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
+
+    {% if not categories %}
+        <p class="text-center text-muted">No categories found.</p>
+    {% endif %}
 </div>
-{% if user.is_authenticated %}
-<a href="{% url 'category_create' %}">Create New Category</a>
-{% endif %}
 {% endblock %}

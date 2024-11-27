@@ -1,74 +1,85 @@
 {% extends 'base.html' %}
 
 {% block content %}
- 
-<div class="torrent-details">
-    {% if torrent.project.image %}
-        <img src="{{ torrent.project.image.url }}" alt="{{ torrent.project.name }}" style="width: 100px; height: 100px; object-fit: contain;">
-    {% endif %}
 
-    <h2>{{ torrent.name|default:"N/A" }}</h2>
-    <p>Size: {{ torrent.size|filesizeformat|default:"N/A" }} ({{ torrent.size|default:"N/A" }} bytes)</p>
-    <p>File Count: {{ torrent.file_count|default:"N/A" }}</p>
-    <p>Description: {{ torrent.description|default:"N/A" }}</p>
-    <p>
-        Torrent File: 
-    {% if filename %}
-        <a href="{% url 'serve_torrent_file' filename=filename %}">
-            {{ filename }}
-        </a>
-    {% else %}
-        N/A
-    {% endif %}
-    </p>
-    <p>
-        Magnet Link: 
-        {% if torrent.magnet %}
-            <a href="{{ torrent.magnet }}">Magnet</a>
-        {% else %}
-            N/A
-        {% endif %}
-    </p>
-    <p>Category: {{ torrent.category.name|default:"N/A" }}</p>
-    <p>
-        Website: 
-        {% if torrent.website_url %}
-            <a href="{{ torrent.website_url }}">{{ torrent.website_url }}</a>
-        {% else %}
-            N/A
-        {% endif %}
-    </p>
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-4">
+                {% if torrent.project.large_image %}
+                    <img src="{{ torrent.project.large_image.url }}" alt="{{ torrent.project.name }}" 
+                         class="img-thumbnail me-3" 
+                         style="width: 100px; height: 100px; object-fit: contain;">
+                {% endif %}
+                <div>
+                    <h2 class="card-title">{{ torrent.name|default:"N/A" }}</h2>
+                    <p class="text-muted mb-0">Category: <strong>{{ torrent.category.name|default:"N/A" }}</strong></p>
+                    <p class="text-muted">File Count: <strong>{{ torrent.file_count|default:"N/A" }}</strong></p>
+                </div>
+            </div>
 
-    <h3>Trackers:</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>URL</th>
-                <th>Seeders</th>
-                <th>Leechers</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for tracker in tracker_detail %}
-                <tr>
-                    <td>{{ tracker.tracker.url|default:"N/A" }}</td>
-                    <td>{{ tracker.seed|default:"N/A" }}</td>
-                    <td>{{ tracker.leech|default:"N/A" }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="3">No trackers found.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <p><strong>Description:</strong> {{ torrent.description|default:"N/A" }}</p>
 
-    {% if user.is_authenticated and user == torrent.user %}
-        <div class="action-buttons">
-            <a href="{% url 'torrent_edit' torrent.slug %}" class="btn btn-primary">Edit Torrent</a> |
-            <a href="{% url 'torrent_delete' torrent.slug %}" class="btn btn-danger">Delete Torrent</a>
+            <hr>
+
+            <p><strong>Size:</strong> {{ torrent.size|filesizeformat|default:"N/A" }} ({{ torrent.size|default:"N/A" }} bytes)</p>
+            <p>
+                <strong>Torrent File:</strong>
+                {% if filename %}
+                    <a href="{% url 'serve_torrent_file' filename=filename %}" class="btn btn-link">{{ filename }}</a>
+                {% else %}
+                    <span class="text-muted">N/A</span>
+                {% endif %}
+            </p>
+            <p>
+                <strong>Magnet Link:</strong>
+                {% if torrent.magnet %}
+                    <a href="{{ torrent.magnet }}" class="btn btn-link">Magnet</a>
+                {% else %}
+                    <span class="text-muted">N/A</span>
+                {% endif %}
+            </p>
+            <p>
+                <strong>Website:</strong>
+                {% if torrent.website_url %}
+                    <a href="{{ torrent.website_url }}" target="_blank" class="btn btn-link">{{ torrent.website_url }}</a>
+                {% else %}
+                    <span class="text-muted">N/A</span>
+                {% endif %}
+            </p>
+
+            <h3 class="mt-4">Trackers</h3>
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>URL</th>
+                        <th class="text-center">Seeders</th>
+                        <th class="text-center">Leechers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tracker in tracker_detail %}
+                        <tr>
+                            <td>{{ tracker.tracker.url|default:"N/A" }}</td>
+                            <td class="text-center">{{ tracker.seed }}</td>
+                            <td class="text-center">{{ tracker.leech }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No trackers found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if user.is_authenticated and user == torrent.user %}
+                <div class="mt-4">
+                    <a href="{% url 'torrent_edit' torrent.slug %}" class="btn btn-primary">Edit Torrent</a>
+                    <a href="{% url 'torrent_delete' torrent.slug %}" class="btn btn-danger">Delete Torrent</a>
+                </div>
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
 </div>
 
 {% endblock %}
