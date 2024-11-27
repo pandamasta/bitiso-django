@@ -94,3 +94,16 @@ class Project(models.Model):
         return "No Image"
 
     small_image_tag.short_description = "Small Image"  # Column header in admin
+
+
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+
+
+@receiver(pre_delete, sender=Project)
+def delete_project_images(sender, instance, **kwargs):
+    image_fields = ['image', 'mini_image', 'small_image', 'medium_image', 'large_image']
+    for field in image_fields:
+        image_field = getattr(instance, field, None)
+        if image_field and image_field.name:
+            image_field.delete(save=False)
