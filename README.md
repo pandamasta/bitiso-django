@@ -42,15 +42,20 @@
    git clone https://github.com/pandamasta/bitiso-django.git
    cd django-bitiso
    ```
-2. Install dependencies:
+2. Create a virtual environment
+   ```
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+3. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
-3. Apply database migrations:
+4. Apply database migrations:
    ```
    python manage.py migrate
    ```
-4. Start the server:
+5. Start the server:
    ```
    python manage.py runserver
    ```
