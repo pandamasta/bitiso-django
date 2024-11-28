@@ -100,9 +100,10 @@ class TorrentAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'description','parent_category', 'created_at')  # Fixed the field names
+    list_display = ('name', 'slug', 'description', 'order','parent_category', 'created_at')  # Fixed the field names
     search_fields = ('name', 'parent_category__name')
     prepopulated_fields = {'slug': ('name',)}
+    list_editable = ('order',)
     ordering = ('name',)
 
 

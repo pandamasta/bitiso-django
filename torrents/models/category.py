@@ -20,6 +20,7 @@ class Category(models.Model):
         related_name='children'
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='categories', null=True)
+    order = models.PositiveIntegerField(_("Order"), default=0)  
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -28,7 +29,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
-        ordering = ['name']
+        ordering = ['order','name']
 
     def __str__(self):
         return f"{self.parent_category.name} -> {self.name}" if self.parent_category else self.name

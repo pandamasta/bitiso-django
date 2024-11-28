@@ -17,9 +17,14 @@ class CategoryListView(ListView):
     template_name = 'torrents/category_list.html'
     context_object_name = 'categories'
 
-    def get_queryset(self):
+    #def get_queryset(self):
         # Fetch only top-level categories and prefetch their children
-        return Category.objects.filter(parent_category__isnull=True).prefetch_related('children')
+    #    return Category.objects.filter(parent_category__isnull=True).prefetch_related('children')
+    def get_queryset(self):
+        # Fetch only top-level categories and prefetch their children, ordered by `order` field
+        return Category.objects.filter(parent_category__isnull=True).prefetch_related(
+            'children'
+        ).order_by('order', 'name')  # Explicitly order by `order`
 
 class CategoryDetailView(DetailView):
     model = Category
