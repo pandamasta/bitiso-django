@@ -10,6 +10,8 @@ from ..models.project import Project
 from ..models.license import License
 from ..utils.slug_utils import generate_unique_slug
 from django.db import transaction
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 # Set up a logger for the application
 logger = logging.getLogger(__name__)
@@ -128,30 +130,27 @@ class Torrent(models.Model):
                 self.slug = generate_unique_slug(self, self.name)
         super().save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        # Delete torrent file if it exists
-        if self.torrent_file and self.torrent_file.path:
-            logger.info(f"Attempting to delete torrent file at {self.torrent_file.path}")
-            if os.path.isfile(self.torrent_file.path):
-                try:
-                    os.remove(self.torrent_file.path)
-                    logger.info(f"Torrent file {self.torrent_file.path} deleted successfully.")
-                except Exception as e:
-                    logger.error(f"Failed to delete torrent file {self.torrent_file.path}: {e}")
-            else:
-                logger.warning(f"Torrent file {self.torrent_file.path} does not exist.")
+# Delete single or multiple .torrent file
+@receiver(post_delete, sender=Torrent)
+def delete_torrent_files(sender, instance, **kwargs):
+    """
+    Deletes associated files when a Torrent instance is deleted.
+    """
+    # Delete torrent file
+    if instance.torrent_file:
+        torrent_file_name = instance.torrent_file.name
+        try:
+            instance.torrent_file.delete(save=False)  # Use storage backend
+            logger.info(f"Torrent file {torrent_file_name} deleted successfully.")
+        except Exception as e:
+            logger.error(f"Failed to delete torrent file {torrent_file_name}: {e}")
 
-        # Delete GPG signature file if it exists
-        if self.gpg_signature and self.gpg_signature.path:
-            logger.info(f"Attempting to delete GPG signature file at {self.gpg_signature.path}")
-            if os.path.isfile(self.gpg_signature.path):
-                try:
-                    os.remove(self.gpg_signature.path)
-                    logger.info(f"GPG signature file {self.gpg_signature.path} deleted successfully.")
-                except Exception as e:
-                    logger.error(f"Failed to delete GPG signature file {self.gpg_signature.path}: {e}")
-            else:
-                logger.warning(f"GPG signature file {self.gpg_signature.path} does not exist.")
-
-        super().delete(*args, **kwargs)
-        logger.info(f"Torrent object with files {self.torrent_file} and {self.gpg_signature} deleted from database.")
+    # Delete GPG signature file
+    if instance.gpg_signature:
+        gpg_signature_name = instance.gpg_signature.name
+        try:
+            instance.gpg_signature.delete(save=False)  # Use storage backend
+            logger.info(f"GPG signature file {gpg_signature_name} deleted successfully.")
+        except Exception as e:
+            logger.error(f"Failed to delete GPG signature file {gpg_signature_name}: {e}")
+    

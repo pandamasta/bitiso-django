@@ -54,24 +54,15 @@ def download_torrent(url):
 def determine_save_dir(info_hash, use_info_hash_folders):
     """
     Determines the directory for saving torrent files.
-
-    Args:
-        info_hash (str): The info hash of the torrent.
-        use_info_hash_folders (bool): Whether to organize files into subdirectories.
-
-    Returns:
-        str: The relative directory path for saving torrent files.
     """
     if use_info_hash_folders:
         subdir_1, subdir_2 = info_hash[:2], info_hash[2:4]
-        torrent_dir = os.path.join(settings.MEDIA_TORRENT, subdir_1, subdir_2)
+        torrent_dir = os.path.join(settings.MEDIA_ROOT, 'torrents', subdir_1, subdir_2)
     else:
-        torrent_dir = settings.MEDIA_TORRENT
+        torrent_dir = os.path.join(settings.MEDIA_ROOT, 'torrents')
 
-    full_path = os.path.join(settings.MEDIA_ROOT, torrent_dir)
-    os.makedirs(full_path, exist_ok=True)
-
-    logger.debug(f"Created or verified save directory: {full_path}")
+    os.makedirs(torrent_dir, exist_ok=True)
+    logger.debug(f"Created or verified save directory: {torrent_dir}")
     return torrent_dir
 
 
@@ -154,34 +145,32 @@ def _link_trackers_to_torrent(trackers, torrent_obj):
             else:
                 logger.warning(f"Invalid tracker URL skipped: {tracker_url}")
 
+
 def process_torrent_file(torrent_file_path, save_dir):
-    """Processes the torrent file, adds custom trackers, and saves it."""
+    """
+    Processes the torrent file, adds custom trackers, and saves it.
+    """
     try:
         logger.info(f"Processing torrent file: {torrent_file_path}")
         t = Torrenttorf.read(torrent_file_path)
-        logger.info(f"Parsed torrent file: {t.name}")
 
-        # Add custom tracker if not already present
+        # Add custom tracker
         custom_tracker = settings.TRACKER_ANNOUNCE
         if custom_tracker and custom_tracker not in [tracker for sublist in t.trackers for tracker in sublist]:
             t.trackers.append([custom_tracker])
             logger.info(f"Added custom tracker: {custom_tracker}")
 
-        # Ensure the save directory exists
-        absolute_save_dir = os.path.join(settings.MEDIA_ROOT, save_dir)
-        os.makedirs(absolute_save_dir, exist_ok=True)
-
-        # Save the torrent file
-        absolute_save_path = os.path.join(absolute_save_dir, f"{t.name}.torrent")
+        # Absolute save path
+        absolute_save_path = os.path.join(save_dir, f"{t.name}.torrent")
         logger.debug(f"Saving torrent to absolute path: {absolute_save_path}")
 
+        # Save the torrent file
         if os.path.exists(absolute_save_path):
-            logger.warning(f"File already exists at: {absolute_save_path}. Removing old file.")
             os.remove(absolute_save_path)
 
         t.write(absolute_save_path)
 
-        # Convert absolute path to relative path
+        # Convert absolute path to relative path for database storage
         relative_path = os.path.relpath(absolute_save_path, settings.MEDIA_ROOT)
         logger.debug(f"Returning relative path for DB: {relative_path}")
 
@@ -201,3 +190,4 @@ def process_torrent_file(torrent_file_path, save_dir):
     except Exception as e:
         logger.error(f"Error processing torrent file: {e}")
         return None
+

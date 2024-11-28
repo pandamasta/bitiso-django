@@ -189,16 +189,21 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'accounts/locale'),
 ]
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
+# webroot
+#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WEBROOT = os.getenv('DJANGO_WEBROOT_PATH', os.path.join(BASE_DIR, 'webroot'))
 
-STATIC_URL = '/static/'
+# static
+STATIC_URL = os.getenv('DJANGO_STATIC_URL', '/static/')
+STATIC_ROOT = os.getenv('DJANGO_STATIC_ROOT', os.path.join(WEBROOT, 'static'))
 STATICFILES_DIRS = [
     BASE_DIR / "static",
     BASE_DIR / "core/static",  # Ensure the path is correct
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# media
+MEDIA_URL = os.getenv('DJANGO_MEDIA_URL', '/media/')
+MEDIA_ROOT = os.getenv('DJANGO_MEDIA_ROOT', os.path.join(WEBROOT, 'media'))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -244,13 +249,16 @@ EMAIL_VERIFICATION_REQUIRED = False
 COPYRIGHT_START_YEAR = 2018
 
 
-MEDIA_URL = '/media/'  # URL to serve media files
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Absolute filesystem path to media directory
+#MEDIA_URL = '/media/'  # URL to serve media files
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Absolute filesystem path to media directory
 
-MEDIA_TORRENT = os.path.join(MEDIA_ROOT, 'torrents/')
+#MEDIA_TORRENT = os.path.join(MEDIA_ROOT, 'torrents/')
+MEDIA_TORRENT = os.getenv('MEDIA_TORRENT', os.path.join(WEBROOT, 'torrents'))
 
 raw_trackers = os.getenv('TRACKER_ANNOUNCE', '')
 TRACKER_ANNOUNCE = [tracker.strip() for tracker in raw_trackers.split(',') if tracker.strip()]
 
 
 MAX_FILE_SIZE_MB = 10
+
+

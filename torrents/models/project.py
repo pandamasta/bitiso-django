@@ -23,25 +23,44 @@ class Project(models.Model):
     """
     Project model for managing torrent projects.
     """
+class Project(models.Model):
     name = models.CharField(_("Project name"), max_length=128)
     slug = models.SlugField(blank=True, null=True, unique=True)
     is_active = models.BooleanField(_("Show in the front end"), default=False)
     description = models.TextField(_("Description of project"), blank=True, default='')
     website_url = models.URLField(_("Official website URL"), max_length=2000, blank=True, null=True)
-    website_url_download = models.URLField(_("Download page URL"), max_length=2000, blank=True)
-    website_url_repo = models.URLField(_("Repository URL"), max_length=2000, blank=True)
-    category = models.ForeignKey(Category, verbose_name=_("Category"), null=True, on_delete=models.PROTECT)  # Assign category at project level
-    license = models.ForeignKey(License, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Default license"))
-    torrent_count = models.PositiveIntegerField(default=0, verbose_name="Number of Torrents")  
-    
+    website_url_download = models.URLField(_("Download page URL"), max_length=2000, blank=True, null=True)
+    website_url_repo = models.URLField(_("Repository URL"), max_length=2000, blank=True, null=True)
+    category = models.ForeignKey(
+        "Category",
+        verbose_name=_("Category"),
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+    license = models.ForeignKey(
+        "License",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("Default license"),
+    )
+    torrent_count = models.PositiveIntegerField(default=0, verbose_name=_("Number of Torrents"))
+
     # Image fields
     image = models.ImageField(upload_to='img/project/original/', null=True, blank=True, default='')
-    mini_image = models.ImageField(upload_to='img/project/mini/', blank=True, default='')
-    small_image = models.ImageField(upload_to='img/project/small/', blank=True, default='')
-    medium_image = models.ImageField(upload_to='img/project/medium/', blank=True, default='')
-    large_image = models.ImageField(upload_to='img/project/large/', blank=True, default='')
+    mini_image = models.ImageField(upload_to='img/project/mini/', blank=True, null=True, default='')
+    small_image = models.ImageField(upload_to='img/project/small/', blank=True, null=True, default='')
+    medium_image = models.ImageField(upload_to='img/project/medium/', blank=True, null=True, default='')
+    large_image = models.ImageField(upload_to='img/project/large/', blank=True, null=True, default='')
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='projects', blank=True, null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='projects',
+        blank=True,
+        null=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), blank=True, null=True)
