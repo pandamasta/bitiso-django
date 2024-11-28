@@ -7,8 +7,8 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-md-3">
-            {% if object.medium_image %}
-                <img src="{{ object.medium_image.url }}" alt="{{ object.name }} Image" class="img-fluid rounded mb-3">
+            {% if object.large_image %}
+                <img src="{{ object.large_image.url }}" alt="{{ object.name }} Image" class="img-fluid rounded mb-3">
             {% else %}
                 <img src="{% static 'images/default_project_image.png' %}" alt="Default Project Image" class="img-fluid rounded mb-3">
             {% endif %}

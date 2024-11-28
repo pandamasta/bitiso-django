@@ -22,8 +22,10 @@
                     <div class="col">
                         <div class="card h-100">
                             {% if project.medium_image %}
+			    <a href="{% url 'project_detail' project.slug %}">
                             <img src="{{ project.large_image.url }}" alt="{{ project.name }}" 
                                  class="card-img-top" style="object-fit: cover; height: 150px;">
+			    </a>
                             {% endif %}
                             <div class="card-body">
                                 <h5 class="card-title">
