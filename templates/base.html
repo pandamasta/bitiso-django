@@ -81,6 +81,57 @@
     .stat-box {
         color: var(--bs-text-color);
     }
+
+/* Light mode styles */
+[data-bs-theme="light"] .seed {
+    background-color: transparent !important;
+    color: #28a745 !important; /* Lighter green for seeds in light mode */
+    text-align: center;
+}
+
+[data-bs-theme="light"] .leech {
+    background-color: transparent !important;
+    color: #dc3545 !important; /* Lighter red for leeches in light mode */
+    text-align: center;
+}
+
+/* Dark mode styles */
+[data-bs-theme="dark"] .seed {
+    background-color: transparent !important;
+    color: #6dff69 !important; /* Bright green for seeds in dark mode */
+    text-align: center;
+}
+
+[data-bs-theme="dark"] .leech {
+    background-color: transparent !important;
+    color: #ff2f2f !important; /* Bright red for leeches in dark mode */
+    text-align: center;
+}
+
+
+    /* Target all links inside the table-torrent */
+/* Default styles for light mode */
+[data-bs-theme="light"] .table-torrent a {
+    color: rgb(0, 102, 204); /* Light mode link color */
+    text-decoration: none;
+}
+
+[data-bs-theme="light"] .table-torrent a:hover {
+    color: rgb(0, 51, 153); /* Light mode hover color */
+    text-decoration: underline;
+}
+
+/* Dark mode styles */
+[data-bs-theme="dark"] .table-torrent a {
+    color: rgb(216, 213, 208); /* Dark mode link color */
+    text-decoration: none;
+}
+
+[data-bs-theme="dark"] .table-torrent a:hover {
+    color: rgb(154, 170, 255); /* Dark mode hover color */
+    text-decoration: underline;
+}
+
     </style>
     <script>
         // Apply saved theme early to prevent flash
