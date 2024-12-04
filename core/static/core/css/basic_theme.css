@@ -5,31 +5,151 @@ body {
     font-family: sans-serif;
 }
 
-
-/*nav {*/
-/*    text-align: center;*/
-/*}*/
-
-.table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    max-width: 100%; /* Prevents table from extending beyond container */
+/* Navigation */
+.primary-nav {
+    display: flex;
+    justify-content: center;
+    background-color: #333;
+    padding: 10px 0;
 }
 
-/* Optional: Add padding or margin adjustments for better spacing */
-.table-container table {
-    width: 100%; /* Keeps table width full within container */
+.primary-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 20px; /* Add spacing between menu items */
 }
 
+.primary-nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 8px 15px;
+    transition: background-color 0.3s ease;
+}
+
+.primary-nav ul li a:hover {
+    background-color: #575757;
+    border-radius: 5px;
+}
+
+/* Hamburger Menu */
+.menu-toggle {
+    display: none;
+}
+
+.menu-icon {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.menu-icon span {
+    display: block;
+    height: 4px;
+    background-color: white;
+    border-radius: 2px;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+    .menu-icon {
+        display: flex; /* Show the hamburger menu */
+    }
+
+    .primary-nav {
+        display: none; /* Hide the navigation menu initially */
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        background-color: #333;
+        position: absolute;
+        top: 50px;
+        left: 0;
+        z-index: 1000;
+    }
+
+    #menu-toggle:checked ~ .primary-nav {
+        display: flex; /* Show the navigation menu when the checkbox is checked */
+    }
+
+    .primary-nav ul {
+        flex-direction: column; /* Stack menu items vertically */
+        gap: 10px; /* Add spacing between menu items */
+    }
+
+    .primary-nav ul li a {
+        width: 100%; /* Make links take full width */
+        text-align: center;
+    }
+}
+.secondary-nav ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    justify-content: flex-end;
+}
+.secondary-nav ul li {
+    margin-left: 10px;
+}
+.secondary-nav ul li a, .secondary-nav ul li button {
+    display: block;
+    padding: 10px;
+    color: #333;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.secondary-nav ul li a:hover, .secondary-nav ul li button:hover {
+    text-decoration: underline;
+}
+.language-switcher ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+    justify-content: flex-end;
+}
+.language-switcher ul li {
+    margin-left: 10px;
+}
+/* Primary navigation */
+
+
+
+/* Language switcher list */
+
+.language-switcher ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+    justify-content: flex-end;
+}
+.language-switcher ul li {
+    margin-left: 10px;
+}
+
+/* main */
 
 main {
     margin-left:auto;
     margin-right:auto;
 }
 
+/* footer */
+
 footer {
     text-align: center;
 }
+
+
 
 /* Torrent */
 
