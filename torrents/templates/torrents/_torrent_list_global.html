@@ -1,0 +1,14 @@
+{# torrents/templates/torrents/_torrent_list_global.html #}
+<!-- Global Torrent Search -->
+<form method="get" action="{% url 'torrent_search' %}" class="mb-4">
+    <div class="input-group">
+        <input 
+            type="text" 
+            name="query" 
+            class="form-control" 
+            placeholder="Search torrents..." 
+            value="{{ query|default_if_none:'' }}">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+</form>
+{% include "torrents/_torrent_list.html" %}

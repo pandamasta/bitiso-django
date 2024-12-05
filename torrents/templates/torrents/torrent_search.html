@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="torrent-search-results">
+
+    <!-- Display error for short queries -->
+    {% if query_too_short %}
+        <div class="alert alert-warning">
+            Please enter at least 2 characters for your search.
+        </div>
+    {% endif %}
+
+    {% if query %}
+        <h2>
+            {{ result_count }} Result{% if result_count != 1 %}s{% endif %} for "{{ query }}"
+            <a href="{% url 'torrent_list' %}" class="btn btn-link ms-2">Back to Torrents</a>
+        </h2>
+        {% include "torrents/_torrent_list_global.html" %}
+    {% else %}
+        <h2>
+            Search Torrents
+            <a href="{% url 'torrent_list' %}" class="btn btn-link ms-2">Back to Torrents</a>
+        </h2>
+        <p>Enter a query to find torrents.</p>
+    {% endif %}
+</div>
+
+
+{% endblock %}

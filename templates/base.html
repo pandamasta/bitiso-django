@@ -212,8 +212,16 @@
                 </nav>
             </div>
         </div>
+        <!-- <form method="get" action="{% url 'torrent_search' %}" class="d-flex">
+            <input 
+                type="text" 
+                name="query" 
+                class="form-control me-2" 
+                placeholder="Search torrents..." 
+                value="{{ query|default_if_none:'' }}">
+            <button class="btn btn-outline-light" type="submit">Search</button>
+        </form> -->
     </header>
-
     {% if user.is_authenticated %}
     <nav class="bg-secondary py-2">
         <div class="container">

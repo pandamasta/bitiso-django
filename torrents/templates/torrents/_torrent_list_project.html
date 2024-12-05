@@ -1,0 +1,15 @@
+{# torrents/templates/torrents/_torrent_list_project.html #}
+
+<!-- Project-Specific Torrent Search -->
+<form method="get" action="" class="mb-4">
+    <div class="input-group">
+        <input 
+            type="text" 
+            name="query" 
+            class="form-control" 
+            placeholder="Search torrents in this project..." 
+            value="{{ query|default_if_none:'' }}">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+</form>
+{% include "torrents/_torrent_list.html" %}

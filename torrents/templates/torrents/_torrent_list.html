@@ -1,13 +1,7 @@
+{# torrents/templates/torrents/_torrent_list.html #}
+
 {% if torrents %}
-<form method="get" action="{% url 'torrent_search' %}" class="d-flex">
-    <input 
-        type="text" 
-        name="query" 
-        class="form-control me-2" 
-        placeholder="Search torrents..." 
-        value="{{ query|default_if_none:'' }}">
-    <button class="btn btn-outline-primary" type="submit">Search</button>
-</form>
+
 <div class="table-responsive">
     <table class="table table-striped align-middle">
         <thead>

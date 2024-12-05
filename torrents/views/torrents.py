@@ -16,6 +16,7 @@ from django.urls import reverse_lazy
 from torrents.utils.torrent_utils import process_torrent_file
 from django.core.files import File
 from django.http import FileResponse, Http404
+from django.db.models import Q
 
 from ..models import Torrent
 from ..forms import TorrentForm
@@ -120,7 +121,39 @@ class TorrentDeleteView(LoginRequiredMixin,DeleteView):
 
     def get_object(self):
         return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
-    
+
+#
+# Searh view
+#
+
+class TorrentSearchView(ListView):
+    model = Torrent
+    template_name = 'torrents/torrent_search.html'
+    context_object_name = 'torrents'
+    paginate_by = 40
+
+    def get_queryset(self):
+        query = self.request.GET.get('query', '').strip()
+        torrents = Torrent.objects.filter(is_active=True)
+
+        # Handle query validation
+        if query:
+            if len(query) < 2:  # Minimum 2-character search
+                self.query_too_short = True
+                return Torrent.objects.none()
+            torrents = torrents.filter(name__icontains=query)
+        else:
+            self.query_too_short = False
+
+        return torrents
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('query', '').strip()
+        context['query'] = query
+        context['result_count'] = self.get_queryset().count()
+        context['query_too_short'] = getattr(self, 'query_too_short', False)
+        return context
 
 #
 # Rewrite the access to .torrent

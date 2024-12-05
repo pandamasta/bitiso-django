@@ -8,6 +8,9 @@ from django.core.paginator import Paginator
 from django.db.models import Count
 from ..models.category import Category
 from ..models.project import Project
+from django.db.models import Q
+from django.core.paginator import Paginator
+from django.contrib import messages
 
 from ..models import Project, Torrent
 from ..forms import ProjectForm
@@ -40,23 +43,31 @@ class ProjectListView(ListView):
 class ProjectDetailView(DetailView):
     model = Project
     template_name = 'torrents/project_detail.html'
-    
-    def get_object(self):
-        return get_object_or_404(Project, slug=self.kwargs.get('slug'))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Get the project instance
         project = self.get_object()
-        
-        # Get related torrents and paginate them
-        related_torrents = Torrent.objects.filter(project=project)
-        paginator = Paginator(related_torrents, 10)  # Show 10 torrents per page
+        query = self.request.GET.get('query', '').strip()
+        related_torrents = Torrent.objects.filter(project=project, is_active=True)
+
+        # Handle query validation
+        query_too_short = False
+        if query:
+            if len(query) < 2:  # Minimum 2-character search
+                query_too_short = True
+            else:
+                related_torrents = related_torrents.filter(name__icontains=query)
+
+        # Paginate torrents
+        paginator = Paginator(related_torrents, 10)
         page_number = self.request.GET.get('page')
         context['torrents'] = paginator.get_page(page_number)
-        
+        context['project'] = project
+        context['query'] = query
+        context['query_too_short'] = query_too_short
+
         return context
+
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
     model = Project

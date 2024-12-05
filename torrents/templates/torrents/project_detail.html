@@ -1,9 +1,11 @@
+{# torrents/templates/torrents/project_detail.html #}
+
 {% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
 
 {% block content %}
-{% load i18n %}
-{% load static %}
-
 <div class="container my-5">
     <div class="row">
         <div class="col-md-3">
@@ -37,7 +39,16 @@
     </div>
     <div class="mt-5">
         <h3>Related Torrents</h3>
-        {% include "torrents/_torrent_list_public.html" %}
+
+        <!-- Display error for short queries -->
+        {% if query_too_short %}
+            <div class="alert alert-warning">
+                Please enter at least 2 characters for your search.
+            </div>
+        {% endif %}
+
+        {% include "torrents/_torrent_list_project.html" %}
     </div>
+</div>
 </div>
 {% endblock %}
