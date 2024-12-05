@@ -12,6 +12,7 @@ import requests
 from urllib.parse import urlparse
 import tempfile  
 from django.conf import settings
+from ..utils.slug_utils import generate_unique_slug
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -66,10 +67,9 @@ def determine_save_dir(info_hash, use_info_hash_folders):
     return torrent_dir
 
 
-
 def create_torrent_instance(metadata, url, torrent_file, user):
     """
-    Creates and saves a Torrent instance in the database.
+    Creates and saves a Torrent instance in the database, retaining meaningful parts in the slug.
 
     Args:
         metadata (dict): Torrent metadata returned from `process_torrent_file`.
@@ -82,11 +82,12 @@ def create_torrent_instance(metadata, url, torrent_file, user):
     """
     try:
         logger.debug(f"Storing torrent file with relative path: {metadata['torrent_file_path']}")
+
+        # Create a Torrent instance without saving
         torrent = Torrent(
             info_hash=metadata["info_hash"],
             name=metadata["name"],
-            slug=slugify(metadata["name"]),
-            torrent_file=metadata["torrent_file_path"],  # Pass relative path directly
+            torrent_file=metadata["torrent_file_path"],
             website_url_download=url,
             user=user,
             size=metadata["size"],
@@ -96,12 +97,22 @@ def create_torrent_instance(metadata, url, torrent_file, user):
             file_list=metadata["file_list"],
             file_count=metadata["file_count"]
         )
+
+        # Generate slug using the instance
+        try:
+            torrent.slug = generate_unique_slug(torrent, torrent.name)
+        except Exception as e:
+            logger.error(f"Failed to generate slug for torrent '{torrent.name}': {e}")
+            torrent.slug = slugify(torrent.name[:100])  # Fallback to a basic slug
+
+        # Save the Torrent instance
         torrent.save()
         logger.info(f"Torrent instance created successfully: {torrent.name}")
         return torrent
     except Exception as e:
         logger.error(f"Error creating torrent instance: {e}")
         return None
+
 
 
 def is_valid_tracker_url(url):

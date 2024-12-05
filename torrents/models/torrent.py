@@ -126,8 +126,7 @@ class Torrent(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            with transaction.atomic():
-                self.slug = generate_unique_slug(self, self.name)
+            self.slug = generate_unique_slug(self, self.name, keep_extension=True)  # Set to True or False as needed
         super().save(*args, **kwargs)
 
 # Delete single or multiple .torrent file
