@@ -19,27 +19,44 @@ class ProjectListView(ListView):
     model = Project
     template_name = 'torrents/project_list.html'
     context_object_name = 'projects'
+    paginate_by = 10  # Set pagination for flat project results
 
     def get_queryset(self):
         """
-        Return only active projects (is_active=True) without dynamic annotations.
+        Handle both default project listing and search queries.
         """
-        return Project.objects.filter(is_active=True)
+        query = self.request.GET.get('query', '').strip()
+        projects = Project.objects.filter(is_active=True)
+
+        if query:
+            # Filter projects by name or description containing the query
+            return projects.filter(name__icontains=query)
+        
+        return projects
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Retrieve categories and group projects under each category
-        categories = Category.objects.all()
-        context['categories'] = categories
-        # For each category, filter active projects using the pre-calculated torrent_count field
-        category_projects = {
-            category: Project.objects.filter(category=category, is_active=True)
-            for category in categories
-        }
-        context['category_projects'] = category_projects
+
+        # Add query to the context for use in the search bar
+        query = self.request.GET.get('query', '').strip()
+        context['query'] = query
+
+        # Add the number of results if a query is present
+        if query:
+            context['result_count'] = self.get_queryset().count()
+
+        if not query:  # Only group by category if there's no query
+            categories = Category.objects.all()
+            context['categories'] = categories
+            category_projects = {
+                category: Project.objects.filter(category=category, is_active=True)
+                for category in categories
+            }
+            context['category_projects'] = category_projects
+
         return context
 
-
+    
 class ProjectDetailView(DetailView):
     model = Project
     template_name = 'torrents/project_detail.html'
