@@ -1,174 +1,146 @@
-{# torrents/templates/torrents/torrent_detail.html #}
 {% extends 'base.html' %}
 
 {% block content %}
-
 <div class="container my-5">
     <div class="card shadow">
         <div class="card-body">
-            <div class="d-flex align-items-center mb-4">
+            <!-- Torrent Header -->
+            <div class="row align-items-center mb-4">
                 {% if torrent.project.large_image %}
+                <div class="col-auto">
                     <img src="{{ torrent.project.large_image.url }}" alt="{{ torrent.project.name }}" 
-                         class="img-thumbnail me-3" 
-                         style="width: 100px; height: 100px; object-fit: contain;">
+                         class="img-thumbnail" style="width: 100px; height: 100px; object-fit: contain;">
+                </div>
                 {% endif %}
-                <div>
+                <div class="col">
                     <h2 class="card-title">{{ torrent.name|default:_("N/A") }}</h2>
-                    <p class="text-muted mb-0">{{ _("Category:") }} 
+                    <p class="text-muted mb-1">{{ _("Category:") }}
                         {% if torrent.category %}
-                            <a href="/{{ LANGUAGE_CODE }}/categories/{{ torrent.category.slug }}/">
-                                <strong>{{ torrent.category.name }}</strong>
-                            </a>
+                        <a href="/{{ LANGUAGE_CODE }}/categories/{{ torrent.category.slug }}/">
+                            <strong>{{ torrent.category.name }}</strong>
+                        </a>
                         {% else %}
-                            <strong>{{ _("N/A") }}</strong>
+                        <strong>{{ _("N/A") }}</strong>
                         {% endif %}
                     </p>
-                    
                     {% if torrent.project %}
-                        <p class="text-muted">
-                            {{ _("Project:") }} 
-                            <a href="/{{ LANGUAGE_CODE }}/projects/{{ torrent.project.slug }}/">
-                                {{ torrent.project.name }}
-                            </a>
-                        </p>
+                    <p class="text-muted mb-1">
+                        {{ _("Project:") }}
+                        <a href="/{{ LANGUAGE_CODE }}/projects/{{ torrent.project.slug }}/">
+                            {{ torrent.project.name }}
+                        </a>
+                    </p>
                     {% endif %}
-
-                    <p class="text-muted">{{ _("File Count:") }} <strong>{{ torrent.file_count|default:_("N/A") }}</strong></p>
+                    <p class="text-muted mb-1">{{ _("File Count:") }} <strong>{{ torrent.file_count|default:_("N/A") }}</strong></p>
                     <p class="text-muted">{{ _("Hash:") }} <strong>{{ torrent.info_hash|default:_("N/A") }}</strong></p>
                 </div>
             </div>
 
-            <p><strong>{{ _("Description:") }}</strong> 
+            <!-- Description -->
+            <p><strong>{{ _("Description:") }}</strong>
                 {% if torrent.description %}
-                    {{ torrent.description }}
+                {{ torrent.description }}
                 {% elif torrent.project and torrent.project.description %}
-                    {{ torrent.project.description }}
+                {{ torrent.project.description }}
                 {% else %}
-                    <span class="text-muted">{{ _("N/A") }}</span>
+                <span class="text-muted">{{ _("N/A") }}</span>
                 {% endif %}
             </p>
 
             <hr>
 
-            <p><strong>{{ _("Size:") }}</strong> {{ torrent.size|filesizeformat|default:_("N/A") }} ({{ torrent.size|default:_("N/A") }} bytes)</p>
-            
-            <p><strong>{{ _("Seeders:") }}</strong> {{ torrent.seed_count }}</p>
-            <p><strong>{{ _("Leechers:") }}</strong> {{ torrent.leech_count }}</p>
-
-            <p>
-                <strong>{{ _("Torrent File:") }}</strong>
-                {% if filename %}
-                    <a href="{% url 'serve_torrent_file' filename=filename %}" class="btn btn-link">{{ filename }}</a>
-                {% else %}
-                    <span class="text-muted">{{ _("N/A") }}</span>
-                {% endif %}
-            </p>
-
-            <p>
-                <strong>{{ _("Magnet Link:") }}</strong>
-                {% if torrent.magnet %}
-                    <a href="{{ torrent.magnet }}" class="btn btn-link">{{ _("Magnet") }}</a>
-                {% else %}
-                    <span class="text-muted">{{ _("N/A") }}</span>
-                {% endif %}
-            </p>
-
-            <p>
-                <strong>{{ _("File List:") }}</strong>
-                {% if torrent.file_list %}
-                    <pre>{{ torrent.file_list }}</pre>
-                {% else %}
-                    <span class="text-muted">{{ _("N/A") }}</span>
-                {% endif %}
-            </p>
-
-            {% if torrent.architecture %}
-                <p><strong>{{ _("Architecture:") }}</strong> {{ torrent.architecture }}</p>
-            {% endif %}
-
-            {% if torrent.os %}
-                <p><strong>{{ _("Operating System:") }}</strong> {{ torrent.os }}</p>
-            {% endif %}
-
-            {% if torrent.is_signed %}
-                <p><strong>{{ _("Signed:") }}</strong> {{ _("Yes") }}</p>
-                <p>
-                    <strong>{{ _("GPG Signature:") }}</strong>
-                    {% if torrent.gpg_signature %}
-                        <a href="{{ torrent.gpg_signature.url }}" class="btn btn-link">{{ _("Download Signature") }}</a>
-                    {% else %}
+            <!-- Details Section -->
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>{{ _("Size:") }}</strong> {{ torrent.size|filesizeformat|default:_("N/A") }}</p>
+                    <p><strong>{{ _("Seeders:") }}</strong> {{ torrent.seed_count }}</p>
+                    <p><strong>{{ _("Leechers:") }}</strong> {{ torrent.leech_count }}</p>
+                    <p><strong>{{ _("Torrent File:") }}</strong>
+                        {% if filename %}
+                        <a href="{% url 'serve_torrent_file' filename=filename %}" class="btn btn-link p-0">{{ filename }}</a>
+                        {% else %}
                         <span class="text-muted">{{ _("N/A") }}</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>{{ _("Magnet Link:") }}</strong>
+                        {% if torrent.magnet %}
+                        <a href="{{ torrent.magnet }}" class="btn btn-link p-0">{{ _("Magnet") }}</a>
+                        {% else %}
+                        <span class="text-muted">{{ _("N/A") }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>{{ _("File List:") }}</strong>
+                        {% if torrent.file_list %}
+                        <pre class="bg-light p-2 rounded">{{ torrent.file_list }}</pre>
+                        {% else %}
+                        <span class="text-muted">{{ _("N/A") }}</span>
+                        {% endif %}
+                    </p>
+                    {% if torrent.architecture %}
+                    <p><strong>{{ _("Architecture:") }}</strong> {{ torrent.architecture }}</p>
                     {% endif %}
-                </p>
-            {% else %}
-                <p><strong>{{ _("Signed:") }}</strong> {{ _("No") }}</p>
-            {% endif %}
+                    {% if torrent.os %}
+                    <p><strong>{{ _("Operating System:") }}</strong> {{ torrent.os }}</p>
+                    {% endif %}
+                    {% if torrent.is_signed %}
+                    <p><strong>{{ _("Signed:") }}</strong> {{ _("Yes") }}</p>
+                    <p><strong>{{ _("GPG Signature:") }}</strong>
+                        {% if torrent.gpg_signature %}
+                        <a href="{{ torrent.gpg_signature.url }}" class="btn btn-link p-0">{{ _("Download Signature") }}</a>
+                        {% else %}
+                        <span class="text-muted">{{ _("N/A") }}</span>
+                        {% endif %}
+                    </p>
+                    {% else %}
+                    <p><strong>{{ _("Signed:") }}</strong> {{ _("No") }}</p>
+                    {% endif %}
+                    <p><strong>{{ _("Bitiso Status:") }}</strong>
+                        {% if torrent.is_bitiso %}
+                        {{ _("Created by Bitiso") }}
+                        {% else %}
+                        {{ _("External Torrent") }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
 
-            <p><strong>{{ _("Bitiso Status:") }}</strong> 
-                {% if torrent.is_bitiso %}
-                    {{ _("Created by Bitiso") }}
-                {% else %}
-                    {{ _("External Torrent") }}
-                {% endif %}
-            </p>
-
-            {% if torrent.version %}
-                <p><strong>{{ _("Version:") }}</strong> {{ torrent.version }}</p>
-            {% endif %}
-
-            <p><strong>{{ _("License:") }}</strong> 
-                {% if torrent.license %}
-                    {{ torrent.license }}
-                {% elif torrent.project.license %}
-                    {{ torrent.project.license }}
-                {% else %}
-                    <span class="text-muted">{{ _("N/A") }}</span>
-                {% endif %}
-            </p>
-
-            <p>
-                <strong>{{ _("Website:") }}</strong>
-                {% if torrent.website_url %}
-                    <a href="{{ torrent.website_url }}" target="_blank" class="btn btn-link">{{ torrent.website_url }}</a>
-                {% elif torrent.project.website_url %}
-                    <a href="{{ torrent.project.website_url }}" target="_blank" class="btn btn-link">{{ torrent.project.website_url }}</a>
-                {% else %}
-                    <span class="text-muted">{{ _("N/A") }}</span>
-                {% endif %}
-            </p>
-
+            <!-- Trackers Section -->
             <h3 class="mt-4">{{ _("Trackers") }}</h3>
-            <table class="table table-striped table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>{{ _("URL") }}</th>
-                        <th class="text-center">{{ _("Seeders") }}</th>
-                        <th class="text-center">{{ _("Leechers") }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for tracker in tracker_detail %}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>{{ _("URL") }}</th>
+                            <th class="text-center">{{ _("Seeders") }}</th>
+                            <th class="text-center">{{ _("Leechers") }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tracker in tracker_detail %}
                         <tr>
                             <td>{{ tracker.tracker.url|default:_("N/A") }}</td>
                             <td class="text-center">{{ tracker.seed }}</td>
                             <td class="text-center">{{ tracker.leech }}</td>
                         </tr>
-                    {% empty %}
+                        {% empty %}
                         <tr>
                             <td colspan="3" class="text-center">{{ _("No trackers found.") }}</td>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
+            <!-- Action Buttons -->
             {% if user.is_authenticated and user == torrent.user %}
-                <div class="mt-4">
-                    <a href="{% url 'torrent_edit' torrent.slug %}" class="btn btn-primary">{{ _("Edit Torrent") }}</a>
-                    <a href="{% url 'torrent_delete' torrent.slug %}" class="btn btn-danger">{{ _("Delete Torrent") }}</a>
-                </div>
+            <div class="mt-4">
+                <a href="{% url 'torrent_edit' torrent.slug %}" class="btn btn-primary">{{ _("Edit Torrent") }}</a>
+                <a href="{% url 'torrent_delete' torrent.slug %}" class="btn btn-danger">{{ _("Delete Torrent") }}</a>
+            </div>
             {% endif %}
         </div>
     </div>
 </div>
-
 {% endblock %}
