@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <div class="container my-5">
@@ -9,11 +10,18 @@
                 {% if torrent.project.large_image %}
                 <div class="col-auto">
                     <img src="{{ torrent.project.large_image.url }}" alt="{{ torrent.project.name }}" 
-                         class="img-thumbnail" style="width: 100px; height: 100px; object-fit: contain;">
+                         class="img-thumbnail" style="width: 150px; height: 150px; object-fit: contain;">
                 </div>
                 {% endif %}
                 <div class="col">
-                    <h2 class="card-title">{{ torrent.name|default:_("N/A") }}</h2>
+                    <h2 class="card-title">{{ torrent.name|default:_("N/A") }}</h2>    
+                    <div class="d-flex align-items-center text-muted mb-1">
+                        <p class="mb-0 me-3">{{ _("Seed:") }} <strong class="seed">{{ torrent.seed_count }}</strong></p>
+                        <p class="mb-0">{{ _("Leech:") }} <strong class="leech">{{ torrent.leech_count }}</strong></p>
+                    </div>
+                    
+
+
                     <p class="text-muted mb-1">{{ _("Category:") }}
                         {% if torrent.category %}
                         <a href="/{{ LANGUAGE_CODE }}/categories/{{ torrent.category.slug }}/">
@@ -53,8 +61,16 @@
             <div class="row">
                 <div class="col-md-6">
                     <p><strong>{{ _("Size:") }}</strong> {{ torrent.size|filesizeformat|default:_("N/A") }}</p>
-                    <p><strong>{{ _("Seeders:") }}</strong> {{ torrent.seed_count }}</p>
-                    <p><strong>{{ _("Leechers:") }}</strong> {{ torrent.leech_count }}</p>
+                    <!-- <div class="d-flex align-items-center mb-3">
+                        <span class="me-4">
+                            <strong>{{ _("Seeders:") }}</strong> 
+                            <span class="seed">{{ torrent.seed_count }}</span>
+                        </span>
+                        <span>
+                            <strong>{{ _("Leechers:") }}</strong> 
+                            <span class="leech">{{ torrent.leech_count }}</span>
+                        </span>
+                    </div> -->
                     <p><strong>{{ _("Torrent File:") }}</strong>
                         {% if filename %}
                         <a href="{% url 'serve_torrent_file' filename=filename %}" class="btn btn-link p-0">{{ filename }}</a>
@@ -73,7 +89,7 @@
                 <div class="col-md-6">
                     <p><strong>{{ _("File List:") }}</strong>
                         {% if torrent.file_list %}
-                        <pre class="bg-light p-2 rounded">{{ torrent.file_list }}</pre>
+                        <pre class="dynamic-bg p-2 rounded">{{ torrent.file_list }}</pre>
                         {% else %}
                         <span class="text-muted">{{ _("N/A") }}</span>
                         {% endif %}
@@ -121,8 +137,8 @@
                         {% for tracker in tracker_detail %}
                         <tr>
                             <td>{{ tracker.tracker.url|default:_("N/A") }}</td>
-                            <td class="text-center">{{ tracker.seed }}</td>
-                            <td class="text-center">{{ tracker.leech }}</td>
+                            <td class="text-center seed">{{ tracker.seed }}</td>
+                            <td class="text-center leech">{{ tracker.leech }}</td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -143,4 +159,16 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Dynamic background for file list */
+    .dynamic-bg {
+        background-color: var(--bs-light);
+        color: var(--bs-body-color);
+    }
+    [data-bs-theme="dark"] .dynamic-bg {
+        background-color: var(--bs-dark);
+        color: var(--bs-body-color);
+    }
+</style>
 {% endblock %}
