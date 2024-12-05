@@ -1,0 +1,22 @@
+<!-- Category-Specific Torrent Search -->
+<form method="get" action="{% url 'category_detail' category.slug %}" class="mb-4">
+    <div class="input-group">
+        <input 
+            type="text" 
+            name="query" 
+            class="form-control" 
+            placeholder="Search torrents in this category..." 
+            value="{{ query|default_if_none:'' }}">
+        <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+</form>
+
+<!-- Display warning for short queries -->
+{% if query_too_short %}
+    <div class="alert alert-warning">
+        Please enter at least 2 characters for your search.
+    </div>
+{% endif %}
+
+<!-- Torrent List -->
+{% include "torrents/_torrent_list.html" %}
