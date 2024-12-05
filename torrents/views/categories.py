@@ -6,7 +6,8 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from ..models.torrent import Torrent
 from ..models.category import Category
-
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404
 
 from ..models import Category
 from ..forms import CategoryForm
@@ -31,22 +32,39 @@ class CategoryDetailView(DetailView):
     template_name = 'torrents/category_detail.html'
     context_object_name = 'category'
 
-    def get_object(self):
-        # Fetch the category based on the slug
-        return get_object_or_404(Category, slug=self.kwargs.get('slug'))
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Fetch torrents related to the category and filter by is_active=True
+
+        # Fetch the category based on the slug
         category = self.get_object()
+        query = self.request.GET.get('query', '').strip()
+
+        # Filter torrents related to the category
         related_torrents = Torrent.objects.filter(
             project__category=category,
             is_active=True
         ).select_related('project')
 
-        context['torrents'] = related_torrents
+        # Handle query validation
+        query_too_short = False
+        if query:
+            if len(query) < 2:  # Minimum 2-character search
+                query_too_short = True
+                related_torrents = Torrent.objects.none()
+            else:
+                related_torrents = related_torrents.filter(name__icontains=query)
+
+        # Paginate torrents
+        paginator = Paginator(related_torrents, 10)  # Show 10 torrents per page
+        page_number = self.request.GET.get('page')
+        context['torrents'] = paginator.get_page(page_number)
+
+        # Add context variables
+        context['query'] = query
+        context['query_too_short'] = query_too_short
+
         return context
+
     
 class CategoryCreateView(LoginRequiredMixin,CreateView):
     model = Category
