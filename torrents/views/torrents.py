@@ -45,11 +45,14 @@ logger = logging.getLogger(__name__)
 
 
 # List view: Display all torrents
+from django.core.cache import cache
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 class TorrentListView(ListView):
     model = Torrent
     template_name = 'torrents/torrent_list.html'
     context_object_name = 'torrents'
-    paginate_by = 40  # Set a default pagination limit (10 items per page)
+    paginate_by = 40  # Pagination limit
 
     def get_queryset(self):
         # Return active torrents only
@@ -57,10 +60,16 @@ class TorrentListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Add total active torrent count for display
-        context['active_torrent_count'] = self.get_queryset().count()
 
-        # Handle pagination explicitly
+        # Cache total active torrent count
+        active_torrent_count = cache.get('active_torrent_count')
+        if active_torrent_count is None:
+            active_torrent_count = self.get_queryset().count()
+            cache.set('active_torrent_count', active_torrent_count, 300)  # Cache for 5 minutes
+
+        context['active_torrent_count'] = active_torrent_count
+
+        # Handle pagination
         queryset = self.get_queryset()
         paginator = Paginator(queryset, self.paginate_by)
         page = self.request.GET.get('page')
@@ -72,11 +81,12 @@ class TorrentListView(ListView):
         except EmptyPage:
             torrents = paginator.page(paginator.num_pages)
 
-        # Update the context with paginated objects
+        # Update context with paginated objects
         context['torrents'] = torrents
         context['page_obj'] = torrents
         context['is_paginated'] = torrents.has_other_pages()
         return context
+
     
 # Detail view: Display details of a specific torrent
 class TorrentDetailView(DetailView):
