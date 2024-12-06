@@ -5,48 +5,66 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-3">
             {% if object.large_image %}
-                <img src="{{ object.large_image.url }}" alt="{{ object.name }} Image" class="img-fluid rounded mb-3">
+                <img src="{{ object.large_image.url }}" 
+                     alt="{{ object.name }} Image" 
+                     class="img-fluid rounded mb-3" 
+                     style="max-height: 200px;">
             {% else %}
-                <img src="{% static 'images/default_project_image.png' %}" alt="{% trans "Default Project Image" %}" class="img-fluid rounded mb-3">
+                <img src="{% static 'images/default_project_image.png' %}" 
+                     alt="{% trans "Default Project Image" %}" 
+                     class="img-fluid rounded mb-3" 
+                     style="max-height: 200px;">
             {% endif %}
         </div>
         <div class="col-md-9">
-            <h2>{{ object.name }}</h2>
-            <p>{{ object.description }}</p>
+            <h2 class="fw-bold">{{ object.name }}</h2>
+            <p class="text-muted">{{ object.description }}</p>
             <ul class="list-unstyled">
                 {% if object.website_url %}
-                    <li><strong>{% trans "Official Website:" %}</strong> <a href="{{ object.website_url }}" target="_blank">{{ object.website_url }}</a></li>
+                    <li><strong>{% trans "Official Website:" %}</strong> 
+                        <a href="{{ object.website_url }}" target="_blank" class="text-decoration-none">
+                            {{ object.website_url }}
+                        </a>
+                    </li>
                 {% endif %}
                 {% if object.website_url_download %}
-                    <li><strong>{% trans "Download:" %}</strong> <a href="{{ object.website_url_download }}" target="_blank">{{ object.website_url_download }}</a></li>
+                    <li><strong>{% trans "Download:" %}</strong> 
+                        <a href="{{ object.website_url_download }}" target="_blank" class="text-decoration-none">
+                            {{ object.website_url_download }}
+                        </a>
+                    </li>
                 {% endif %}
                 {% if object.website_url_repo %}
-                    <li><strong>{% trans "Repository:" %}</strong> <a href="{{ object.website_url_repo }}" target="_blank">{{ object.website_url_repo }}</a></li>
+                    <li><strong>{% trans "Repository:" %}</strong> 
+                        <a href="{{ object.website_url_repo }}" target="_blank" class="text-decoration-none">
+                            {{ object.website_url_repo }}
+                        </a>
+                    </li>
                 {% endif %}
             </ul>
             {% if user.is_authenticated %}
-                <div class="mt-3">
-                    <a href="{% url 'project_edit' object.slug %}" class="btn btn-primary me-2">{% trans "Edit" %}</a>
-                    <a href="{% url 'project_delete' object.slug %}" class="btn btn-danger">{% trans "Delete" %}</a>
+                <div class="mt-3 d-flex gap-2">
+                    <a href="{% url 'project_edit' object.slug %}" 
+                       class="btn btn-primary btn-sm">{% trans "Edit" %}</a>
+                    <a href="{% url 'project_delete' object.slug %}" 
+                       class="btn btn-danger btn-sm">{% trans "Delete" %}</a>
                 </div>
             {% endif %}
         </div>
     </div>
     <div class="mt-5">
-        <h3>{% trans "Related Torrents" %}</h3>
-    
-        <!-- Display error for short queries -->
+        <h3 class="mb-3">{% trans "Related Torrents" %}</h3>
+        
         {% if query_too_short %}
             <div class="alert alert-warning">
                 {% trans "Please enter at least 2 characters for your search." %}
             </div>
         {% endif %}
-    
-        <!-- Sorting Options -->
-        <div class="mb-3">
+        
+        <div class="d-flex gap-2 mb-3">
             <a href="?query={{ query }}&sort_by=date" 
                class="btn btn-sm {% if sort_by == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">
                 {% trans "Sort by Date" %}
@@ -60,7 +78,7 @@
                 {% trans "Sort by Leeches" %}
             </a>
         </div>
-    
+        
         {% include "torrents/_torrent_list_project.html" %}
     </div>
 </div>
