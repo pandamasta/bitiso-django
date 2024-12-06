@@ -17,6 +17,10 @@ from torrents.utils.torrent_utils import process_torrent_file
 from django.core.files import File
 from django.http import FileResponse, Http404
 from django.db.models import Q
+from django.db.models import Count
+from django.core.cache import cache
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 from ..models import Torrent
 from ..forms import TorrentForm
@@ -45,17 +49,35 @@ class TorrentListView(ListView):
     model = Torrent
     template_name = 'torrents/torrent_list.html'
     context_object_name = 'torrents'
-    paginate_by = 40  # If you want to paginate torrents
-
+    paginate_by = 40  # Set a default pagination limit (10 items per page)
 
     def get_queryset(self):
-        # Return only active torrents (is_active=True)
+        # Return active torrents only
         return Torrent.objects.filter(is_active=True)
-    
-    def get_object(self):
-        # Ensure that the torrent with the provided slug exists
-        return get_object_or_404(Torrent, slug=self.kwargs.get('slug'))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add total active torrent count for display
+        context['active_torrent_count'] = self.get_queryset().count()
+
+        # Handle pagination explicitly
+        queryset = self.get_queryset()
+        paginator = Paginator(queryset, self.paginate_by)
+        page = self.request.GET.get('page')
+
+        try:
+            torrents = paginator.page(page)
+        except PageNotAnInteger:
+            torrents = paginator.page(1)
+        except EmptyPage:
+            torrents = paginator.page(paginator.num_pages)
+
+        # Update the context with paginated objects
+        context['torrents'] = torrents
+        context['page_obj'] = torrents
+        context['is_paginated'] = torrents.has_other_pages()
+        return context
+    
 # Detail view: Display details of a specific torrent
 class TorrentDetailView(DetailView):
     model = Torrent

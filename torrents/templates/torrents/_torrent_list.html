@@ -50,12 +50,14 @@
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
         <li class="page-item">
-            <a class="page-link" href="?page=1" aria-label="First">
+            <a class="page-link" href="?page=1{% if query %}&query={{ query }}{% endif %}" aria-label="First">
                 &laquo; First
             </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&query={{ query }}{% endif %}">
+                Previous
+            </a>
         </li>
         {% endif %}
         <li class="page-item disabled">
@@ -65,16 +67,19 @@
         </li>
         {% if page_obj.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&query={{ query }}{% endif %}">
+                Next
+            </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&query={{ query }}{% endif %}" aria-label="Last">
                 Last &raquo;
             </a>
         </li>
         {% endif %}
     </ul>
 </nav>
+
 {% endif %}
 {% else %}
 <p class="text-center text-muted">No active torrents found.</p>

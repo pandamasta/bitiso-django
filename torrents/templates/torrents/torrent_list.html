@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- <h2>Torrents List</h2> -->
-{% include "torrents/_torrent_list_public.html" %}
+<h2>{{ active_torrent_count }} torrents</h2>
+{% include "torrents/_torrent_list_global.html" with torrents=torrents is_paginated=is_paginated page_obj=page_obj %}
 
 {% endblock %}
