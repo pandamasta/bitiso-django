@@ -1,9 +1,7 @@
 {# torrents/templates/torrents/project_detail.html #}
-
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-
 
 {% block content %}
 <div class="container my-5">
@@ -12,7 +10,7 @@
             {% if object.large_image %}
                 <img src="{{ object.large_image.url }}" alt="{{ object.name }} Image" class="img-fluid rounded mb-3">
             {% else %}
-                <img src="{% static 'images/default_project_image.png' %}" alt="Default Project Image" class="img-fluid rounded mb-3">
+                <img src="{% static 'images/default_project_image.png' %}" alt="{% trans "Default Project Image" %}" class="img-fluid rounded mb-3">
             {% endif %}
         </div>
         <div class="col-md-9">
@@ -20,30 +18,30 @@
             <p>{{ object.description }}</p>
             <ul class="list-unstyled">
                 {% if object.website_url %}
-                    <li><strong>Official Website:</strong> <a href="{{ object.website_url }}" target="_blank">{{ object.website_url }}</a></li>
+                    <li><strong>{% trans "Official Website:" %}</strong> <a href="{{ object.website_url }}" target="_blank">{{ object.website_url }}</a></li>
                 {% endif %}
                 {% if object.website_url_download %}
-                    <li><strong>Download:</strong> <a href="{{ object.website_url_download }}" target="_blank">{{ object.website_url_download }}</a></li>
+                    <li><strong>{% trans "Download:" %}</strong> <a href="{{ object.website_url_download }}" target="_blank">{{ object.website_url_download }}</a></li>
                 {% endif %}
                 {% if object.website_url_repo %}
-                    <li><strong>Repository:</strong> <a href="{{ object.website_url_repo }}" target="_blank">{{ object.website_url_repo }}</a></li>
+                    <li><strong>{% trans "Repository:" %}</strong> <a href="{{ object.website_url_repo }}" target="_blank">{{ object.website_url_repo }}</a></li>
                 {% endif %}
             </ul>
             {% if user.is_authenticated %}
                 <div class="mt-3">
-                    <a href="{% url 'project_edit' object.slug %}" class="btn btn-primary me-2">Edit</a>
-                    <a href="{% url 'project_delete' object.slug %}" class="btn btn-danger">Delete</a>
+                    <a href="{% url 'project_edit' object.slug %}" class="btn btn-primary me-2">{% trans "Edit" %}</a>
+                    <a href="{% url 'project_delete' object.slug %}" class="btn btn-danger">{% trans "Delete" %}</a>
                 </div>
             {% endif %}
         </div>
     </div>
     <div class="mt-5">
-        <h3>Related Torrents</h3>
+        <h3>{% trans "Related Torrents" %}</h3>
     
         <!-- Display error for short queries -->
         {% if query_too_short %}
             <div class="alert alert-warning">
-                Please enter at least 2 characters for your search.
+                {% trans "Please enter at least 2 characters for your search." %}
             </div>
         {% endif %}
     
@@ -51,20 +49,19 @@
         <div class="mb-3">
             <a href="?query={{ query }}&sort_by=date" 
                class="btn btn-sm {% if sort_by == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                Sort by Date
+                {% trans "Sort by Date" %}
             </a>
             <a href="?query={{ query }}&sort_by=seeds" 
                class="btn btn-sm {% if sort_by == 'seeds' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                Sort by Seeds
+                {% trans "Sort by Seeds" %}
             </a>
             <a href="?query={{ query }}&sort_by=leeches" 
                class="btn btn-sm {% if sort_by == 'leeches' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                Sort by Leeches
+                {% trans "Sort by Leeches" %}
             </a>
         </div>
     
         {% include "torrents/_torrent_list_project.html" %}
     </div>
-</div>
 </div>
 {% endblock %}

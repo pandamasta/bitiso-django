@@ -1,4 +1,5 @@
 {# torrents/templates/torrents/_torrent_list_project.html #}
+{% load i18n %}
 
 <!-- Project-Specific Torrent Search -->
 <form method="get" action="" class="mb-4">
@@ -7,7 +8,7 @@
             type="text" 
             name="query" 
             class="form-control" 
-            placeholder="Search torrents in this project..." 
+            placeholder="{% trans "Search torrents in this project..." %}"
             value="{{ query|default_if_none:'' }}">
         <button class="btn btn-primary" type="submit">Search</button>
     </div>

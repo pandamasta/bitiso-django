@@ -1,18 +1,18 @@
 {# torrents/templates/torrents/_torrent_list.html #}
-
+{% load i18n %}
 {% if torrents %}
 
 <div class="table-responsive">
     <table class="table table-striped align-middle">
         <thead>
             <tr>
-                <th scope="col">Torrent Name</th>
-                <th scope="col">Size</th>
-                <th scope="col">Added At</th>
-                <th scope="col" class="text-center">Seeds</th>
-                <th scope="col" class="text-center">Leeches</th>
-                <th scope="col">Category</th>
-                <th scope="col">Project</th>
+                <th scope="col">{% trans "Torrent Name" %}</th>
+                <th scope="col">{% trans "Size" %}</th>
+                <th scope="col">{% trans "Added At" %}</th>
+                <th scope="col" class="text-center">{% trans "Seeds" %}</th>
+                <th scope="col" class="text-center">{% trans "Leeches" %}</th>
+                <th scope="col">{% trans "Category" %}</th>
+                <th scope="col">{% trans "Project" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -22,7 +22,7 @@
                     <td>
                         <div class="d-flex align-items-center">
                             {% if torrent.project.mini_image %}
-                            <img src="{{ torrent.project.mini_image.url }}" alt="" style="width: 15px; height: 15px; margin-right: 10px;">
+                            <img src="{{ torrent.project.mini_image.url }}" alt="{% trans "Project Image" %}" style="width: 15px; height: 15px; margin-right: 10px;">
                             {% endif %}
                             <a href="{% url 'torrent_detail' torrent.slug %}">{{ torrent.name }}</a>
                         </div>
@@ -37,7 +37,7 @@
                 {% endif %}
             {% empty %}
             <tr>
-                <td colspan="7" class="text-center">No active torrents found.</td>
+                <td colspan="7" class="text-center">{% trans "No active torrents found." %}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -46,42 +46,40 @@
 
 <!-- Pagination -->
 {% if is_paginated %}
-<nav aria-label="Torrent pagination">
+<nav aria-label="{% trans "Torrent pagination" %}">
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
         <li class="page-item">
-            <a class="page-link" href="?page=1{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" aria-label="First">
-                &laquo; First
+            <a class="page-link" href="?page=1{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" aria-label="{% trans "First" %}">
+                &laquo; {% trans "First" %}
             </a>
         </li>
         <li class="page-item">
             <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">
-                Previous
+                {% trans "Previous" %}
             </a>
         </li>
         {% endif %}
         <li class="page-item disabled">
             <span class="page-link">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                {% blocktrans %}Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}{% endblocktrans %}
             </span>
         </li>
         {% if page_obj.has_next %}
         <li class="page-item">
             <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">
-                Next
+                {% trans "Next" %}
             </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" aria-label="Last">
-                Last &raquo;
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" aria-label="{% trans "Last" %}">
+                {% trans "Last" %} &raquo;
             </a>
         </li>
         {% endif %}
     </ul>
 </nav>
-
-
 {% endif %}
 {% else %}
-<p class="text-center text-muted">No active torrents found.</p>
+<p class="text-center text-muted">{% trans "No active torrents found." %}</p>
 {% endif %}

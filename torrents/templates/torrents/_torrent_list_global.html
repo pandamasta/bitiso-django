@@ -6,7 +6,7 @@
             type="text" 
             name="query" 
             class="form-control" 
-            placeholder="Search torrents..." 
+            placeholder="{% trans "Search torrents..." %}"
             value="{{ query|default_if_none:'' }}">
         <button class="btn btn-primary" type="submit">Search</button>
     </div>
