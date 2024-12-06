@@ -55,8 +55,19 @@ class TorrentListView(ListView):
     paginate_by = 40  # Pagination limit
 
     def get_queryset(self):
-        # Return active torrents only
-        return Torrent.objects.filter(is_active=True)
+        # Retrieve base queryset
+        queryset = Torrent.objects.filter(is_active=True)
+
+        # Handle sorting logic
+        sort_by = self.request.GET.get('sort_by', 'date')  # Default to sorting by date
+        if sort_by == 'seeds':
+            queryset = queryset.order_by('-seed_count')  # Sort by seeds descending
+        elif sort_by == 'leeches':
+            queryset = queryset.order_by('-leech_count')  # Sort by leeches descending
+        else:
+            queryset = queryset.order_by('-created_at')  # Default to date descending
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,6 +79,9 @@ class TorrentListView(ListView):
             cache.set('active_torrent_count', active_torrent_count, 300)  # Cache for 5 minutes
 
         context['active_torrent_count'] = active_torrent_count
+
+        # Include the sort_by parameter in the context for template access
+        context['sort_by'] = self.request.GET.get('sort_by', 'date')  # Default to 'date'
 
         # Handle pagination
         queryset = self.get_queryset()
@@ -86,6 +100,7 @@ class TorrentListView(ListView):
         context['page_obj'] = torrents
         context['is_paginated'] = torrents.has_other_pages()
         return context
+
 
     
 # Detail view: Display details of a specific torrent
