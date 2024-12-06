@@ -50,12 +50,12 @@
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
         <li class="page-item">
-            <a class="page-link" href="?page=1{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" aria-label="First">
+            <a class="page-link" href="?page=1{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" aria-label="First">
                 &laquo; First
             </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">
                 Previous
             </a>
         </li>
@@ -67,18 +67,19 @@
         </li>
         {% if page_obj.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">
                 Next
             </a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" aria-label="Last">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&query={{ query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" aria-label="Last">
                 Last &raquo;
             </a>
         </li>
         {% endif %}
     </ul>
 </nav>
+
 
 {% endif %}
 {% else %}

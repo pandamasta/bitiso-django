@@ -65,6 +65,7 @@ class ProjectDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         project = self.get_object()
         query = self.request.GET.get('query', '').strip()
+        sort_by = self.request.GET.get('sort_by', 'date')  # Default sorting by date
         related_torrents = Torrent.objects.filter(project=project, is_active=True)
 
         # Handle query validation
@@ -72,15 +73,27 @@ class ProjectDetailView(DetailView):
         if query:
             if len(query) < 2:  # Minimum 2-character search
                 query_too_short = True
+                related_torrents = Torrent.objects.none()
             else:
                 related_torrents = related_torrents.filter(name__icontains=query)
+
+        # Apply sorting
+        if sort_by == 'seeds':
+            related_torrents = related_torrents.order_by('-seed_count')
+        elif sort_by == 'leeches':
+            related_torrents = related_torrents.order_by('-leech_count')
+        else:  # Default to sorting by date
+            related_torrents = related_torrents.order_by('-created_at')
 
         # Paginate torrents
         paginator = Paginator(related_torrents, 10)
         page_number = self.request.GET.get('page')
         context['torrents'] = paginator.get_page(page_number)
+
+        # Add extra context
         context['project'] = project
         context['query'] = query
+        context['sort_by'] = sort_by
         context['query_too_short'] = query_too_short
 
         return context
