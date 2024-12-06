@@ -17,6 +17,23 @@
             {{ result_count }} Result{% if result_count != 1 %}s{% endif %} for "{{ query }}"
             <a href="{% url 'torrent_list' %}" class="btn btn-link ms-2">Back to Torrents</a>
         </h2>
+
+        <!-- Sorting Options -->
+        <div class="mb-3">
+            <a href="?query={{ query }}&sort_by=date" 
+               class="btn btn-sm {% if sort_by == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                Sort by Date
+            </a>
+            <a href="?query={{ query }}&sort_by=seeds" 
+               class="btn btn-sm {% if sort_by == 'seeds' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                Sort by Seeds
+            </a>
+            <a href="?query={{ query }}&sort_by=leeches" 
+               class="btn btn-sm {% if sort_by == 'leeches' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                Sort by Leeches
+            </a>
+        </div>
+
         {% include "torrents/_torrent_list_global.html" %}
     {% else %}
         <h2>

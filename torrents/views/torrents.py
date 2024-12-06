@@ -181,6 +181,7 @@ class TorrentSearchView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get('query', '').strip()
+        sort_by = self.request.GET.get('sort_by', 'date')  # Default sorting by date
         torrents = Torrent.objects.filter(is_active=True)
 
         # Handle query validation
@@ -192,6 +193,14 @@ class TorrentSearchView(ListView):
         else:
             self.query_too_short = False
 
+        # Apply sorting logic
+        if sort_by == 'seeds':
+            torrents = torrents.order_by('-seed_count')
+        elif sort_by == 'leeches':
+            torrents = torrents.order_by('-leech_count')
+        else:  # Default to date sorting
+            torrents = torrents.order_by('-created_at')
+
         return torrents
 
     def get_context_data(self, **kwargs):
@@ -200,8 +209,8 @@ class TorrentSearchView(ListView):
         context['query'] = query
         context['result_count'] = self.get_queryset().count()
         context['query_too_short'] = getattr(self, 'query_too_short', False)
+        context['sort_by'] = self.request.GET.get('sort_by', 'date')  # Pass the sorting method to the template
         return context
-
 #
 # Rewrite the access to .torrent
 #
