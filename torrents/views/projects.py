@@ -15,6 +15,11 @@ from django.contrib import messages
 from ..models import Project, Torrent
 from ..forms import ProjectForm
 
+from django.core.cache import cache
+
+from django.db.models import Count
+from django.core.cache import cache
+
 class ProjectListView(ListView):
     model = Project
     template_name = 'torrents/project_list.html'
@@ -26,7 +31,9 @@ class ProjectListView(ListView):
         Handle both default project listing and search queries.
         """
         query = self.request.GET.get('query', '').strip()
-        projects = Project.objects.filter(is_active=True)
+        projects = Project.objects.filter(is_active=True).annotate(
+            calculated_torrent_count=Count('torrents')  # Correct related name
+        )
 
         if query:
             # Filter projects by name or description containing the query
@@ -35,6 +42,9 @@ class ProjectListView(ListView):
         return projects
 
     def get_context_data(self, **kwargs):
+        """
+        Add cached project count, categories, and other relevant data to context.
+        """
         context = super().get_context_data(**kwargs)
 
         # Add query to the context for use in the search bar
@@ -45,17 +55,35 @@ class ProjectListView(ListView):
         if query:
             context['result_count'] = self.get_queryset().count()
 
-        if not query:  # Only group by category if there's no query
-            categories = Category.objects.all()
+        # Cache the total project count
+        active_project_count = cache.get('active_project_count')
+        if active_project_count is None:
+            # Count the active projects and cache the result
+            active_project_count = Project.objects.filter(is_active=True).count()
+            cache.set('active_project_count', active_project_count, 300)  # Cache for 5 minutes
+        context['active_project_count'] = active_project_count
+
+        # Only group by category if there's no search query
+        if not query:
+            # Cache categories and projects grouped by category
+            categories = cache.get('project_categories')
+            category_projects = cache.get('category_projects')
+
+            if categories is None or category_projects is None:
+                categories = Category.objects.all()
+                category_projects = {
+                    category: Project.objects.filter(category=category, is_active=True).annotate(
+                        calculated_torrent_count=Count('torrents')  # Correct related name
+                    )
+                    for category in categories
+                }
+                cache.set('project_categories', categories, 300)  # Cache for 5 minutes
+                cache.set('category_projects', category_projects, 300)  # Cache for 5 minutes
+
             context['categories'] = categories
-            category_projects = {
-                category: Project.objects.filter(category=category, is_active=True)
-                for category in categories
-            }
             context['category_projects'] = category_projects
 
         return context
-
     
 class ProjectDetailView(DetailView):
     model = Project
