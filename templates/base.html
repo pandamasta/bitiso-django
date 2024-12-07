@@ -115,7 +115,7 @@
     
     <script>
         // Apply saved theme early to prevent flash
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || document.documentElement.getAttribute('data-bs-theme') || 'light';
         document.documentElement.setAttribute('data-bs-theme', savedTheme);
     </script>
 </head>
