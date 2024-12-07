@@ -1,5 +1,6 @@
 # bitiso/urls.py
 
+import os
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.urls import path, include
@@ -7,6 +8,15 @@ from core.pages.views import HomePageView, PageDetailView, PageUpdateView, redir
 from django.conf.urls.static import static
 from django.conf import settings
 from torrents.views.torrents import serve_torrent_file
+
+
+from dotenv import load_dotenv  # python-dotenv
+load_dotenv()  # Loads variables from the .env file
+
+
+# Get the accounts path from the environment variable, with a default fallback
+accounts_path = os.getenv('ACCOUNTS_PATH', 'accounts/')
+admin_path = os.getenv('ADMIN_PATH', 'admin/')
 
 
 urlpatterns = [
@@ -25,8 +35,8 @@ if settings.DEBUG:
 # i18n URL patterns for language-prefixed routes (like /fr/, /en/)
 urlpatterns += i18n_patterns(
     path('', HomePageView.as_view(), name='home'),  # Home page URL should be named 'home'
-    path('admin/', admin.site.urls),  # Admin paths
-    path('accounts/', include('core.accounts.urls')),  # Accounts app paths
+    path(admin_path, admin.site.urls),  # Use the variable for the admin path
+    path(accounts_path, include('core.accounts.urls')),  # Accounts app paths
 
     path('profiles/', include('bitiso_user_profiles.urls')),  # Ensure you include the bitiso_user_profiles URLs
 

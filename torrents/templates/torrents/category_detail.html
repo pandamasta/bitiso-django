@@ -7,8 +7,6 @@
     <p>Parent Category: <a href="{% url 'category_detail' category.parent_category.slug %}">{{ category.parent_category.name }}</a></p>
 {% endif %}
 <p>{{ category.description }}</p>
-<p>Created at: {{ category.created_at }}</p>
-
 <h3>Related Torrents</h3>
 
 {% include "torrents/_torrent_list_category.html" %}
