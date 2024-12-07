@@ -121,6 +121,7 @@ TEMPLATES = [
                 'bitiso.context_processors.profile_user',
                 'bitiso.context_processors.use_uuid_for_profile_url', 
                 'bitiso.context_processors.user_dashboard_counts', 
+                'bitiso.context_processors.gtag_processor',
             ],
         },
     },
@@ -261,4 +262,8 @@ TRACKER_ANNOUNCE = [tracker.strip() for tracker in raw_trackers.split(',') if tr
 
 MAX_FILE_SIZE_MB = 10
 
+
+# Google Tag Manager
+GTAG_ENABLE = os.getenv('GTAG_ENABLE', 'False') == 'True'
+GTAG_ID = os.getenv('GTAG_ID', '')
 

@@ -43,3 +43,10 @@ def user_dashboard_counts(request):
         'projects_count': projects_count,
         'categories_count': categories_count,
     }
+
+
+def gtag_processor(request):
+    return {
+        'GTAG_ENABLE': getattr(settings, 'GTAG_ENABLE', False),
+        'GTAG_ID': getattr(settings, 'GTAG_ID', '')
+    }
