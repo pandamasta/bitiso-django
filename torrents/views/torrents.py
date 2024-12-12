@@ -48,7 +48,7 @@ class TorrentListView(ListView):
     model = Torrent
     template_name = 'torrents/torrent_list.html'
     context_object_name = 'torrents'
-    pagination_count = 10  # Number of torrents per page
+    pagination_count = settings.PAGINATION_COUNT
 
     def get_queryset(self):
         """

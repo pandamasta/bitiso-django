@@ -267,3 +267,6 @@ MAX_FILE_SIZE_MB = 10
 GTAG_ENABLE = os.getenv('GTAG_ENABLE', 'False') == 'True'
 GTAG_ID = os.getenv('GTAG_ID', '')
 
+# Pagination 
+
+PAGINATION_COUNT = os.getenv('PAGINATION_COUNT', '20')

@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
 from torrents.utils.query import validate_query
+from django.conf import settings
 
 from ..models import Category
 from ..forms import CategoryForm
@@ -32,7 +33,7 @@ class CategoryListView(ListView):
 class CategoryDetailView(DetailView):
     model = Category
     template_name = 'torrents/category_detail.html'
-    pagination_count = 10
+    pagination_count = settings.PAGINATION_COUNT
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

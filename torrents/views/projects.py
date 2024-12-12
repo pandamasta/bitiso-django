@@ -11,6 +11,7 @@ from ..models.project import Project
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.conf import settings
 
 from ..models import Project, Torrent
 from ..forms import ProjectForm
@@ -91,7 +92,7 @@ class ProjectListView(ListView):
 class ProjectDetailView(DetailView):
     model = Project
     template_name = 'torrents/project_detail.html'
-    pagination_count = 10
+    pagination_count = settings.PAGINATION_COUNT
 
     def get_context_data(self, **kwargs):
         """
