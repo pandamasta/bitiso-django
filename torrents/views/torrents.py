@@ -43,64 +43,60 @@ from torrents.utils.torrent_utils import (
 
 logger = logging.getLogger(__name__)
 
-
-# List view: Display all torrents
-from django.core.cache import cache
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 class TorrentListView(ListView):
     model = Torrent
     template_name = 'torrents/torrent_list.html'
     context_object_name = 'torrents'
-    paginate_by = 40  # Pagination limit
+    pagination_count = 10  # Number of torrents per page
 
     def get_queryset(self):
-        # Retrieve base queryset
-        queryset = Torrent.objects.filter(is_active=True)
+        """
+        Fetch and filter torrents based on query parameters.
+        """
+        query = self.request.GET.get('query', '').strip()  # Clean whitespace
+        sort_by = self.request.GET.get('sort_by', 'date')
+        torrents = Torrent.objects.filter(is_active=True)  # Filter only active torrents
+        self.query_too_short = False  # Track if the query is too short
 
-        # Handle sorting logic
-        sort_by = self.request.GET.get('sort_by', 'date')  # Default to sorting by date
+        # Handle short or empty queries
+        if query and len(query) < 2:  # Minimum 2 characters required
+            self.query_too_short = True
+            return Torrent.objects.none()
+
+        if query:  # Apply filtering if query is valid
+            torrents = torrents.filter(name__icontains=query)
+
+        # Sorting logic
         if sort_by == 'seeds':
-            queryset = queryset.order_by('-seed_count')  # Sort by seeds descending
+            torrents = torrents.order_by('-seed_count')
         elif sort_by == 'leeches':
-            queryset = queryset.order_by('-leech_count')  # Sort by leeches descending
-        else:
-            queryset = queryset.order_by('-created_at')  # Default to date descending
+            torrents = torrents.order_by('-leech_count')
+        else:  # Default sorting by date
+            torrents = torrents.order_by('-created_at')
 
-        return queryset
+        return torrents
 
     def get_context_data(self, **kwargs):
+        """
+        Add pagination and other context variables.
+        """
         context = super().get_context_data(**kwargs)
-
-        # Cache total active torrent count
-        active_torrent_count = cache.get('active_torrent_count')
-        if active_torrent_count is None:
-            active_torrent_count = self.get_queryset().count()
-            cache.set('active_torrent_count', active_torrent_count, 300)  # Cache for 5 minutes
-
-        context['active_torrent_count'] = active_torrent_count
-
-        # Include the sort_by parameter in the context for template access
-        context['sort_by'] = self.request.GET.get('sort_by', 'date')  # Default to 'date'
+        torrents = self.get_queryset()
 
         # Handle pagination
-        queryset = self.get_queryset()
-        paginator = Paginator(queryset, self.paginate_by)
-        page = self.request.GET.get('page')
+        paginator = Paginator(torrents, self.pagination_count)
+        page_number = self.request.GET.get('page', 1)  # Default to the first page
+        page_obj = paginator.get_page(page_number)
 
-        try:
-            torrents = paginator.page(page)
-        except PageNotAnInteger:
-            torrents = paginator.page(1)
-        except EmptyPage:
-            torrents = paginator.page(paginator.num_pages)
+        # Add additional context
+        context['torrents'] = page_obj
+        context['page_obj'] = page_obj
+        context['is_paginated'] = page_obj.has_other_pages()
+        context['query'] = self.request.GET.get('query', '').strip()
+        context['sort_by'] = self.request.GET.get('sort_by', 'date')
+        context['query_too_short'] = self.query_too_short
 
-        # Update context with paginated objects
-        context['torrents'] = torrents
-        context['page_obj'] = torrents
-        context['is_paginated'] = torrents.has_other_pages()
         return context
-
 
     
 # Detail view: Display details of a specific torrent

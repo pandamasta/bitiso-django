@@ -1,26 +1,62 @@
 {# torrents/templates/torrents/torrent_list.html #}
+
 {% extends 'base.html' %}
 {% load i18n %}
 
 {% block content %}
-<h2>{{ active_torrent_count }} torrents</h2>
 
-<!-- Sorting Options -->
+<!-- Display warning if the query is too short -->
+{% if query_too_short %}
+<div class="alert alert-warning">
+    {% trans "Search query must be at least 2 characters long. Please refine your search." %}
+</div>
+{% endif %}
+
+<!-- Display the number of torrents found -->
+{% if query and not query_too_short %}
+<h2>
+    {% blocktrans with total=torrents.paginator.count query=query %}
+        {{ total }} torrents found for "{{ query }}"
+    {% endblocktrans %}
+</h2>
+{% else %}
+<h2>
+    {% blocktrans with total=torrents.paginator.count %}
+        {{ total }} torrents found
+    {% endblocktrans %}
+</h2>
+{% endif %}
+
+<!-- Search form -->
+<form method="get" action="" class="mb-4">
+    <div class="input-group">
+        <input 
+            type="text" 
+            name="query" 
+            class="form-control" 
+            placeholder="{% trans 'Search torrents in this project...' %}"
+            value="{{ query }}"> <!-- Pre-fill the search field with the current query -->
+        <button class="btn btn-primary" type="submit">{% trans 'Search' %}</button>
+    </div>
+</form>
+
+<!-- Sorting buttons -->
 <div class="mb-3">
-    <a href="?sort_by=date{% if page_obj.number %}&page={{ page_obj.number }}{% endif %}" 
+    <a href="?sort_by=date{% if query %}&query={{ query }}{% endif %}" 
        class="btn btn-sm {% if sort_by == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-       {% trans "Sort by Date" %}
+       {% trans 'Sort by Date' %}
     </a>
-    <a href="?sort_by=seeds{% if page_obj.number %}&page={{ page_obj.number }}{% endif %}" 
+    <a href="?sort_by=seeds{% if query %}&query={{ query }}{% endif %}" 
        class="btn btn-sm {% if sort_by == 'seeds' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-       {% trans "Sort by Seeds" %}
+       {% trans 'Sort by Seeds' %}
     </a>
-    <a href="?sort_by=leeches{% if page_obj.number %}&page={{ page_obj.number }}{% endif %}" 
+    <a href="?sort_by=leeches{% if query %}&query={{ query }}{% endif %}" 
        class="btn btn-sm {% if sort_by == 'leeches' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-       {% trans "Sort by Leeches" %}
+       {% trans 'Sort by Leeches' %}
     </a>
 </div>
 
-{% include "torrents/_torrent_list_global.html" with torrents=torrents is_paginated=is_paginated page_obj=page_obj %}
+<!-- Include the torrent list -->
+{% include 'torrents/_torrent_list.html' with torrents=torrents is_paginated=is_paginated page_obj=page_obj %}
 
 {% endblock %}
