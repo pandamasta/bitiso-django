@@ -24,7 +24,7 @@ class ProjectListView(ListView):
     model = Project
     template_name = 'torrents/project_list.html'
     context_object_name = 'projects'
-    paginate_by = 10  # Set pagination for flat project results
+    paginate_by = 3  # Set pagination for flat project results
 
     def get_queryset(self):
         """
@@ -88,43 +88,48 @@ class ProjectListView(ListView):
 class ProjectDetailView(DetailView):
     model = Project
     template_name = 'torrents/project_detail.html'
+    pagination_count = 10
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project = self.get_object()
         query = self.request.GET.get('query', '').strip()
-        sort_by = self.request.GET.get('sort_by', 'date')  # Default sorting by date
-        related_torrents = Torrent.objects.filter(project=project, is_active=True)
+        sort_by = self.request.GET.get('sort_by', 'date')
 
-        # Handle query validation
+        # Filter torrents
+        torrents = Torrent.objects.filter(project=project, is_active=True)
         query_too_short = False
+
         if query:
-            if len(query) < 2:  # Minimum 2-character search
+            if len(query) < 2:
                 query_too_short = True
-                related_torrents = Torrent.objects.none()
+                torrents = Torrent.objects.none()
             else:
-                related_torrents = related_torrents.filter(name__icontains=query)
+                torrents = torrents.filter(name__icontains=query)
 
-        # Apply sorting
+        # Sorting
         if sort_by == 'seeds':
-            related_torrents = related_torrents.order_by('-seed_count')
+            torrents = torrents.order_by('-seed_count')
         elif sort_by == 'leeches':
-            related_torrents = related_torrents.order_by('-leech_count')
-        else:  # Default to sorting by date
-            related_torrents = related_torrents.order_by('-created_at')
+            torrents = torrents.order_by('-leech_count')
+        else:
+            torrents = torrents.order_by('-created_at')
 
-        # Paginate torrents
-        paginator = Paginator(related_torrents, 10)
+        # Pagination
+        paginator = Paginator(torrents, self.pagination_count)
         page_number = self.request.GET.get('page')
-        context['torrents'] = paginator.get_page(page_number)
+        page_obj = paginator.get_page(page_number)
 
-        # Add extra context
-        context['project'] = project
+        # Context
+        context['torrents'] = page_obj
+        context['page_obj'] = page_obj
+        context['is_paginated'] = page_obj.has_other_pages()
         context['query'] = query
         context['sort_by'] = sort_by
         context['query_too_short'] = query_too_short
 
         return context
+
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):

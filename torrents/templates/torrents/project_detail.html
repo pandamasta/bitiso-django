@@ -56,14 +56,41 @@
         </div>
     </div>
     <div class="mt-5">
-        <h3 class="mb-3">{% trans "Related Torrents" %}</h3>
-        
+        <!-- Display the number of torrents found -->
+{% if query and not query_too_short %}
+<h2>
+    {% blocktrans with total=torrents.paginator.count query=query %}
+        {{ total }} torrents found for "{{ query }}"
+    {% endblocktrans %}
+</h2>
+{% else %}
+<h2>
+    {% blocktrans with total=torrents.paginator.count %}
+        {{ total }} torrents found
+    {% endblocktrans %}
+</h2>
+{% endif %}
+        <!-- Show warning if the query is too short -->
         {% if query_too_short %}
             <div class="alert alert-warning">
                 {% trans "Please enter at least 2 characters for your search." %}
             </div>
         {% endif %}
-        
+
+        <!-- Search form -->
+        <form method="get" action="" class="mb-4">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    name="query" 
+                    class="form-control" 
+                    placeholder="{% trans 'Search torrents in this project...' %}"
+                    value="{{ query }}"> <!-- Pre-fill the search field with the current query -->
+                <button class="btn btn-primary" type="submit">{% trans 'Search' %}</button>
+            </div>
+        </form>
+            
+        <!-- Sorting buttons -->
         <div class="d-flex gap-2 mb-3">
             <a href="?query={{ query }}&sort_by=date" 
                class="btn btn-sm {% if sort_by == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">
@@ -78,8 +105,8 @@
                 {% trans "Sort by Leeches" %}
             </a>
         </div>
-        
-        {% include "torrents/_torrent_list_project.html" %}
+        <!-- Include the shared torrent list -->
+        {% include "torrents/_torrent_list.html" with torrents=torrents is_paginated=is_paginated page_obj=page_obj %}
     </div>
 </div>
 {% endblock %}
