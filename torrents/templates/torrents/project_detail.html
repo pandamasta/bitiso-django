@@ -56,26 +56,36 @@
         </div>
     </div>
     <div class="mt-5">
+
         <!-- Display the number of torrents found -->
-{% if query and not query_too_short %}
-<h2>
-    {% blocktrans with total=torrents.paginator.count query=query %}
-        {{ total }} torrents found for "{{ query }}"
-    {% endblocktrans %}
-</h2>
-{% else %}
-<h2>
-    {% blocktrans with total=torrents.paginator.count %}
-        {{ total }} torrents found
-    {% endblocktrans %}
-</h2>
-{% endif %}
-        <!-- Show warning if the query is too short -->
-        {% if query_too_short %}
-            <div class="alert alert-warning">
-                {% trans "Please enter at least 2 characters for your search." %}
-            </div>
+        {% if query and not query_too_short %}
+        <h2>
+            {% blocktrans with total=torrents.paginator.count query=query %}
+                {{ total }} torrents found for "{{ query }}"
+            {% endblocktrans %}
+        </h2>
+        {% else %}
+        <h2>
+            {% blocktrans with total=torrents.paginator.count %}
+                {{ total }} torrents found
+            {% endblocktrans %}
+        </h2>
         {% endif %}
+
+        <!-- Warning if query is too short -->
+        {% if query_too_short %}
+        <div class="alert alert-warning">
+            {% trans "Search query must be at least 2 characters long. Please refine your search." %}
+        </div>
+        {% endif %}
+
+        <!-- Warning if query is too long -->
+        {% if query_too_long %}
+        <div class="alert alert-warning">
+            {% trans "Search query must not exceed 50 characters. Please refine your search." %}
+        </div>
+        {% endif %}
+
 
         <!-- Search form -->
         <form method="get" action="" class="mb-4">

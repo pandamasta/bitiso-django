@@ -5,12 +5,19 @@
 
 {% block content %}
 
-<!-- Display warning if the query is too short -->
-{% if query_too_short %}
-<div class="alert alert-warning">
-    {% trans "Search query must be at least 2 characters long. Please refine your search." %}
-</div>
-{% endif %}
+        <!-- Warning if query is too short -->
+        {% if query_too_short %}
+        <div class="alert alert-warning">
+            {% trans "Search query must be at least 2 characters long. Please refine your search." %}
+        </div>
+        {% endif %}
+
+        <!-- Warning if query is too long -->
+        {% if query_too_long %}
+        <div class="alert alert-warning">
+            {% trans "Search query must not exceed 50 characters. Please refine your search." %}
+        </div>
+        {% endif %}
 
 <!-- Display the number of torrents found -->
 {% if query and not query_too_short %}
@@ -22,7 +29,7 @@
 {% else %}
 <h2>
     {% blocktrans with total=torrents.paginator.count %}
-        {{ total }} torrents found
+        {{ total }} torrents
     {% endblocktrans %}
 </h2>
 {% endif %}

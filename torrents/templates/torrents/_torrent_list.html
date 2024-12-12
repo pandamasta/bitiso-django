@@ -21,7 +21,12 @@
             {% for torrent in torrents %}
                 <tr>
                     <td>
-                        <a href="{% url 'torrent_detail' torrent.slug %}">{{ torrent.name }}</a>
+                        <div class="d-flex align-items-center">
+                            {% if torrent.project.mini_image %}
+                            <img src="{{ torrent.project.mini_image.url }}" alt="">
+                            {% endif %}
+                            <a href="{% url 'torrent_detail' torrent.slug %}">{{ torrent.name }}</a>
+                        </div>
                     </td>
                     <td>{{ torrent.size|filesizeformat }}</td>
                     <td>{{ torrent.created_at|date:"Y-m-d" }}</td>

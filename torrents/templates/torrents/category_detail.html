@@ -1,18 +1,93 @@
+{# torrents/templates/torrents/category_detail.html #}
+
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
 <h2>{{ category.name }}</h2>
 
+<!-- Display parent category if it exists -->
 {% if category.parent_category %}
-    <p>Parent Category: <a href="{% url 'category_detail' category.parent_category.slug %}">{{ category.parent_category.name }}</a></p>
+<p>
+    {% trans "Parent Category" %}: 
+    <a href="{% url 'category_detail' category.parent_category.slug %}">
+        {{ category.parent_category.name }}
+    </a>
+</p>
 {% endif %}
+
 <p>{{ category.description }}</p>
-<h3>Related Torrents</h3>
 
-{% include "torrents/_torrent_list_category.html" %}
+        <!-- Display the number of torrents found -->
+        {% if query and not query_too_short %}
+        <h2>
+            {% blocktrans with total=torrents.paginator.count query=query %}
+                {{ total }} torrents found for "{{ query }}"
+            {% endblocktrans %}
+        </h2>
+        {% else %}
+        <h2>
+            {% blocktrans with total=torrents.paginator.count %}
+                {{ total }} torrents found
+            {% endblocktrans %}
+        </h2>
+        {% endif %}
 
-{% if user.is_authenticated %}
-<a href="{% url 'category_edit' category.slug %}">Edit</a> | 
-<a href="{% url 'category_delete' category.slug %}">Delete</a>
+        <!-- Warning if query is too short -->
+        {% if query_too_short %}
+        <div class="alert alert-warning">
+            {% trans "Search query must be at least 2 characters long. Please refine your search." %}
+        </div>
+        {% endif %}
+
+        <!-- Warning if query is too long -->
+        {% if query_too_long %}
+        <div class="alert alert-warning">
+            {% trans "Search query must not exceed 50 characters. Please refine your search." %}
+        </div>
+        {% endif %}
+
+        <!-- Search form -->
+        <form method="get" action="" class="mb-4">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    name="query" 
+                    class="form-control" 
+                    placeholder="{% trans 'Search torrents in this project...' %}"
+                    value="{{ query }}"> <!-- Pre-fill the search field with the current query -->
+                <button class="btn btn-primary" type="submit">{% trans 'Search' %}</button>
+            </div>
+        </form>
+
+    <!-- Sorting buttons -->
+    <div class="d-flex gap-2 mb-3">
+        <a href="?query={{ query }}&sort_by=date" 
+        class="btn btn-sm {% if sort_by == 'date' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            {% trans "Sort by Date" %}
+        </a>
+        <a href="?query={{ query }}&sort_by=seeds" 
+        class="btn btn-sm {% if sort_by == 'seeds' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            {% trans "Sort by Seeds" %}
+        </a>
+        <a href="?query={{ query }}&sort_by=leeches" 
+        class="btn btn-sm {% if sort_by == 'leeches' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            {% trans "Sort by Leeches" %}
+        </a>
+    </div>
+
+    <!-- Include the shared torrent list -->
+    {% include "torrents/_torrent_list.html" with torrents=torrents is_paginated=is_paginated page_obj=page_obj %}
+
+    <!-- Links to edit or delete the category -->
+    {% if user.is_authenticated %}
+    <div class="mt-4">
+        <a href="{% url 'category_edit' category.slug %}" class="btn btn-sm btn-warning">
+            {% trans "Edit Category" %}
+        </a>
+        <a href="{% url 'category_delete' category.slug %}" class="btn btn-sm btn-danger">
+            {% trans "Delete Category" %}
+        </a>
+    </div>
 {% endif %}
 {% endblock %}

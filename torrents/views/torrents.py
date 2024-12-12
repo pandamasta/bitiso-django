@@ -20,7 +20,8 @@ from django.db.models import Q
 from django.db.models import Count
 from django.core.cache import cache
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from torrents.utils.query import validate_query
+from django.core.exceptions import ValidationError
 
 from ..models import Torrent
 from ..forms import TorrentForm
@@ -56,23 +57,42 @@ class TorrentListView(ListView):
         query = self.request.GET.get('query', '').strip()  # Clean whitespace
         sort_by = self.request.GET.get('sort_by', 'date')
         torrents = Torrent.objects.filter(is_active=True)  # Filter only active torrents
-        self.query_too_short = False  # Track if the query is too short
+        query_too_short = False
+        query_too_long = False
 
-        # Handle short or empty queries
-        if query and len(query) < 2:  # Minimum 2 characters required
-            self.query_too_short = True
-            return Torrent.objects.none()
+        # Validate the query
+        try:
+            if query:
+                query = validate_query(query, min_length=2, max_length=50)
+        except ValidationError as e:
+            if "at least" in str(e):
+                query_too_short = True
+            if "not exceed" in str(e):
+                query_too_long = True
+            query = ""  # Reset query if invalid
 
-        if query:  # Apply filtering if query is valid
+        # Validate the sort_by parameter
+        valid_sort_options = ['date', 'seeds', 'leeches']
+        if sort_by not in valid_sort_options:
+            sort_by = 'date'  # Default to 'date' if invalid
+
+        # Apply query filtering
+        if query and not query_too_short and not query_too_long:
             torrents = torrents.filter(name__icontains=query)
 
-        # Sorting logic
+        # Apply sorting
         if sort_by == 'seeds':
             torrents = torrents.order_by('-seed_count')
         elif sort_by == 'leeches':
             torrents = torrents.order_by('-leech_count')
-        else:  # Default sorting by date
+        else:  # Default to sorting by date
             torrents = torrents.order_by('-created_at')
+
+        # Track state for context
+        self.query_too_short = query_too_short
+        self.query_too_long = query_too_long
+        self.query = query
+        self.sort_by = sort_by
 
         return torrents
 
@@ -92,9 +112,10 @@ class TorrentListView(ListView):
         context['torrents'] = page_obj
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
-        context['query'] = self.request.GET.get('query', '').strip()
-        context['sort_by'] = self.request.GET.get('sort_by', 'date')
+        context['query'] = self.query
+        context['sort_by'] = self.sort_by
         context['query_too_short'] = self.query_too_short
+        context['query_too_long'] = self.query_too_long
 
         return context
 

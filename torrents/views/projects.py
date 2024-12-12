@@ -20,6 +20,9 @@ from django.core.cache import cache
 from django.db.models import Count
 from django.core.cache import cache
 
+from torrents.utils.query import validate_query
+from django.core.exceptions import ValidationError
+
 class ProjectListView(ListView):
     model = Project
     template_name = 'torrents/project_list.html'
@@ -91,42 +94,61 @@ class ProjectDetailView(DetailView):
     pagination_count = 10
 
     def get_context_data(self, **kwargs):
+        """
+        Add torrents related to the project, filtered by query and sorted by user preference.
+        """
         context = super().get_context_data(**kwargs)
         project = self.get_object()
         query = self.request.GET.get('query', '').strip()
         sort_by = self.request.GET.get('sort_by', 'date')
 
-        # Filter torrents
-        torrents = Torrent.objects.filter(project=project, is_active=True)
+        # Validate the query
         query_too_short = False
+        query_too_long = False
 
-        if query:
-            if len(query) < 2:
+        try:
+            if query:
+                query = validate_query(query, min_length=2, max_length=50)
+        except ValidationError as e:
+            if "at least" in str(e):
                 query_too_short = True
-                torrents = Torrent.objects.none()
-            else:
-                torrents = torrents.filter(name__icontains=query)
+            if "not exceed" in str(e):
+                query_too_long = True
+            query = ""  # Reset query if invalid
+
+        # Validate the sort_by parameter
+        valid_sort_options = ['date', 'seeds', 'leeches']
+        if sort_by not in valid_sort_options:
+            sort_by = 'date'  # Default to 'date' if invalid
+
+        # Filter torrents by project and active status
+        torrents = Torrent.objects.filter(project=project, is_active=True)
+
+        if query and not query_too_short and not query_too_long:
+            torrents = torrents.filter(name__icontains=query)
 
         # Sorting
         if sort_by == 'seeds':
             torrents = torrents.order_by('-seed_count')
         elif sort_by == 'leeches':
             torrents = torrents.order_by('-leech_count')
-        else:
+        else:  # Default sorting by date
             torrents = torrents.order_by('-created_at')
 
         # Pagination
         paginator = Paginator(torrents, self.pagination_count)
-        page_number = self.request.GET.get('page')
+        page_number = self.request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
-        # Context
+        # Add variables to context
+        context['project'] = project
         context['torrents'] = page_obj
         context['page_obj'] = page_obj
         context['is_paginated'] = page_obj.has_other_pages()
         context['query'] = query
         context['sort_by'] = sort_by
         context['query_too_short'] = query_too_short
+        context['query_too_long'] = query_too_long
 
         return context
 
